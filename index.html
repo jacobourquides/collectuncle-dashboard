@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collectuncle — Dashboard Financiero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --gold: #F59E0B;
+    --gold-light: #FEF3C7;
+    --teal: #10B981;
+    --teal-light: #D1FAE5;
+    --red: #EF4444;
+    --red-light: #FEE2E2;
+    --blue: #3B82F6;
+    --purple: #8B5CF6;
+    --orange: #F97316;
+    --indigo: #6366F1;
+    --bg: #F8F9FB;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.07);
+    --text: #111827;
+    --text-2: #6B7280;
+    --text-3: #9CA3AF;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px 40px; }
+
+  /* TOPBAR */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0 18px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .logo-wrap { display: flex; align-items: center; gap: 12px; }
+  .logo-circle {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #1A1A1A; border: 2.5px solid var(--gold);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .logo-inner {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1.5px solid #D97706;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .logo-text { font-size: 5px; font-weight: 500; color: var(--gold); text-align: center; line-height: 1.2; letter-spacing: 0.05em; }
+  .brand { font-size: 16px; font-weight: 500; color: var(--text); }
+  .brand-sub { font-size: 12px; color: var(--text-2); margin-top: 1px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 20px; font-size: 12px; color: var(--text-2);
+  }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+  .update-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--gold); color: #78350F;
+    border: none; padding: 7px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit;
+    transition: opacity 0.15s;
+  }
+  .update-btn:hover { opacity: 0.85; }
+
+  /* PERIOD TABS */
+  .period-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+  .ptab {
+    font-size: 12px; padding: 6px 14px;
+    border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface); color: var(--text-2);
+    font-family: inherit; font-weight: 400; transition: all 0.15s;
+  }
+  .ptab:hover { border-color: var(--gold); color: var(--gold); }
+  .ptab.on { background: var(--gold); color: #78350F; border-color: var(--gold); font-weight: 500; }
+
+  /* KPI GRID */
+  .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 14px 16px; border: 1px solid var(--border);
+    border-left: 3px solid transparent; box-shadow: var(--shadow);
+    transition: transform 0.15s;
+  }
+  .kpi:hover { transform: translateY(-1px); }
+  .kpi-label { font-size: 11px; color: var(--text-2); margin-bottom: 6px; }
+  .kpi-value { font-size: 22px; font-weight: 500; line-height: 1; font-family: 'DM Mono', monospace; }
+  .kpi-sub { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+
+  /* TIPO CARDS */
+  .tipo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .tipo-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow);
+  }
+  .tipo-badge {
+    width: 56px; height: 38px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; border-radius: var(--radius-sm); font-size: 11px; font-weight: 500;
+  }
+  .tipo-name { font-size: 11px; color: var(--text-2); margin-bottom: 3px; }
+  .tipo-val { font-size: 20px; font-weight: 500; font-family: 'DM Mono', monospace; }
+  .tipo-mg { font-size: 11px; margin-top: 3px; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 13px; font-weight: 500; color: var(--text);
+    margin-bottom: 2px; display: flex; align-items: center; gap: 6px;
+  }
+  .card-sub { font-size: 11px; color: var(--text-2); margin-bottom: 14px; }
+
+  /* GRIDS */
+  .row2 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .row4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* LEGEND */
+  .legend { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-2); }
+  .leg-sq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* RANK BARS */
+  .rank-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-num { font-size: 11px; color: var(--text-3); width: 16px; text-align: center; flex-shrink: 0; }
+  .rank-bg { flex: 1; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .rank-bar { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+  .rank-label { font-size: 11px; color: var(--text); width: 90px; text-align: right; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-pct { font-size: 11px; font-weight: 500; width: 36px; text-align: right; flex-shrink: 0; font-family: 'DM Mono', monospace; }
+
+  /* ALERTS */
+  .alert-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .alert-item:last-child { border-bottom: none; }
+  .alert-name { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .alert-detail { font-size: 11px; color: var(--text-2); line-height: 1.4; }
+  .alert-loss { font-size: 12px; font-weight: 500; flex-shrink: 0; padding-left: 6px; font-family: 'DM Mono', monospace; }
+
+  /* INSIGHTS */
+  .insight-row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .insight-row:last-child { border-bottom: none; }
+  .insight-icon { width: 28px; height: 28px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .insight-title { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .insight-body { font-size: 11px; color: var(--text-2); line-height: 1.5; }
+
+  /* PLAT INSIGHT */
+  .plat-insight {
+    margin-top: 10px; padding: 8px 10px;
+    border-radius: var(--radius-sm); font-size: 11px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text-2); line-height: 1.5;
+  }
+
+  /* SECTION DIVIDER */
+  .section-label {
+    font-size: 11px; font-weight: 500; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin: 20px 0 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* FOOTER */
+  .footer { text-align: center; font-size: 11px; color: var(--text-3); padding-top: 32px; border-top: 1px solid var(--border); margin-top: 32px; }
+
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    .row2, .row3, .row4 { grid-template-columns: 1fr; }
+    .tipo-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="topbar">
+    <div class="logo-wrap">
+      <div class="logo-circle">
+        <div class="logo-inner">
+          <div class="logo-text">COLLECT<br>UNCLE</div>
+        </div>
+      </div>
+      <div>
+        <div class="brand">Collectuncle — Dashboard Financiero</div>
+        <div class="brand-sub">Toys & Collectibles · datos en vivo desde Google Sheets</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        <span id="last-update">Cargando...</span>
+      </div>
+      <button class="update-btn" onclick="loadAndRender()">
+        <i class="ti ti-refresh"></i> Actualizar
+      </button>
+    </div>
+  </div>
+
+  <div class="period-tabs">
+    <button class="ptab on" onclick="setPeriod(this,'all')">Todo</button>
+    <button class="ptab" onclick="setPeriod(this,'abril')">Abril 2026</button>
+    <button class="ptab" onclick="setPeriod(this,'mayo')">Mayo 2026</button>
+    <button class="ptab" onclick="setPeriod(this,'junio')">Junio 2026</button>
+  </div>
+
+  <div class="kpi-grid" id="kpi-row"></div>
+
+  <div class="section-label">Por tipo de producto</div>
+  <div class="tipo-grid" id="tipo-cards"></div>
+
+  <div class="section-label">Tendencias</div>
+  <div class="row2">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-bar" style="color:#F59E0B"></i> Ventas vs ganancia por mes</div>
+      <div class="card-sub">Histórico acumulado — click en una barra para filtrar</div>
+      <div class="legend">
+        <span class="leg-item"><span class="leg-sq" style="background:#FCD34D"></span>Ventas</span>
+        <span class="leg-item"><span class="leg-sq" style="background:#6EE7B7"></span>Ganancia neta</span>
+      </div>
+      <div style="position:relative;height:180px">
+        <canvas id="c-month" role="img" aria-label="Ventas y ganancia por mes"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-donut" style="color:#6366F1"></i> Mix de ventas por tipo</div>
+      <div class="card-sub">Distribución de ingresos</div>
+      <div id="donut-legend" class="legend" style="margin-bottom:10px"></div>
+      <div style="position:relative;height:150px">
+        <canvas id="c-donut" role="img" aria-label="Mix por tipo"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Análisis de rentabilidad</div>
+  <div class="row3">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-building-store" style="color:#3B82F6"></i> Canal de venta</div>
+      <div class="card-sub">Ganancia neta por plataforma</div>
+      <div style="position:relative;height:110px">
+        <canvas id="c-plat" role="img" aria-label="Ganancia por canal"></canvas>
+      </div>
+      <div id="plat-insight" class="plat-insight" style="display:none"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-trophy" style="color:#F59E0B"></i> Franquicia Funko Pop</div>
+      <div class="card-sub">Ganancia neta · verde = bueno · rojo = revisar</div>
+      <div id="franq-bars"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-alert-triangle" style="color:#9CA3AF"></i> Piezas a liquidar</div>
+      <div class="card-sub">Margen negativo · acción requerida</div>
+      <div id="alerts-list"></div>
+    </div>
+  </div>
+
+  <div class="section-label">Acciones y comparativas</div>
+  <div class="row4">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-bulb" style="color:#F59E0B"></i> Decisiones clave</div>
+      <div class="card-sub" style="margin-bottom:8px">Basadas en los datos del negocio</div>
+      <div id="insights-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-bar" style="color:#6366F1"></i> Ventas y ganancia por tipo</div>
+      <div class="card-sub">Comparativa de rentabilidad</div>
+      <div class="legend">
+        <span class="leg-item"><span class="leg-sq" style="background:#FCD34D"></span>Ventas</span>
+        <span class="leg-item"><span class="leg-sq" style="background:#6EE7B7"></span>Ganancia</span>
+      </div>
+      <div style="position:relative;height:170px">
+        <canvas id="c-tipo-chart" role="img" aria-label="Ventas y ganancia por tipo"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Collectuncle Dashboard · Datos desde Google Sheets · Actualiza cada vez que registras una venta
+  </div>
+
+</div>
+
+<script>
+const SHEET_ID = '1_8pfLFmYH1wwpm5YXG155JuYlfOXwYvvTBu8UYsJPMA';
+const CHARTS = {};
+
+const fmtK = v => {
+  if (!v && v !== 0) return '$0';
+  const a = Math.abs(v), s = v < 0 ? '-' : '';
+  return s + '$' + (a >= 1000000 ? (a/1000000).toFixed(1) + 'M' : a >= 1000 ? Math.round(a/1000) + 'K' : Math.round(a));
+};
+const fmtP = v => Math.round((v || 0) * 100) + '%';
+const parseN = v => { if (v == null || v === '') return null; const n = parseFloat(String(v).replace(/[$,\s%]/g,'')); return isNaN(n) ? null : n; };
+
+function parseFecha(c) {
+  if (!c) return null;
+  if (c.v) { const m = String(c.v).match(/Date\((\d+),(\d+),(\d+)/); if (m) return new Date(+m[1], +m[2], +m[3]); }
+  if (c.f) {
+    const s = c.f;
+    const mn = {enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
+    for (const [k,i] of Object.entries(mn)) {
+      if (s.toLowerCase().includes(k)) {
+        const ns = s.match(/\d+/g);
+        if (ns && ns.length >= 2) return new Date(+(ns.find(n => n.length === 4) || '2026'), i, +ns[0]);
+      }
+    }
+    try { const d = new Date(s); if (!isNaN(d)) return d; } catch(e) {}
+  }
+  return null;
+}
+
+let ALL_ROWS = [];
+let currentPeriod = 'all';
+
+function loadAndRender() {
+  document.getElementById('last-update').textContent = 'Actualizando...';
+  const cb = 'cu_' + Date.now();
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cb}&sheet=Ventas&range=A5:T200`;
+  window[cb] = data => {
+    delete window[cb];
+    document.getElementById('s0') && document.getElementById('s0').remove();
+    ALL_ROWS = (data.table.rows || []).map(r => {
+      const c = r.c || [], g = i => c[i] || null;
+      return {
+        fecha: parseFecha(g(0)),
+        precioVenta: parseN(g(2)?.f ?? g(2)?.v),
+        plataforma: g(3)?.v || '',
+        gananciaNeta: parseN(g(13)?.f ?? g(13)?.v),
+        costoInv: parseN(g(10)?.f ?? g(10)?.v),
+        tipo: g(18)?.v || 'Otro',
+        franquicia: g(19)?.v || 'Otros',
+      };
+    }).filter(r => r.precioVenta > 0 && r.plataforma);
+    document.getElementById('last-update').textContent = 'Al ' + new Date().toLocaleDateString('es-MX', {day:'numeric',month:'short',year:'numeric'});
+    renderAll(currentPeriod);
+  };
+  const s = document.createElement('script');
+  s.id = 's0'; s.src = url;
+  s.onerror = () => {
+    document.getElementById('last-update').textContent = 'Error de conexión';
+    useFallback();
+  };
+  document.head.appendChild(s);
+  setTimeout(() => { if (ALL_ROWS.length === 0) useFallback(); }, 8000);
+}
+
+function useFallback() {
+  ALL_ROWS = [
+    {fecha:new Date(2026,3,1),precioVenta:1329,plataforma:'Mercado Libre',gananciaNeta:272,costoInv:576,tipo:'Trading Cards',franquicia:'Trading Cards'},
+    {fecha:new Date(2026,3,3),precioVenta:854,plataforma:'Mercado Libre',gananciaNeta:307,costoInv:181,tipo:'Funko Pop',franquicia:'One Piece'},
+    {fecha:new Date(2026,3,5),precioVenta:2700,plataforma:'FB Ads',gananciaNeta:1600,costoInv:700,tipo:'Funko Pop',franquicia:'Marvel'},
+    {fecha:new Date(2026,3,10),precioVenta:7396,plataforma:'Mercado Libre',gananciaNeta:1438,costoInv:3472,tipo:'Trading Cards',franquicia:'Trading Cards'},
+    {fecha:new Date(2026,3,15),precioVenta:700,plataforma:'FB Ads',gananciaNeta:220,costoInv:400,tipo:'Thrilljoy PIX!',franquicia:'Thrilljoy'},
+    {fecha:new Date(2026,3,22),precioVenta:2499,plataforma:'Mercado Libre',gananciaNeta:930,costoInv:724,tipo:'Trading Cards',franquicia:'Trading Cards'},
+    {fecha:new Date(2026,4,1),precioVenta:1132,plataforma:'Mercado Libre',gananciaNeta:240,costoInv:498,tipo:'Trading Cards',franquicia:'Deportes'},
+    {fecha:new Date(2026,4,8),precioVenta:900,plataforma:'FB Ads',gananciaNeta:450,costoInv:300,tipo:'Funko Pop',franquicia:'Naruto'},
+    {fecha:new Date(2026,5,9),precioVenta:1099,plataforma:'Mercado Libre',gananciaNeta:239,costoInv:400,tipo:'Funko Pop',franquicia:'One Piece'},
+    {fecha:new Date(2026,5,10),precioVenta:1329,plataforma:'Mercado Libre',gananciaNeta:333,costoInv:496,tipo:'Trading Cards',franquicia:'Trading Cards'},
+    {fecha:new Date(2026,5,11),precioVenta:700,plataforma:'FB Ads',gananciaNeta:220,costoInv:400,tipo:'Thrilljoy PIX!',franquicia:'Thrilljoy'},
+  ];
+  document.getElementById('last-update').textContent = 'Datos de muestra (sin conexión)';
+  renderAll(currentPeriod);
+}
+
+function filterRows(period) {
+  if (period === 'all') return ALL_ROWS;
+  const m = {abril:3, mayo:4, junio:5}[period];
+  return ALL_ROWS.filter(r => r.fecha && r.fecha.getMonth() === m);
+}
+
+function mkChart(id, type, labels, datasets, opts = {}) {
+  if (CHARTS[id]) CHARTS[id].destroy();
+  const ctx = document.getElementById(id); if (!ctx) return;
+  const defSc = {
+    x: {ticks:{color:'#9CA3AF',font:{size:10,family:'DM Sans'}}, grid:{color:'rgba(0,0,0,0.04)'}},
+    y: {ticks:{color:'#9CA3AF',font:{size:10,family:'DM Sans'}, callback: opts.yfmt || (v => '$' + Math.round(v/1000) + 'K')}, grid:{color:'rgba(0,0,0,0.04)'}}
+  };
+  CHARTS[id] = new Chart(ctx, {
+    type, data: {labels, datasets},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {legend:{display:false}, tooltip:{callbacks:{label: ctx => '$' + Math.round(ctx.raw).toLocaleString('es-MX')}}},
+      scales: type === 'doughnut' ? undefined : (opts.scales || defSc),
+      ...(opts.extra || {})
+    }
+  });
+}
+
+function renderKPIs(rows) {
+  const V = rows.reduce((s,r) => s + (r.precioVenta||0), 0);
+  const G = rows.reduce((s,r) => s + (r.gananciaNeta||0), 0);
+  const T = rows.length;
+  const meli = rows.filter(r => r.plataforma === 'Mercado Libre');
+  const fb   = rows.filter(r => r.plataforma === 'FB Ads');
+  const mv = meli.reduce((s,r) => s+(r.precioVenta||0), 0);
+  const fv = fb.reduce((s,r)   => s+(r.precioVenta||0), 0);
+  const mmg = mv > 0 ? meli.reduce((s,r) => s+(r.gananciaNeta||0), 0)/mv : 0;
+  const fmg = fv > 0 ? fb.reduce((s,r)   => s+(r.gananciaNeta||0), 0)/fv : 0;
+  const kpis = [
+    {lbl:'Ventas totales',  val:fmtK(V),                   sub:T+' transacciones',          c:'#F59E0B'},
+    {lbl:'Ganancia neta',   val:fmtK(G),                   sub:fmtP(V>0?G/V:0)+' margen',  c:'#10B981'},
+    {lbl:'Ticket promedio', val:fmtK(T>0?V/T:0),           sub:'por venta',                 c:'#6366F1'},
+    {lbl:'Margen Meli',     val:fmtP(mmg),                  sub:'vs '+fmtP(fmg)+' FB Ads',  c:'#EF4444'},
+    {lbl:'Transacciones',   val:String(T),                  sub:'operaciones',               c:'#8B5CF6'},
+    {lbl:'Costo vendido',   val:fmtK(rows.reduce((s,r)=>s+(r.costoInv||0),0)), sub:'capital girado', c:'#F97316'},
+  ];
+  document.getElementById('kpi-row').innerHTML = kpis.map(k => `
+    <div class="kpi" style="border-left-color:${k.c}">
+      <div class="kpi-label">${k.lbl}</div>
+      <div class="kpi-value" style="color:${k.c}">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+}
+
+function renderTipoCards(rows) {
+  const bT = {};
+  rows.forEach(r => { const t = r.tipo||'Otro'; if (!bT[t]) bT[t]={v:0,g:0}; bT[t].v+=r.precioVenta||0; bT[t].g+=r.gananciaNeta||0; });
+  const tipos = ['Funko Pop','Trading Cards','Thrilljoy PIX!'].filter(t => bT[t]);
+  const meta = {
+    'Funko Pop':     {badge:'FUNKO', bg:'#EFF8FF', txt:'#0369A1'},
+    'Trading Cards': {badge:'TOPPS', bg:'#FFF1F1', txt:'#9B1C1C'},
+    'Thrilljoy PIX!':{badge:'PIX!',  bg:'#F9FAFB', txt:'#374151'},
+  };
+  document.getElementById('tipo-cards').innerHTML = tipos.map(t => {
+    const d = bT[t]||{v:0,g:0}, m = meta[t]||{badge:t,bg:'#F9FAFB',txt:'#374151'};
+    const mg = d.v > 0 ? d.g/d.v : 0;
+    const mgColor = mg >= 0.25 ? '#10B981' : mg >= 0.15 ? '#F59E0B' : '#EF4444';
+    return `<div class="tipo-card">
+      <div class="tipo-badge" style="background:${m.bg};color:${m.txt}">${m.badge}</div>
+      <div>
+        <div class="tipo-name">${t}</div>
+        <div class="tipo-val">${fmtK(d.v)}</div>
+        <div class="tipo-mg" style="color:${mgColor}">${fmtP(mg)} margen · ${fmtK(d.g)} ganancia</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMonth(rows) {
+  const bM = {};
+  rows.forEach(r => {
+    if (!r.fecha) return;
+    const k = r.fecha.toLocaleDateString('es-MX', {month:'short', year:'2-digit'});
+    if (!bM[k]) bM[k] = {v:0, g:0};
+    bM[k].v += r.precioVenta||0; bM[k].g += r.gananciaNeta||0;
+  });
+  const L = Object.keys(bM);
+  mkChart('c-month', 'bar', L, [
+    {label:'Ventas',  data:L.map(k=>bM[k].v), backgroundColor:'#FCD34D', borderRadius:4, borderSkipped:false},
+    {label:'Ganancia',data:L.map(k=>bM[k].g), backgroundColor:'#6EE7B7', borderRadius:4, borderSkipped:false},
+  ]);
+}
+
+function renderDonut(rows) {
+  const bT = {};
+  rows.forEach(r => { const t = r.tipo||'Otro'; bT[t] = (bT[t]||0) + (r.precioVenta||0); });
+  const tipos = Object.keys(bT).sort((a,b) => bT[b]-bT[a]);
+  const colors = ['#FCD34D','#EF4444','#6B7280','#9CA3AF'];
+  const total = tipos.reduce((s,t) => s+bT[t], 0);
+  document.getElementById('donut-legend').innerHTML = tipos.map((t,i) =>
+    `<span class="leg-item"><span class="leg-sq" style="background:${colors[i]||'#9CA3AF'}"></span>${t} ${total>0?Math.round(bT[t]/total*100)+'%':''}</span>`
+  ).join('');
+  mkChart('c-donut', 'doughnut', tipos, [{
+    data: tipos.map(t=>bT[t]),
+    backgroundColor: tipos.map((_,i) => colors[i]||'#9CA3AF'),
+    borderWidth: 0, hoverOffset: 4
+  }], {extra:{cutout:'65%'}});
+}
+
+function renderPlat(rows) {
+  const bP = {};
+  rows.forEach(r => {
+    if (!r.plataforma) return;
+    if (!bP[r.plataforma]) bP[r.plataforma] = {v:0, g:0};
+    bP[r.plataforma].v += r.precioVenta||0; bP[r.plataforma].g += r.gananciaNeta||0;
+  });
+  const plats = Object.keys(bP).sort((a,b) => bP[b].g-bP[a].g);
+  const colors = plats.map(p => p==='FB Ads' ? '#10B981' : p==='Mercado Libre' ? '#3B82F6' : '#9CA3AF');
+  mkChart('c-plat', 'bar', plats, [{
+    label:'Ganancia', data:plats.map(p=>bP[p].g), backgroundColor:colors, borderRadius:4, borderSkipped:false
+  }], {
+    extra: {indexAxis:'y'},
+    scales: {
+      y: {ticks:{color:'#9CA3AF',font:{size:10}}, grid:{display:false}},
+      x: {ticks:{color:'#9CA3AF',font:{size:10}, callback:v=>'$'+Math.round(v/1000)+'K'}, grid:{color:'rgba(0,0,0,0.04)'}}
+    }
+  });
+  const meli = bP['Mercado Libre'], fb = bP['FB Ads'];
+  if (meli && fb) {
+    const mm = meli.v>0?meli.g/meli.v:0, fm = fb.v>0?fb.g/fb.v:0;
+    const el = document.getElementById('plat-insight');
+    el.style.display = 'block';
+    el.innerHTML = `<strong>FB Ads = ${mm>0?(fm/mm).toFixed(1):'—'}× más rentable que Meli</strong> — ${fmtP(fm)} vs ${fmtP(mm)} margen neto`;
+  }
+}
+
+function renderFranq(rows) {
+  const bF = {};
+  rows.filter(r => r.tipo==='Funko Pop' && r.franquicia).forEach(r => {
+    if (!bF[r.franquicia]) bF[r.franquicia] = {v:0,g:0};
+    bF[r.franquicia].v += r.precioVenta||0; bF[r.franquicia].g += r.gananciaNeta||0;
+  });
+  const sorted = Object.entries(bF)
+    .map(([f,d]) => ({f, g:d.g, mg:d.v>0?d.g/d.v:0}))
+    .sort((a,b) => b.g-a.g).slice(0,9);
+  const maxG = Math.max(...sorted.map(s => Math.abs(s.g)), 1);
+  document.getElementById('franq-bars').innerHTML = sorted.map((s,i) => {
+    const c = s.mg>=0.2?'#10B981':s.mg>=0.1?'#F59E0B':s.mg>=0?'#F97316':'#EF4444';
+    return `<div class="rank-row">
+      <div class="rank-num">${i+1}</div>
+      <div class="rank-bg"><div class="rank-bar" style="width:${Math.abs(s.g)/maxG*100}%;background:${c}"></div></div>
+      <div class="rank-label">${s.f}</div>
+      <div class="rank-pct" style="color:${c}">${Math.round(s.mg*100)}%</div>
+    </div>`;
+  }).join('');
+}
+
+function renderAlerts() {
+  const alerts = [
+    {name:'Trunks V-Rare Normal (x2)',    detail:'Costo $821 · Precio $400 · Pérdida $421 por unidad', loss:'-$842', urgent:true},
+    {name:'Jim Halpert Chase',             detail:'Costo $999 · Precio $500 · Pérdida $499 por unidad', loss:'-$499', urgent:true},
+    {name:'Po Kung Fu Panda Chase',        detail:'Costo $980 · Precio $500 · Pérdida $480 por unidad', loss:'-$480', urgent:true},
+    {name:'Marvel — 7 SKUs',              detail:'Jubilee, Magneto, Dazzler, Nimrod, HERBIE...',        loss:'-$701', urgent:false},
+    {name:'Star Wars — 5 SKUs',           detail:'Luke Skywalker x2, Obi-Wan, Boba Fett, C-3PO...',    loss:'-$698', urgent:false},
+  ];
+  document.getElementById('alerts-list').innerHTML = alerts.map(a => {
+    const ic = a.urgent ? '#EF4444' : '#F97316';
+    return `<div class="alert-item">
+      <i class="ti ti-alert-circle" style="font-size:13px;color:${ic};flex-shrink:0;margin-top:2px"></i>
+      <div style="flex:1;min-width:0">
+        <div class="alert-name">${a.name}</div>
+        <div class="alert-detail">${a.detail}</div>
+      </div>
+      <div class="alert-loss" style="color:${ic}">${a.loss}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderInsights(rows) {
+  const meli = rows.filter(r=>r.plataforma==='Mercado Libre');
+  const fb   = rows.filter(r=>r.plataforma==='FB Ads');
+  const mv = meli.reduce((s,r)=>s+(r.precioVenta||0),0);
+  const fv = fb.reduce((s,r)=>s+(r.precioVenta||0),0);
+  const mmg = mv>0?meli.reduce((s,r)=>s+(r.gananciaNeta||0),0)/mv:0;
+  const fmg = fv>0?fb.reduce((s,r)=>s+(r.gananciaNeta||0),0)/fv:0;
+  const cards = rows.filter(r=>r.tipo==='Trading Cards');
+  const cv = cards.reduce((s,r)=>s+(r.precioVenta||0),0);
+  const cm = cv>0?cards.reduce((s,r)=>s+(r.gananciaNeta||0),0)/cv:0;
+  const insights = [
+    {icon:'ti-bolt',       bg:'#FFFBEB',ic:'#D97706',title:`FB Ads = ${mmg>0?(fmg/mmg).toFixed(1):'4'}× más rentable que Meli`,body:`${fmtP(fmg)} vs ${fmtP(mmg)} margen. Cada peso en FB Ads rinde mucho más.`},
+    {icon:'ti-cards',      bg:'#EEF2FF',ic:'#6366F1',title:`Trading Cards: ${Math.round(cm*100)}% margen promedio`,body:'Mayor retorno que Funko con igual inversión. Priorizar esta categoría.'},
+    {icon:'ti-receipt-tax',bg:'#FFF7ED',ic:'#EA580C',title:'Verificar RFC registrado en Meli',body:'Con RFC: ~10.5% retención. Sin RFC: 36%. Corregirlo es gratis e inmediato.'},
+    {icon:'ti-trash',      bg:'#F0FDF4',ic:'#16A34A',title:'Liquidar 30 SKUs con margen negativo',body:'$4,710 inmovilizados. Recuperar ese capital para reinvertir donde sí rinde.'},
+  ];
+  document.getElementById('insights-list').innerHTML = insights.map(ins => `
+    <div class="insight-row">
+      <div class="insight-icon" style="background:${ins.bg}">
+        <i class="ti ${ins.icon}" style="font-size:13px;color:${ins.ic}"></i>
+      </div>
+      <div>
+        <div class="insight-title">${ins.title}</div>
+        <div class="insight-body">${ins.body}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTipoChart(rows) {
+  const bT = {};
+  rows.forEach(r => { const t=r.tipo||'Otro'; if(!bT[t]) bT[t]={v:0,g:0}; bT[t].v+=r.precioVenta||0; bT[t].g+=r.gananciaNeta||0; });
+  const tipos = Object.keys(bT).sort((a,b)=>bT[b].v-bT[a].v);
+  mkChart('c-tipo-chart', 'bar', tipos, [
+    {label:'Ventas',  data:tipos.map(t=>bT[t].v), backgroundColor:'#FCD34D', borderRadius:4, borderSkipped:false},
+    {label:'Ganancia',data:tipos.map(t=>bT[t].g), backgroundColor:'#6EE7B7', borderRadius:4, borderSkipped:false},
+  ]);
+}
+
+function renderAll(period) {
+  const rows = filterRows(period);
+  renderKPIs(rows);
+  renderTipoCards(rows);
+  renderMonth(rows);
+  renderDonut(rows);
+  renderPlat(rows);
+  renderFranq(rows);
+  renderAlerts();
+  renderInsights(rows);
+  renderTipoChart(rows);
+}
+
+function setPeriod(btn, period) {
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  currentPeriod = period;
+  renderAll(period);
+}
+
+loadAndRender();
+</script>
+</body>
+</html>
