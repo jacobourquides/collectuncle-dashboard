@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0043)file:///Users/jacobo/Downloads/index_3.html -->
+<!-- saved from url=(0043)file:///Users/jacobo/Downloads/index_4.html -->
 <html lang="es" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -151,7 +151,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 @media(max-width:960px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.row2,.row3,.row4{grid-template-columns:1fr}.pnl-summary-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.tipo-grid{grid-template-columns:1fr}.topbar{flex-direction:column;align-items:flex-start}}
 </style>
-<script id="s0" src="./index_files/json.txt"></script></head>
+<script id="s0" src="./index_files/tq"></script></head>
 <body>
 <div class="container">
 
@@ -463,6 +463,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 
 <script>
 const SHEET_ID='1_8pfLFmYH1wwpm5YXG155JuYlfOXwYvvTBu8UYsJPMA';
+const PUBLISHED_ID='2PACX-1vRmKeA9hlJyvhR6AYuEZhh7T0apRjuOkl2b1WX-QKW-WuKfkMq-N6GIWg_OHyLxibtXXuuhDZSj3pgc';
 const CHARTS={};let ALL_ROWS=[];let currentPeriod='all';
 
 function toggleTheme(){const html=document.documentElement;const isDark=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',isDark?'light':'dark');document.getElementById('theme-btn').innerHTML=isDark?'<i class="ti ti-moon"></i> Oscuro':'<i class="ti ti-sun"></i> Claro';renderAll(currentPeriod);}
@@ -483,7 +484,7 @@ function parseFecha(c){if(!c)return null;if(c.v){const m=String(c.v).match(/Date
 function loadAndRender(){
   document.getElementById('last-update').textContent='Actualizando...';
   const cb='cu_'+Date.now();
-  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cb}&sheet=Ventas&range=A5:T200`;
+  const url=`https://docs.google.com/spreadsheets/d/e/${PUBLISHED_ID}/gviz/tq?tqx=out:json&responseHandler=${cb}&sheet=Ventas&range=A5:T200`;
   window[cb]=data=>{delete window[cb];document.getElementById('s0')&&document.getElementById('s0').remove();
     ALL_ROWS=(data.table.rows||[]).map(r=>{const c=r.c||[],g=i=>c[i]||null;return{fecha:parseFecha(g(0)),estado:g(15)?.v||'',notas:g(5)?.v||'',precioVenta:parseN(g(2)?.f??g(2)?.v),piezas:parseN(g(17)?.v)||1,plataforma:g(3)?.v||'',gananciaNeta:parseN(g(13)?.f??g(13)?.v),costoInv:parseN(g(10)?.f??g(10)?.v),tipo:g(18)?.v||'Otro',franquicia:g(19)?.v||'Otros'};}).filter(r=>r.precioVenta>0&&r.plataforma&&r.estado!=='Apartado');
     document.getElementById('last-update').textContent='Al '+new Date().toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});renderAll(currentPeriod);};
