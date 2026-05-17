@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_15.html -->
+<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_16.html -->
 <html lang="es" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -192,7 +192,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .ti-database::before{content:'🗄'}
 .ti-info::before{content:'ℹ'}
 </style>
-<script id="s0" src="./index_files/json.txt"></script><script src="./index_files/json(1).txt"></script></head>
+<script id="s0" src="./index_files/json.txt"></script></head>
 <body>
 <div class="container">
 
@@ -507,18 +507,19 @@ function processGastosData(data) {
   document.head.appendChild(s);
   setTimeout(() => { if(ALL_ROWS.length === 0) useFallback(); }, 9000);
 
-  // Load Gastos sheet - delay slightly so Ventas callback is set first
+  // Load Gastos via fetch (avoids JSONP callback conflict)
   setTimeout(() => {
-    const cbG = 'cug_' + Date.now();
-    // Temporarily override google callback for Gastos
-    window.google.visualization.Query.setResponse = processGastosData;
-    window[cbG] = processGastosData;
-    const urlG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cbG}&sheet=Gastos&range=A2:C200`;
-    const sg = document.createElement('script');
-    sg.src = urlG;
-    sg.onerror = () => { console.log('Gastos no disponible'); window.google.visualization.Query.setResponse = processGvizData; };
-    document.head.appendChild(sg);
-  }, 3000);
+    const urlG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Gastos&range=A2:C200`;
+    fetch(urlG)
+      .then(r => r.text())
+      .then(txt => {
+        // Strip JSONP wrapper: /*O_o*/ google.visualization.Query.setResponse({...});
+        const json = txt.replace(/^[^{]*/, '').replace(/\);?\s*$/, '');
+        const data = JSON.parse(json);
+        processGastosData(data);
+      })
+      .catch(e => console.log('Gastos fetch error:', e));
+  }, 1000);
 }
 
 function useFallback(){
