@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_17.html -->
+<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_18.html -->
 <html lang="es" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -638,6 +638,7 @@ function renderInsights(rows){const meli=rows.filter(r=>r.plataforma==='Mercado 
 function renderTipoChart(rows){const bT={};rows.forEach(r=>{const t=r.tipo||'Otro';if(!bT[t])bT[t]={v:0,g:0};bT[t].v+=r.precioVenta||0;bT[t].g+=r.gananciaNeta||0;});const tipos=Object.keys(bT).sort((a,b)=>bT[b].v-bT[a].v);mkChart('c-tipo-chart','bar',tipos,[{label:'Ventas',data:tipos.map(t=>bT[t].v),backgroundColor:'#FCD34D',borderRadius:4,borderSkipped:false},{label:'Ganancia',data:tipos.map(t=>bT[t].g),backgroundColor:'#6EE7B7',borderRadius:4,borderSkipped:false}]);}
 
 function renderPnL() {
+  console.log('renderPnL called - GASTOS_OPS:', GASTOS_OPS, 'rows:', ALL_ROWS.length);
   const rows = ALL_ROWS; // Use all rows regardless of period filter
 
   // Calculate from real data
@@ -798,7 +799,7 @@ function renderPnL() {
     Vendiste <strong>${fmt(ventas)}</strong> en total.<br>
     Meli se llevó <strong>${fmt(costosMeli)}</strong> en comisiones, impuestos y envíos → te quedaron <strong>${fmt(ingresoNeto)}</strong>.<br>
     Los productos vendidos te costaron <strong>${fmt(cogs)}</strong> → utilidad bruta: <strong>${fmt(utilBruta)}</strong>.<br>
-    Gastos operativos: <strong>$0</strong> (pendiente conectar hoja Gastos).<br>
+    Gastos operativos: <strong>${fmt(gastos)}</strong>${gastos>0?' ('+Object.keys(GASTOS_DETAIL).join(', ')+')':' (pendiente conectar hoja Gastos)'}.<br>
     <strong style="color:#10B981">Utilidad neta del período: ${fmt(utilNeta)}</strong><br><br>
     <em>La compra de inventario nuevo no es un gasto — es inversión en stock que se convertirá en ventas futuras.</em>`;
 
