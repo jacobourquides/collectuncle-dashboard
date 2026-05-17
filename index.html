@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_19.html -->
+<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_22.html -->
 <html lang="es" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -192,7 +192,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .ti-database::before{content:'🗄'}
 .ti-info::before{content:'ℹ'}
 </style>
-</head>
+<script id="s0" src="./index_files/json.txt"></script><script src="./index_files/json(1).txt"></script></head>
 <body>
 <div class="container">
 
@@ -207,7 +207,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       </div>
     </div>
     <div class="topbar-right">
-      <div class="live-badge"><div class="live-dot"></div><span id="last-update">Actualizando...</span></div>
+      <div class="live-badge"><div class="live-dot"></div><span id="last-update">Datos de muestra</span></div>
       <button class="btn btn-theme" onclick="toggleTheme()" id="theme-btn"><i class="ti ti-sun"></i> Claro</button>
       <button class="btn btn-gold" onclick="loadAndRender()"><i class="ti ti-refresh"></i> Actualizar</button>
     </div>
@@ -236,9 +236,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
         <button class="ptab" onclick="setPeriod(this,&#39;junio&#39;)">Junio</button>
       </div>
     </div>
-    <div class="kpi-grid" id="kpi-row"></div>
+    <div class="kpi-grid" id="kpi-row"><div class="kpi" style="border-left-color:#F59E0B"><div class="kpi-label">Ventas totales</div><div class="kpi-value" style="color:#F59E0B">$7K</div><div class="kpi-sub">5 transacciones</div></div><div class="kpi" style="border-left-color:#10B981"><div class="kpi-label">Ganancia neta</div><div class="kpi-value" style="color:#10B981">$3K</div><div class="kpi-sub">41% margen</div></div><div class="kpi" style="border-left-color:#10B981"><div class="kpi-label">Piezas vendidas</div><div class="kpi-value" style="color:#10B981">5</div><div class="kpi-sub">unidades despachadas</div></div><div class="kpi" style="border-left-color:#6366F1"><div class="kpi-label">Ticket promedio</div><div class="kpi-value" style="color:#6366F1">$1K</div><div class="kpi-sub">por venta</div></div><div class="kpi" style="border-left-color:#EF4444"><div class="kpi-label">Margen Meli</div><div class="kpi-value" style="color:#EF4444">25%</div><div class="kpi-sub">vs 70% FB Ads</div></div><div class="kpi" style="border-left-color:#F97316"><div class="kpi-label">Costo vendido</div><div class="kpi-value" style="color:#F97316">$2K</div><div class="kpi-sub">capital en producto</div></div></div>
     <div class="section-label">Por tipo de producto</div>
-    <div class="tipo-grid" id="tipo-cards"></div>
+    <div class="tipo-grid" id="tipo-cards"><div class="tipo-card"><div class="tipo-badge" style="background:rgba(32,150,212,0.15);color:#2096D4">FUNKO</div><div><div class="tipo-name">Funko Pop</div><div class="tipo-val">$4K</div><div class="tipo-mg" style="color:#10B981">62% margen · $2K ganancia</div></div></div><div class="tipo-card"><div class="tipo-badge" style="background:rgba(204,0,0,0.12);color:#CC0000">TOPPS</div><div><div class="tipo-name">Trading Cards</div><div class="tipo-val">$4K</div><div class="tipo-mg" style="color:#F59E0B">23% margen · $893 ganancia</div></div></div></div>
     <div class="section-label">Tendencias</div>
     <div class="row2">
       <div class="card">
@@ -258,13 +258,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
             <option value="Otro">Otros</option>
           </select>
         </div>
-        <div style="position:relative;height:200px"><canvas id="c-month"></canvas></div>
+        <div style="position:relative;height:200px"><canvas id="c-month" style="box-sizing: border-box; display: block; height: 200px; width: 694px;" width="1388" height="400"></canvas></div>
       </div>
       <div class="card">
         <div class="card-title"><i class="ti ti-chart-donut" style="color:#6366F1"></i>Mix de ventas por tipo</div>
         <div class="card-sub">Distribución de ingresos</div>
-        <div id="donut-legend" class="legend" style="margin-bottom:10px"></div>
-        <div style="position:relative;height:150px"><canvas id="c-donut"></canvas></div>
+        <div id="donut-legend" class="legend" style="margin-bottom:10px"><span class="leg-item"><span class="leg-sq" style="background:#FCD34D"></span>Trading Cards 52%</span><span class="leg-item"><span class="leg-sq" style="background:#EF4444"></span>Funko Pop 48%</span></div>
+        <div style="position:relative;height:150px"><canvas id="c-donut" style="box-sizing: border-box; display: block; height: 150px; width: 450px;" width="900" height="300"></canvas></div>
       </div>
     </div>
     <div class="section-label">Análisis de rentabilidad</div>
@@ -282,18 +282,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
             <span>FB Ads</span>
           </div>
         </div>
-        <div style="position:relative;height:100px"><canvas id="c-plat"></canvas></div>
-        <div id="plat-insight" class="plat-insight" style="display:none"></div>
+        <div style="position:relative;height:100px"><canvas id="c-plat" style="box-sizing: border-box; display: block; height: 100px; width: 364px;" width="729" height="200"></canvas></div>
+        <div id="plat-insight" class="plat-insight" style="display: block;"><strong style="color:var(--text)">FB Ads = 2.8× más rentable</strong> — 70% vs 25% margen neto</div>
       </div>
       <div class="card">
         <div class="card-title"><i class="ti ti-trophy" style="color:#F59E0B"></i>Franquicia Funko Pop</div>
         <div class="card-sub">Ganancia neta · verde = bueno · rojo = revisar</div>
-        <div id="franq-bars"></div>
+        <div id="franq-bars"><div class="rank-row"><div class="rank-num">1</div><div class="rank-bg"><div class="rank-bar" style="width:100%;background:#10B981"></div></div><div class="rank-label">Marvel</div><div class="rank-pct" style="color:#10B981">70%</div></div><div class="rank-row"><div class="rank-num">2</div><div class="rank-bg"><div class="rank-bar" style="width:25.75838211814795%;background:#10B981"></div></div><div class="rank-label">Trading Cards</div><div class="rank-pct" style="color:#10B981">25%</div></div><div class="rank-row"><div class="rank-num">3</div><div class="rank-bg"><div class="rank-bar" style="width:21.766897285790314%;background:#10B981"></div></div><div class="rank-label">Deportes</div><div class="rank-pct" style="color:#10B981">20%</div></div><div class="rank-row"><div class="rank-num">4</div><div class="rank-bg"><div class="rank-bar" style="width:16.338477913783926%;background:#10B981"></div></div><div class="rank-label">One Piece</div><div class="rank-pct" style="color:#10B981">36%</div></div></div>
       </div>
       <div class="card">
         <div class="card-title"><i class="ti ti-alert-triangle" style="color:var(--text-3)"></i>Piezas a liquidar</div>
         <div class="card-sub">Margen negativo · acción requerida</div>
-        <div class="alerts-scroll" id="alerts-list"></div>
+        <div class="alerts-scroll" id="alerts-list"><div class="alert-item"><span style="color:#EF4444;flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">Trunks V-Rare Normal (x2)</div><div class="alert-detail">Costo $821 · Precio $400 · Pérdida $421 por unidad</div></div><div class="alert-loss" style="color:#EF4444">-$842</div></div><div class="alert-item"><span style="color:#EF4444;flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">Jim Halpert Chase</div><div class="alert-detail">Costo $999 · Precio $500 · Pérdida $499 por unidad</div></div><div class="alert-loss" style="color:#EF4444">-$499</div></div><div class="alert-item"><span style="color:#EF4444;flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">Po Kung Fu Panda Chase</div><div class="alert-detail">Costo $980 · Precio $500 · Pérdida $480 por unidad</div></div><div class="alert-loss" style="color:#EF4444">-$480</div></div><div class="alert-item"><span style="color:#F97316;flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">Marvel — 7 SKUs</div><div class="alert-detail">Jubilee, Magneto, Dazzler, Nimrod, HERBIE...</div></div><div class="alert-loss" style="color:#F97316">-$701</div></div><div class="alert-item"><span style="color:#F97316;flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">Star Wars — 5 SKUs</div><div class="alert-detail">Luke Skywalker x2, Obi-Wan, Boba Fett, C-3PO...</div></div><div class="alert-loss" style="color:#F97316">-$698</div></div></div>
       </div>
     </div>
     <div class="section-label">Acciones y comparativas</div>
@@ -301,13 +301,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       <div class="card">
         <div class="card-title"><i class="ti ti-bulb" style="color:#F59E0B"></i>Decisiones clave</div>
         <div class="card-sub" style="margin-bottom:8px">Basadas en los datos del negocio</div>
-        <div id="insights-list"></div>
+        <div id="insights-list"><div class="insight-row"><div class="insight-icon" style="background:rgba(245,158,11,0.1)">⚡</div><div><div class="insight-title">FB Ads = 2.8× más rentable que Meli</div><div class="insight-body">70% vs 25% margen. Mover volumen a FB Ads tiene impacto enorme.</div></div></div><div class="insight-row"><div class="insight-icon" style="background:rgba(99,102,241,0.1)">🃏</div><div><div class="insight-title">Trading Cards: 23% margen promedio</div><div class="insight-body">Mayor retorno que Funko con igual inversión. Priorizar capital en esta categoría.</div></div></div><div class="insight-row"><div class="insight-icon" style="background:rgba(239,68,68,0.1)">🧾</div><div><div class="insight-title">Verificar RFC registrado en Meli</div><div class="insight-body">Con RFC: ~10.5% retención fiscal. Sin RFC: 36%. Corregirlo es gratis e inmediato.</div></div></div><div class="insight-row"><div class="insight-icon" style="background:rgba(16,185,129,0.1)">🗑</div><div><div class="insight-title">Liquidar SKUs con margen negativo</div><div class="insight-body">Capital inmovilizado. Recuperar para reinvertir donde sí rinde.</div></div></div></div>
       </div>
       <div class="card">
         <div class="card-title"><i class="ti ti-chart-bar" style="color:#6366F1"></i>Ventas y ganancia por tipo</div>
         <div class="card-sub">Comparativa de rentabilidad</div>
         <div class="legend"><span class="leg-item"><span class="leg-sq" style="background:#FCD34D"></span>Ventas</span><span class="leg-item"><span class="leg-sq" style="background:#6EE7B7"></span>Ganancia</span></div>
-        <div style="position:relative;height:170px"><canvas id="c-tipo-chart"></canvas></div>
+        <div style="position:relative;height:170px"><canvas id="c-tipo-chart" style="box-sizing: border-box; display: block; height: 170px; width: 572px;" width="1144" height="340"></canvas></div>
       </div>
     </div>
   </div>
@@ -351,138 +351,329 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 
 <script>
 const SHEET_ID='17DzG3oSOTXosHNpp-mW97u1WHAwzf-T6';
-const PUBLISHED_ID='2PACX-1vQcbhRWORKOPUEPofLwACyUvvo5_UqqlIx5zN-GpvOYMP0K4oFymHd6uNKLVa0nOg';
 const CHARTS={};let ALL_ROWS=[];let currentPeriod='all';
+window.GASTOS_OPS=0;window.GASTOS_DETAIL={};
 
-function toggleTheme(){const html=document.documentElement;const isDark=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',isDark?'light':'dark');document.getElementById('theme-btn').innerHTML=isDark?'<i class="ti ti-moon"></i> Oscuro':'<i class="ti ti-sun"></i> Claro';renderAll(currentPeriod);}
-
+function toggleTheme(){const html=document.documentElement;const isDark=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',isDark?'light':'dark');document.getElementById('theme-btn').innerHTML=isDark?'<i class="ti-moon"></i> Oscuro':'<i class="ti-sun"></i> Claro';renderAll(currentPeriod);}
 function showPanel(name,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('on'));
-  document.getElementById('panel-'+name).classList.add('active');
-  btn.classList.add('on');
-  if(name==='pnl'){
-    if(ALL_ROWS.length > 0) renderPnL();
-    else setTimeout(()=>{ if(ALL_ROWS.length>0) renderPnL(); else{ useFallback(); renderPnL(); }}, 2000);
-  }}
-
-const fmtK=v=>{if(!v&&v!==0)return'$0';const a=Math.abs(v),s=v<0?'-':'';return s+'$'+(a>=1000000?(a/1000000).toFixed(1)+'M':a>=1000?Math.round(a/1000)+'K':Math.round(a));};
+  document.getElementById('panel-'+name).classList.add('active');btn.classList.add('on');
+  if(name==='pnl'){if(ALL_ROWS.length>0)renderPnL();else setTimeout(()=>{if(ALL_ROWS.length>0)renderPnL();else{useFallback();renderPnL();}},2000);}
+}
+const fmtK=v=>{if(!v&&v!==0)return'$0';const a=Math.abs(v),s=v<0?'-':'';return s+'$'+(a>=1000000?(a/1000000).toFixed(1)+'M':a>=1000?Math.round(a/1000)+'K':Math.round(a).toLocaleString('es-MX'));};
 const fmtP=v=>Math.round((v||0)*100)+'%';
 const parseN=v=>{if(v==null||v==='')return null;const n=parseFloat(String(v).replace(/[$,\s%]/g,''));return isNaN(n)?null:n;};
-
 function parseFecha(c){if(!c)return null;if(c.v){const m=String(c.v).match(/Date\((\d+),(\d+),(\d+)/);if(m)return new Date(+m[1],+m[2],+m[3]);}if(c.f){const s=c.f,mn={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};for(const[k,i]of Object.entries(mn)){if(s.toLowerCase().includes(k)){const ns=s.match(/\d+/g);if(ns&&ns.length>=2)return new Date(+(ns.find(n=>n.length===4)||'2026'),i,+ns[0]);}}try{const d=new Date(s);if(!isNaN(d))return d;}catch(e){}}return null;}
 
-// Define google namespace so gviz JSONP works
-window.google = window.google || {};
-window.google.visualization = window.google.visualization || {};
-window.google.visualization.Query = window.google.visualization.Query || {};
-
-function processGvizData(data) {
-  try {
-    ALL_ROWS = (data.table.rows||[]).map(r => {
-      const c = r.c||[], g = i => c[i]||null;
-      // New sheet column mapping:
-      // A(0)=Fecha, C(2)=Estado Pago, D(3)=Piezas, E(4)=Plataforma
-      // I(8)=Precio Venta, J(9)=Cargos Plataforma, K(10)=Envío, L(11)=Impuestos
-      // N(13)=Costo Inventario, P(15)=Costo Embalaje, Q(16)=Ganancia Neta
-      // S(18)=Producto, T(19)=Cliente
-      const prod = g(18)?.v||'';
-      const tipo = prod.toLowerCase().includes('funko')||prod.match(/#[0-9]{3,4}/) ? 'Funko Pop'
-                 : prod.toLowerCase().includes('topps')||prod.toLowerCase().includes('panini')||prod.toLowerCase().includes('trading') ? 'Trading Cards'
-                 : prod.toLowerCase().includes('thrilljoy') ? 'Thrilljoy PIX!'
-                 : 'Otro';
-      return {
-        fecha: parseFecha(g(0)),
-        estado: g(2)?.v||'',
-        // F(5)=Precio Venta, J(9)=Cargos Plataforma, K(10)=Envío, L(11)=Impuestos
-        // N(13)=Costo Inventario, P(15)=Costo Embalaje, Q(16)=Ganancia Neta
-        precioVenta: parseN(g(5)?.f??g(5)?.v),
-        piezas: parseN(g(3)?.v)||1,
-        plataforma: g(4)?.v||'',
-        cargosMeli: parseN(g(9)?.f??g(9)?.v)||0,
-        envioMeli: parseN(g(10)?.f??g(10)?.v)||0,
-        impuestosMeli: parseN(g(11)?.f??g(11)?.v)||0,
-        gananciaNeta: parseN(g(16)?.f??g(16)?.v),
-        costoInv: parseN(g(13)?.f??g(13)?.v)||0,
-        embalaje: parseN(g(15)?.f??g(15)?.v)||0,
-        producto: prod,
-        tipo: tipo,
-        franquicia: prod.split(' ').slice(0,3).join(' ')
+function processGvizData(data){
+  try{
+    ALL_ROWS=(data.table.rows||[]).map(r=>{
+      const c=r.c||[],g=i=>c[i]||null;
+      const prod=g(18)?.v||'';
+      const tipo=prod.toLowerCase().includes('funko')||prod.match(/#[0-9]{3,4}/)?'Funko Pop'
+               :prod.toLowerCase().includes('topps')||prod.toLowerCase().includes('panini')||prod.toLowerCase().includes('trading')?'Trading Cards'
+               :prod.toLowerCase().includes('thrilljoy')?'Thrilljoy PIX!':'Otro';
+      return{
+        fecha:parseFecha(g(0)),
+        estado:g(2)?.v||'',
+        precioVenta:parseN(g(5)?.f??g(5)?.v),
+        piezas:parseN(g(3)?.v)||1,
+        plataforma:g(4)?.v||'',
+        cargosMeli:parseN(g(9)?.f??g(9)?.v)||0,
+        envioMeli:parseN(g(10)?.f??g(10)?.v)||0,
+        impuestosMeli:parseN(g(11)?.f??g(11)?.v)||0,
+        gananciaNeta:parseN(g(16)?.f??g(16)?.v),
+        costoInv:parseN(g(13)?.f??g(13)?.v)||0,
+        embalaje:parseN(g(15)?.f??g(15)?.v)||0,
+        producto:prod,tipo,
+        franquicia:prod.split(' ').slice(0,3).join(' ')
       };
-    }).filter(r => r.precioVenta > 0 && r.plataforma && 
-      (r.estado === 'Venta' || r.estado === 'Venta - Pendiente liq.'));
-    document.getElementById('last-update').textContent = 'Al ' + new Date().toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+    }).filter(r=>r.precioVenta>0&&r.plataforma&&(r.estado==='Venta'||r.estado==='Venta - Pendiente liq.'));
+    document.getElementById('last-update').textContent='Al '+new Date().toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
     renderAll(currentPeriod);
-    if(document.getElementById('panel-pnl').classList.contains('active')) renderPnL();
-  } catch(e) {
-    console.error('Parse error:', e);
-    useFallback();
-  }
+    if(document.getElementById('panel-pnl').classList.contains('active'))renderPnL();
+  }catch(e){console.error('Parse error:',e);useFallback();}
 }
 
-window.google.visualization.Query.setResponse = processGvizData;
-
-window.GASTOS_OPS = 0;
-window.GASTOS_DETAIL = {};
-
-function processGastosData(data) {
-  try {
-    const rows = data.table.rows||[];
-    const gastosTotales = {};
-    rows.forEach(r => {
-      const c = r.c||[];
-      const cat = c[1]?.v||'';
-      const monto = parseN(c[2]?.f??c[2]?.v)||0;
-      if(cat && monto > 0) {
-        gastosTotales[cat] = (gastosTotales[cat]||0) + monto;
-      }
+function processGastosData(data){
+  try{
+    const rows=data.table.rows||[];
+    const totales={};
+    rows.forEach(r=>{
+      const c=r.c||[];
+      const cat=c[1]?.v||'';
+      const monto=parseN(c[2]?.f??c[2]?.v)||0;
+      if(cat&&monto>0)totales[cat]=(totales[cat]||0)+monto;
     });
-    // Exclude Compra de Inventario
-    const excluir = ['Compra de Inventario','Compra de inventario'];
-    window.GASTOS_OPS = 0;
-    window.GASTOS_DETAIL = {};
-    Object.entries(gastosTotales).forEach(([cat,total])=>{
-      if(!excluir.includes(cat)){
-        window.GASTOS_OPS += total;
-        window.GASTOS_DETAIL[cat] = total;
-      }
+    const excluir=['Compra de Inventario','Compra de inventario'];
+    window.GASTOS_OPS=0;window.GASTOS_DETAIL={};
+    Object.entries(totales).forEach(([cat,total])=>{
+      if(!excluir.includes(cat.trim())){window.GASTOS_OPS+=total;window.GASTOS_DETAIL[cat]=total;}
     });
-    console.log('Gastos ops cargados:', GASTOS_OPS, GASTOS_DETAIL);
-    // Always re-render PnL with new gastos data
+    console.log('Gastos cargados:',window.GASTOS_OPS,window.GASTOS_DETAIL);
     renderPnL();
-  } catch(e) {
-    console.error('Gastos parse error:', e);
-  }
+  }catch(e){console.error('Gastos error:',e);}
 }
 
-function loadAndRender() {
-  document.getElementById('last-update').textContent = 'Actualizando...';
-  ALL_ROWS = [];
-  const cb = 'cu_' + Date.now();
-  window[cb] = processGvizData;
-  window.google.visualization.Query.setResponse = processGvizData;
+window.google=window.google||{};
+window.google.visualization=window.google.visualization||{};
+window.google.visualization.Query=window.google.visualization.Query||{};
+window.google.visualization.Query.setResponse=function(data){
+  // Route to correct handler based on which sheet loaded
+  if(data.table&&data.table.cols&&data.table.cols[0]&&data.table.cols[0].type==='date'){
+    processGvizData(data); // Ventas has date in col A
+  } else {
+    processGastosData(data); // Gastos has date as string or no date
+  }
+};
 
+function useFallback(){
+  ALL_ROWS=[
+    {fecha:new Date(2026,3,1),precioVenta:1329,plataforma:'Mercado Libre',gananciaNeta:272,costoInv:576,cargosMeli:259,envioMeli:65,impuestosMeli:120,embalaje:36,piezas:1,tipo:'Trading Cards',franquicia:'Trading Cards',estado:'Venta',producto:'Panini Monopoly'},
+    {fecha:new Date(2026,3,3),precioVenta:854,plataforma:'Mercado Libre',gananciaNeta:307,costoInv:181,cargosMeli:166,envioMeli:84,impuestosMeli:77,embalaje:36,piezas:1,tipo:'Funko Pop',franquicia:'One Piece',estado:'Venta',producto:'Luffy Gear Four #926'},
+    {fecha:new Date(2026,3,4),precioVenta:2700,plataforma:'FB Ads',gananciaNeta:1879,costoInv:584,cargosMeli:0,envioMeli:200,impuestosMeli:0,embalaje:36,piezas:1,tipo:'Funko Pop',franquicia:'Marvel',estado:'Venta',producto:'Wolverine #1576'},
+    {fecha:new Date(2026,4,1),precioVenta:1999,plataforma:'Mercado Libre',gananciaNeta:409,costoInv:898,cargosMeli:389,envioMeli:65,impuestosMeli:180,embalaje:36,piezas:1,tipo:'Trading Cards',franquicia:'Deportes',estado:'Venta',producto:'Panini NFL'},
+    {fecha:new Date(2026,5,5),precioVenta:599,plataforma:'Mercado Libre',gananciaNeta:212,costoInv:126,cargosMeli:95,envioMeli:84,impuestosMeli:54,embalaje:36,piezas:1,tipo:'Trading Cards',franquicia:'Trading Cards',estado:'Venta',producto:'Topps Update'},
+  ];
+  document.getElementById('last-update').textContent='Datos de muestra';
+  renderAll(currentPeriod);
+}
 
-  const old = document.getElementById('s0');
-  if(old) old.remove();
-  const s = document.createElement('script');
-  s.id = 's0'; s.src = url;
-  s.onerror = () => { document.getElementById('last-update').textContent = 'Sin conexión'; useFallback(); };
+function filterRows(p){
+  if(p==='all'||p==='ytd')return ALL_ROWS;
+  if(p==='q1')return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getMonth()<=2);
+  if(p==='q2')return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getMonth()>=3&&r.fecha.getMonth()<=5);
+  const m={abril:3,mayo:4,junio:5}[p];
+  return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getMonth()===m);
+}
+
+function getColors(){const dark=document.documentElement.getAttribute('data-theme')==='dark';return{grid:dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',tick:dark?'#5A5D72':'#9CA3AF'};}
+
+function mkChart(id,type,labels,datasets,opts={}){
+  if(CHARTS[id])CHARTS[id].destroy();const ctx=document.getElementById(id);if(!ctx)return;
+  const{grid,tick}=getColors();
+  const defSc={x:{ticks:{color:tick,font:{size:10}},grid:{color:grid}},y:{ticks:{color:tick,font:{size:10},callback:opts.yfmt||(v=>'$'+Math.round(v/1000)+'K')},grid:{color:grid}}};
+  CHARTS[id]=new Chart(ctx,{type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'$'+Math.round(ctx.raw).toLocaleString('es-MX')}}},scales:type==='doughnut'?undefined:(opts.scales||defSc),...(opts.extra||{})}});
+}
+
+function renderKPIs(rows){
+  const V=rows.reduce((s,r)=>s+(r.precioVenta||0),0),G=rows.reduce((s,r)=>s+(r.gananciaNeta||0),0),T=rows.length;
+  const piezas=rows.reduce((s,r)=>s+(r.piezas||1),0);
+  const meli=rows.filter(r=>r.plataforma==='Mercado Libre'),fb=rows.filter(r=>r.plataforma==='FB Ads');
+  const mv=meli.reduce((s,r)=>s+(r.precioVenta||0),0),fv=fb.reduce((s,r)=>s+(r.precioVenta||0),0);
+  const mmg=mv>0?meli.reduce((s,r)=>s+(r.gananciaNeta||0),0)/mv:0,fmg=fv>0?fb.reduce((s,r)=>s+(r.gananciaNeta||0),0)/fv:0;
+  const kpis=[
+    {lbl:'Ventas totales',val:fmtK(V),sub:T+' transacciones',c:'#F59E0B'},
+    {lbl:'Ganancia neta',val:fmtK(G),sub:fmtP(V>0?G/V:0)+' margen',c:'#10B981'},
+    {lbl:'Piezas vendidas',val:String(piezas),sub:'unidades despachadas',c:'#10B981'},
+    {lbl:'Ticket promedio',val:fmtK(T>0?V/T:0),sub:'por venta',c:'#6366F1'},
+    {lbl:'Margen Meli',val:fmtP(mmg),sub:'vs '+fmtP(fmg)+' FB Ads',c:'#EF4444'},
+    {lbl:'Costo vendido',val:fmtK(rows.reduce((s,r)=>s+(r.costoInv||0),0)),sub:'capital en producto',c:'#F97316'}
+  ];
+  document.getElementById('kpi-row').innerHTML=kpis.map(k=>`<div class="kpi" style="border-left-color:${k.c}"><div class="kpi-label">${k.lbl}</div><div class="kpi-value" style="color:${k.c}">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+}
+
+function renderTipoCards(rows){
+  const bT={};rows.forEach(r=>{const t=r.tipo||'Otro';if(!bT[t])bT[t]={v:0,g:0};bT[t].v+=r.precioVenta||0;bT[t].g+=r.gananciaNeta||0;});
+  const tipos=['Funko Pop','Trading Cards','Thrilljoy PIX!'].filter(t=>bT[t]);
+  const meta={'Funko Pop':{badge:'FUNKO',bg:'rgba(32,150,212,0.15)',txt:'#2096D4'},'Trading Cards':{badge:'TOPPS',bg:'rgba(204,0,0,0.12)',txt:'#CC0000'},'Thrilljoy PIX!':{badge:'PIX!',bg:'rgba(100,100,120,0.12)',txt:'#9094A8'}};
+  document.getElementById('tipo-cards').innerHTML=tipos.map(t=>{const d=bT[t]||{v:0,g:0},m=meta[t]||{badge:t,bg:'rgba(100,100,120,0.1)',txt:'#9094A8'};const mg=d.v>0?d.g/d.v:0;const mgColor=mg>=0.25?'#10B981':mg>=0.15?'#F59E0B':'#EF4444';return`<div class="tipo-card"><div class="tipo-badge" style="background:${m.bg};color:${m.txt}">${m.badge}</div><div><div class="tipo-name">${t}</div><div class="tipo-val">${fmtK(d.v)}</div><div class="tipo-mg" style="color:${mgColor}">${fmtP(mg)} margen · ${fmtK(d.g)} ganancia</div></div></div>`;}).join('');
+}
+
+function renderMonth(rows){
+  const tipoSel=document.getElementById('tipo-filter')?.value||'all';
+  const filtered=tipoSel==='all'?rows:rows.filter(r=>r.tipo===tipoSel);
+  const bM={};
+  filtered.forEach(r=>{
+    if(!r.fecha)return;
+    const k=r.fecha.toLocaleDateString('es-MX',{month:'short',year:'2-digit'});
+    if(!bM[k])bM[k]={meli:0,cogs:0,ops:0,gan:0,ventas:0};
+    const v=r.precioVenta||0;
+    bM[k].meli+=(r.cargosMeli||0)+(r.envioMeli||0)+(r.impuestosMeli||0);
+    bM[k].cogs+=(r.costoInv||0)+(r.embalaje||0);
+    bM[k].ops+=v*0.024;
+    bM[k].gan+=r.gananciaNeta||0;
+    bM[k].ventas+=v;
+  });
+  const L=Object.keys(bM);
+  const{grid,tick}=getColors();
+  if(CHARTS['c-month'])CHARTS['c-month'].destroy();
+  const ctx=document.getElementById('c-month');if(!ctx)return;
+  CHARTS['c-month']=new Chart(ctx,{type:'bar',data:{labels:L,datasets:[
+    {label:'Costos Meli',data:L.map(k=>Math.round(bM[k].meli)),backgroundColor:'#EF4444',stack:'s'},
+    {label:'Costo inventario',data:L.map(k=>Math.round(bM[k].cogs)),backgroundColor:'#F97316',stack:'s'},
+    {label:'Gastos ops',data:L.map(k=>Math.round(bM[k].ops)),backgroundColor:'#8B5CF6',stack:'s'},
+    {label:'Ganancia neta',data:L.map(k=>Math.round(bM[k].gan)),backgroundColor:'#10B981',stack:'s'},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{title:items=>'Mes: '+items[0].label,label:ctx=>'  '+ctx.dataset.label+': $'+ctx.raw.toLocaleString('es-MX'),afterBody:items=>{const mes=items[0].label;return['','  Total: $'+Math.round(bM[mes]?.ventas||0).toLocaleString('es-MX')];} }}},scales:{x:{ticks:{color:tick,font:{size:10}},grid:{color:grid},stacked:true},y:{ticks:{color:tick,font:{size:10},callback:v=>'$'+Math.round(v/1000)+'K'},grid:{color:grid},stacked:true}}}});
+}
+
+function renderDonut(rows){
+  const bT={};rows.forEach(r=>{const t=r.tipo||'Otro';bT[t]=(bT[t]||0)+(r.precioVenta||0);});
+  const tipos=Object.keys(bT).sort((a,b)=>bT[b]-bT[a]);
+  const colors=['#FCD34D','#EF4444','#6B7280','#9CA3AF'];
+  const total=tipos.reduce((s,t)=>s+bT[t],0);
+  document.getElementById('donut-legend').innerHTML=tipos.map((t,i)=>`<span class="leg-item"><span class="leg-sq" style="background:${colors[i]||'#9CA3AF'}"></span>${t} ${total>0?Math.round(bT[t]/total*100)+'%':''}</span>`).join('');
+  mkChart('c-donut','doughnut',tipos,[{data:tipos.map(t=>bT[t]),backgroundColor:tipos.map((_,i)=>colors[i]||'#9CA3AF'),borderWidth:0,hoverOffset:4}],{extra:{cutout:'65%'}});
+}
+
+function renderPlat(rows){
+  const bP={};rows.forEach(r=>{if(!r.plataforma)return;if(!bP[r.plataforma])bP[r.plataforma]={v:0,g:0};bP[r.plataforma].v+=r.precioVenta||0;bP[r.plataforma].g+=r.gananciaNeta||0;});
+  const plats=Object.keys(bP).sort((a,b)=>bP[b].g-bP[a].g);
+  const colors=plats.map(p=>p==='FB Ads'?'#10B981':'#3B82F6');
+  const{grid,tick}=getColors();
+  mkChart('c-plat','bar',plats,[{label:'Ganancia',data:plats.map(p=>bP[p].g),backgroundColor:colors,borderRadius:4,borderSkipped:false}],{extra:{indexAxis:'y'},scales:{y:{ticks:{color:tick,font:{size:10}},grid:{display:false}},x:{ticks:{color:tick,font:{size:10},callback:v=>'$'+Math.round(v/1000)+'K'},grid:{color:grid}}}});
+  const meli=bP['Mercado Libre'],fb=bP['FB Ads'];
+  if(meli&&fb){const mm=meli.v>0?meli.g/meli.v:0,fm=fb.v>0?fb.g/fb.v:0;const el=document.getElementById('plat-insight');if(el){el.style.display='block';el.innerHTML=`<strong style="color:var(--text)">FB Ads = ${mm>0?(fm/mm).toFixed(1):'—'}× más rentable</strong> — ${fmtP(fm)} vs ${fmtP(mm)} margen neto`;}}
+}
+
+function renderFranq(rows){
+  const bF={};rows.forEach(r=>{const f=r.franquicia||r.tipo;if(!bF[f])bF[f]={v:0,g:0};bF[f].v+=r.precioVenta||0;bF[f].g+=r.gananciaNeta||0;});
+  const sorted=Object.entries(bF).map(([f,d])=>({f,g:d.g,mg:d.v>0?d.g/d.v:0})).sort((a,b)=>b.g-a.g).slice(0,9);
+  const maxG=Math.max(...sorted.map(s=>Math.abs(s.g)),1);
+  document.getElementById('franq-bars').innerHTML=sorted.map((s,i)=>{const c=s.mg>=0.2?'#10B981':s.mg>=0.1?'#F59E0B':s.mg>=0?'#F97316':'#EF4444';return`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-bg"><div class="rank-bar" style="width:${Math.abs(s.g)/maxG*100}%;background:${c}"></div></div><div class="rank-label">${s.f}</div><div class="rank-pct" style="color:${c}">${Math.round(s.mg*100)}%</div></div>`;}).join('');
+}
+
+function renderAlerts(){
+  const alerts=[
+    {name:'Trunks V-Rare Normal (x2)',detail:'Costo $821 · Precio $400 · Pérdida $421 por unidad',loss:'-$842',urgent:true},
+    {name:'Jim Halpert Chase',detail:'Costo $999 · Precio $500 · Pérdida $499 por unidad',loss:'-$499',urgent:true},
+    {name:'Po Kung Fu Panda Chase',detail:'Costo $980 · Precio $500 · Pérdida $480 por unidad',loss:'-$480',urgent:true},
+    {name:'Marvel — 7 SKUs',detail:'Jubilee, Magneto, Dazzler, Nimrod, HERBIE...',loss:'-$701',urgent:false},
+    {name:'Star Wars — 5 SKUs',detail:'Luke Skywalker x2, Obi-Wan, Boba Fett, C-3PO...',loss:'-$698',urgent:false}
+  ];
+  document.getElementById('alerts-list').innerHTML=alerts.map(a=>{const ic=a.urgent?'#EF4444':'#F97316';return`<div class="alert-item"><span style="color:${ic};flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">${a.name}</div><div class="alert-detail">${a.detail}</div></div><div class="alert-loss" style="color:${ic}">${a.loss}</div></div>`;}).join('');
+}
+
+function renderInsights(rows){
+  const meli=rows.filter(r=>r.plataforma==='Mercado Libre'),fb=rows.filter(r=>r.plataforma==='FB Ads');
+  const mv=meli.reduce((s,r)=>s+(r.precioVenta||0),0),fv=fb.reduce((s,r)=>s+(r.precioVenta||0),0);
+  const mmg=mv>0?meli.reduce((s,r)=>s+(r.gananciaNeta||0),0)/mv:0,fmg=fv>0?fb.reduce((s,r)=>s+(r.gananciaNeta||0),0)/fv:0;
+  const cards=rows.filter(r=>r.tipo==='Trading Cards'),cv=cards.reduce((s,r)=>s+(r.precioVenta||0),0),cm=cv>0?cards.reduce((s,r)=>s+(r.gananciaNeta||0),0)/cv:0;
+  const insights=[
+    {icon:'⚡',bg:'rgba(245,158,11,0.1)',ic:'#F59E0B',title:`FB Ads = ${mmg>0?(fmg/mmg).toFixed(1):'—'}× más rentable que Meli`,body:`${fmtP(fmg)} vs ${fmtP(mmg)} margen. Mover volumen a FB Ads tiene impacto enorme.`},
+    {icon:'🃏',bg:'rgba(99,102,241,0.1)',ic:'#6366F1',title:`Trading Cards: ${Math.round(cm*100)}% margen promedio`,body:'Mayor retorno que Funko con igual inversión. Priorizar capital en esta categoría.'},
+    {icon:'🧾',bg:'rgba(239,68,68,0.1)',ic:'#EF4444',title:'Verificar RFC registrado en Meli',body:'Con RFC: ~10.5% retención fiscal. Sin RFC: 36%. Corregirlo es gratis e inmediato.'},
+    {icon:'🗑',bg:'rgba(16,185,129,0.1)',ic:'#10B981',title:'Liquidar SKUs con margen negativo',body:'Capital inmovilizado. Recuperar para reinvertir donde sí rinde.'}
+  ];
+  document.getElementById('insights-list').innerHTML=insights.map(ins=>`<div class="insight-row"><div class="insight-icon" style="background:${ins.bg}">${ins.icon}</div><div><div class="insight-title">${ins.title}</div><div class="insight-body">${ins.body}</div></div></div>`).join('');
+}
+
+function renderTipoChart(rows){
+  const bT={};rows.forEach(r=>{const t=r.tipo||'Otro';if(!bT[t])bT[t]={v:0,g:0};bT[t].v+=r.precioVenta||0;bT[t].g+=r.gananciaNeta||0;});
+  const tipos=Object.keys(bT).sort((a,b)=>bT[b].v-bT[a].v);
+  mkChart('c-tipo-chart','bar',tipos,[{label:'Ventas',data:tipos.map(t=>bT[t].v),backgroundColor:'#FCD34D',borderRadius:4,borderSkipped:false},{label:'Ganancia',data:tipos.map(t=>bT[t].g),backgroundColor:'#6EE7B7',borderRadius:4,borderSkipped:false}]);
+}
+
+function renderPnL(){
+  const rows=ALL_ROWS;
+  const ventas=rows.reduce((s,r)=>s+(r.precioVenta||0),0);
+  const cargosMeli=rows.reduce((s,r)=>s+(r.cargosMeli||0),0);
+  const enviosMeli=rows.reduce((s,r)=>s+(r.envioMeli||0),0);
+  const impuestosMeli=rows.reduce((s,r)=>s+(r.impuestosMeli||0),0);
+  const costosMeli=cargosMeli+enviosMeli+impuestosMeli;
+  const ingresoNeto=ventas-costosMeli;
+  const costoInv=rows.reduce((s,r)=>s+(r.costoInv||0),0);
+  const embalaje=rows.reduce((s,r)=>s+(r.embalaje||0),0);
+  const cogs=costoInv+embalaje;
+  const utilBruta=ingresoNeto-cogs;
+  const gastos=window.GASTOS_OPS;
+  const utilNeta=utilBruta-gastos;
+  const piezas=rows.reduce((s,r)=>s+(r.piezas||1),0);
+  const margenPostMeli=ventas>0?ingresoNeto/ventas:0;
+  const margenBruto=ventas>0?utilBruta/ventas:0;
+  const margenNeto=ventas>0?utilNeta/ventas:0;
+  const fmt=v=>{if(!v&&v!==0)return'$0';const a=Math.abs(v),sg=v<0?'-':'';return sg+'$'+(a>=1000000?(a/1000000).toFixed(1)+'M':a>=1000?Math.round(a/1000)+'K':Math.round(a).toLocaleString('es-MX'));};
+  const fP=v=>(v*100).toFixed(1)+'%';
+
+  const sc=document.getElementById('pnl-summary-cards');
+  if(sc)sc.innerHTML=`
+    <div class="pnl-summary-card" style="border-top-color:#FCD34D"><div class="pnl-summary-label">Ventas brutas</div><div class="pnl-summary-val" style="color:#F59E0B">${fmt(ventas)}</div><div class="pnl-summary-sub">${rows.length} ventas · ${piezas} piezas</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#6EE7B7"><div class="pnl-summary-label">Utilidad bruta</div><div class="pnl-summary-val" style="color:#10B981">${fmt(utilBruta)}</div><div class="pnl-summary-sub">después de Meli y producto</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#10B981"><div class="pnl-summary-label">Utilidad neta</div><div class="pnl-summary-val" style="color:#10B981">${fmt(utilNeta)}</div><div class="pnl-summary-sub">lo que queda al final</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#6366F1"><div class="pnl-summary-label">Margen neto</div><div class="pnl-summary-val" style="color:#6366F1">${fP(margenNeto)}</div><div class="pnl-summary-sub">de cada peso vendido</div></div>`;
+
+  const mg=document.getElementById('pnl-margin-cards');
+  if(mg)mg.innerHTML=`
+    <div class="pnl-summary-card" style="border-top-color:#3B82F6"><div class="pnl-summary-label">Margen post-Meli</div><div class="pnl-summary-val" style="color:#3B82F6">${fP(margenPostMeli)}</div><div class="pnl-summary-sub">después de comisiones y retenciones</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#F59E0B"><div class="pnl-summary-label">Margen bruto</div><div class="pnl-summary-val" style="color:#F59E0B">${fP(margenBruto)}</div><div class="pnl-summary-sub">después de Meli + costo de producto</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#10B981"><div class="pnl-summary-label">Margen operativo</div><div class="pnl-summary-val" style="color:#10B981">${fP(margenNeto)}</div><div class="pnl-summary-sub">después de todos los gastos</div></div>`;
+
+  const pr=document.getElementById('pnl-rows');
+  if(pr)pr.innerHTML=`
+    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(252,211,77,0.06)"><span style="color:#F59E0B">↑</span><span class="pnl-block-title" style="color:#F59E0B">Ingresos</span></div><div class="pnl-row"><span class="pnl-label">Ventas brutas (precio de venta total)</span><span class="pnl-amount" style="color:#10B981">${fmt(ventas)}</span></div></div>
+    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(239,68,68,0.06)"><svg width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="48" ry="48" fill="#FFE600"/><path d="M22 55 Q50 28 78 55" stroke="#2D3277" stroke-width="8" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="68" rx="26" ry="12" fill="#2D3277"/></svg><span class="pnl-block-title">Costos Mercado Libre</span></div>
+      <div class="pnl-row indent"><span class="pnl-label">Cargos plataforma</span><span class="pnl-amount">-${fmt(cargosMeli)}</span></div>
+      <div class="pnl-row indent"><span class="pnl-label">Envío (mi parte)</span><span class="pnl-amount">-${fmt(enviosMeli)}</span></div>
+      <div class="pnl-row indent"><span class="pnl-label">Impuestos retenidos</span><span class="pnl-amount">-${fmt(impuestosMeli)}</span></div>
+      <div class="pnl-row subtotal"><span class="pnl-label">Ingreso neto después de Meli</span><span class="pnl-amount" style="color:#F59E0B">${fmt(ingresoNeto)}</span></div></div>
+    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(249,115,22,0.06)"><span style="color:#F97316">📦</span><span class="pnl-block-title">Costo del producto vendido (COGS)</span></div>
+      <div class="pnl-row indent"><span class="pnl-label">Costo de inventario vendido</span><span class="pnl-amount">-${fmt(costoInv)}</span></div>
+      <div class="pnl-row indent"><span class="pnl-label">Embalaje por venta</span><span class="pnl-amount">-${fmt(embalaje)}</span></div>
+      <div class="pnl-row subtotal"><span class="pnl-label">Utilidad bruta</span><span class="pnl-amount" style="color:#10B981">${fmt(utilBruta)}</span></div></div>
+    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(139,92,246,0.06)"><span style="color:#8B5CF6">🧾</span><span class="pnl-block-title">Gastos operativos</span></div>
+      ${Object.keys(window.GASTOS_DETAIL).length>0
+        ?Object.entries(window.GASTOS_DETAIL).map(([cat,total])=>`<div class="pnl-row indent"><span class="pnl-label">${cat.trim()}</span><span class="pnl-amount" style="color:#EF4444">-${fmt(total)}</span></div>`).join('')
+        :'<div class="pnl-row indent"><span class="pnl-label" style="color:#9CA3AF">Cargando gastos...</span><span class="pnl-amount" style="color:#9CA3AF">—</span></div>'}
+      <div class="pnl-row subtotal"><span class="pnl-label">Total gastos operativos</span><span class="pnl-amount" style="color:#EF4444">-${fmt(gastos)}</span></div></div>
+    <div class="pnl-block" style="margin-top:4px"><div class="pnl-row result-positive" style="margin:8px"><span style="font-size:16px;margin-right:8px">🏆</span><span class="pnl-label">UTILIDAD NETA DEL PERÍODO</span><span class="pnl-amount">${fmt(utilNeta)}</span></div></div>`;
+
+  const nota=document.getElementById('pnl-nota');
+  if(nota)nota.innerHTML=`<strong>¿Cómo leer esto?</strong><br>Vendiste <strong>${fmt(ventas)}</strong> en total.<br>Meli se llevó <strong>${fmt(costosMeli)}</strong> → te quedaron <strong>${fmt(ingresoNeto)}</strong>.<br>Los productos te costaron <strong>${fmt(cogs)}</strong> → utilidad bruta: <strong>${fmt(utilBruta)}</strong>.<br>Gastos operativos: <strong>${fmt(gastos)}</strong>.<br><strong style="color:#10B981">Utilidad neta: ${fmt(utilNeta)}</strong><br><br><em>La compra de inventario nuevo no es un gasto — es inversión en stock.</em>`;
+
+  renderPnLChart(ventas,costosMeli,costoInv,embalaje,gastos,utilNeta);
+}
+
+function renderPnLChart(ventas,costosMeli,costoInv,embalaje,gastos,utilNeta){
+  const{grid,tick}=getColors();
+  if(CHARTS['c-pnl-chart'])CHARTS['c-pnl-chart'].destroy();
+  const ctx=document.getElementById('c-pnl-chart');if(!ctx)return;
+  const pct=v=>ventas>0?Math.round(Math.abs(v)/ventas*1000)/10:0;
+  const labels=['Costos Meli','Costo inventario','Embalaje','Gastos operativos','Utilidad neta'];
+  const values=[pct(costosMeli),pct(costoInv),pct(embalaje),pct(gastos),pct(utilNeta)];
+  const colors=['#EF4444','#F97316','#F97316','#8B5CF6','#10B981'];
+  CHARTS['c-pnl-chart']=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data:values,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw.toFixed(1)+'% de $100 vendido'}}},scales:{y:{ticks:{color:tick,font:{size:11}},grid:{display:false}},x:{ticks:{color:tick,font:{size:10},callback:v=>v+'%'},grid:{color:grid},max:100}}}});
+}
+
+function renderAll(period){
+  const rows=filterRows(period);
+  renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderInsights(rows);renderTipoChart(rows);
+}
+
+function setPeriod(btn,period){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');currentPeriod=period;renderAll(period);
+}
+
+function loadAndRender(){
+  document.getElementById('last-update').textContent='Actualizando...';
+  ALL_ROWS=[];
+  const cb='cu_'+Date.now();
+  window[cb]=processGvizData;
+  window.google.visualization.Query.setResponse=function(data){
+  // Route to correct handler based on which sheet loaded
+  if(data.table&&data.table.cols&&data.table.cols[0]&&data.table.cols[0].type==='date'){
+    processGvizData(data); // Ventas has date in col A
+  } else {
+    processGastosData(data); // Gastos has date as string or no date
+  }
+};
+  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cb}&sheet=Ventas&range=A5:V200`;
+  const oldS=document.getElementById('s0');if(oldS)oldS.remove();
+  const s=document.createElement('script');s.id='s0';s.src=url;
+  s.onerror=()=>{document.getElementById('last-update').textContent='Sin conexión';useFallback();};
   document.head.appendChild(s);
-  setTimeout(() => { if(ALL_ROWS.length === 0) useFallback(); }, 9000);
+  setTimeout(()=>{if(ALL_ROWS.length===0)useFallback();},9000);
 
-  // Load Gastos via fetch (avoids JSONP callback conflict)
-  setTimeout(() => {
-    const urlG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Gastos&range=A2:C200`;
-    fetch(urlG)
-      .then(r => r.text())
-      .then(txt => {
-        const json = txt.replace(/^\/\*[^*]*\*\/\s*[^(]*\(/, '').replace(/\);?\s*$/, '');
-        const data = JSON.parse(json);
-        processGastosData(data);
-      })
-      .catch(e => console.log('Gastos fetch error:', e));
-  }, 1000);
+  setTimeout(()=>{
+    const cbG='cug_'+Date.now();
+    window[cbG]=function(data){ delete window[cbG]; processGastosData(data); };
+    const urlG=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cbG}&sheet=Gastos&range=A2:C200`;
+    const sg=document.createElement('script');
+    sg.src=urlG;
+    sg.onerror=()=>console.log('Gastos JSONP error');
+    document.head.appendChild(sg);
+  },1500);
 }
 
 loadAndRender();
