@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_18.html -->
+<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_19.html -->
 <html lang="es" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -192,7 +192,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .ti-database::before{content:'🗄'}
 .ti-info::before{content:'ℹ'}
 </style>
-<script id="s0" src="./index_files/json.txt"></script></head>
+</head>
 <body>
 <div class="container">
 
@@ -207,7 +207,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       </div>
     </div>
     <div class="topbar-right">
-      <div class="live-badge"><div class="live-dot"></div><span id="last-update">Al 17 may 2026</span></div>
+      <div class="live-badge"><div class="live-dot"></div><span id="last-update">Actualizando...</span></div>
       <button class="btn btn-theme" onclick="toggleTheme()" id="theme-btn"><i class="ti ti-sun"></i> Claro</button>
       <button class="btn btn-gold" onclick="loadAndRender()"><i class="ti ti-refresh"></i> Actualizar</button>
     </div>
@@ -236,9 +236,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
         <button class="ptab" onclick="setPeriod(this,&#39;junio&#39;)">Junio</button>
       </div>
     </div>
-    <div class="kpi-grid" id="kpi-row"><div class="kpi" style="border-left-color:#F59E0B"><div class="kpi-label">Ventas totales</div><div class="kpi-value" style="color:#F59E0B">$132K</div><div class="kpi-sub">91 transacciones</div></div><div class="kpi" style="border-left-color:#10B981"><div class="kpi-label">Ganancia neta</div><div class="kpi-value" style="color:#10B981">$24K</div><div class="kpi-sub">18% margen</div></div><div class="kpi" style="border-left-color:#10B981"><div class="kpi-label">Piezas vendidas</div><div class="kpi-value" style="color:#10B981">293</div><div class="kpi-sub">unidades despachadas</div></div><div class="kpi" style="border-left-color:#6366F1"><div class="kpi-label">Ticket promedio</div><div class="kpi-value" style="color:#6366F1">$1K</div><div class="kpi-sub">por venta</div></div><div class="kpi" style="border-left-color:#EF4444"><div class="kpi-label">Margen Meli</div><div class="kpi-value" style="color:#EF4444">12%</div><div class="kpi-sub">vs 34% FB Ads</div></div><div class="kpi" style="border-left-color:#F97316"><div class="kpi-label">Costo vendido</div><div class="kpi-value" style="color:#F97316">$64K</div><div class="kpi-sub">capital en producto</div></div></div>
+    <div class="kpi-grid" id="kpi-row"></div>
     <div class="section-label">Por tipo de producto</div>
-    <div class="tipo-grid" id="tipo-cards"><div class="tipo-card"><div class="tipo-badge" style="background:rgba(32,150,212,0.15);color:#2096D4">FUNKO</div><div><div class="tipo-name">Funko Pop</div><div class="tipo-val">$47K</div><div class="tipo-mg" style="color:#EF4444">13% margen · $6K ganancia</div></div></div><div class="tipo-card"><div class="tipo-badge" style="background:rgba(204,0,0,0.12);color:#CC0000">TOPPS</div><div><div class="tipo-name">Trading Cards</div><div class="tipo-val">$58K</div><div class="tipo-mg" style="color:#F59E0B">22% margen · $12K ganancia</div></div></div><div class="tipo-card"><div class="tipo-badge" style="background:rgba(100,100,120,0.12);color:#9094A8">PIX!</div><div><div class="tipo-name">Thrilljoy PIX!</div><div class="tipo-val">$6K</div><div class="tipo-mg" style="color:#F59E0B">16% margen · $1K ganancia</div></div></div></div>
+    <div class="tipo-grid" id="tipo-cards"></div>
     <div class="section-label">Tendencias</div>
     <div class="row2">
       <div class="card">
@@ -258,13 +258,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
             <option value="Otro">Otros</option>
           </select>
         </div>
-        <div style="position:relative;height:200px"><canvas id="c-month" width="1388" height="400" style="display: block; box-sizing: border-box; height: 200px; width: 694px;"></canvas></div>
+        <div style="position:relative;height:200px"><canvas id="c-month"></canvas></div>
       </div>
       <div class="card">
         <div class="card-title"><i class="ti ti-chart-donut" style="color:#6366F1"></i>Mix de ventas por tipo</div>
         <div class="card-sub">Distribución de ingresos</div>
-        <div id="donut-legend" class="legend" style="margin-bottom:10px"><span class="leg-item"><span class="leg-sq" style="background:#FCD34D"></span>Trading Cards 44%</span><span class="leg-item"><span class="leg-sq" style="background:#EF4444"></span>Funko Pop 36%</span><span class="leg-item"><span class="leg-sq" style="background:#6B7280"></span>Otro 16%</span><span class="leg-item"><span class="leg-sq" style="background:#9CA3AF"></span>Thrilljoy PIX! 5%</span></div>
-        <div style="position:relative;height:150px"><canvas id="c-donut" width="900" height="300" style="display: block; box-sizing: border-box; height: 150px; width: 450px;"></canvas></div>
+        <div id="donut-legend" class="legend" style="margin-bottom:10px"></div>
+        <div style="position:relative;height:150px"><canvas id="c-donut"></canvas></div>
       </div>
     </div>
     <div class="section-label">Análisis de rentabilidad</div>
@@ -282,18 +282,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
             <span>FB Ads</span>
           </div>
         </div>
-        <div style="position:relative;height:100px"><canvas id="c-plat" width="729" height="200" style="display: block; box-sizing: border-box; height: 100px; width: 364px;"></canvas></div>
-        <div id="plat-insight" class="plat-insight" style="display: block;"><strong style="color:var(--text)">FB Ads = 2.8× más rentable</strong> — 34% vs 12% margen neto</div>
+        <div style="position:relative;height:100px"><canvas id="c-plat"></canvas></div>
+        <div id="plat-insight" class="plat-insight" style="display:none"></div>
       </div>
       <div class="card">
         <div class="card-title"><i class="ti ti-trophy" style="color:#F59E0B"></i>Franquicia Funko Pop</div>
         <div class="card-sub">Ganancia neta · verde = bueno · rojo = revisar</div>
-        <div id="franq-bars"><div class="rank-row"><div class="rank-num">1</div><div class="rank-bg"><div class="rank-bar" style="width:100%;background:#10B981"></div></div><div class="rank-label">Thrilljoy PIX! Scareglow</div><div class="rank-pct" style="color:#10B981">36%</div></div><div class="rank-row"><div class="rank-num">2</div><div class="rank-bg"><div class="rank-bar" style="width:66.66134751773049%;background:#10B981"></div></div><div class="rank-label">Wolverine #1576 (EECC</div><div class="rank-pct" style="color:#10B981">70%</div></div><div class="rank-row"><div class="rank-num">3</div><div class="rank-bg"><div class="rank-bar" style="width:26.73758865248227%;background:#10B981"></div></div><div class="rank-label">Paul Skenes #129</div><div class="rank-pct" style="color:#10B981">54%</div></div><div class="rank-row"><div class="rank-num">4</div><div class="rank-bg"><div class="rank-bar" style="width:21.302482269503546%;background:#10B981"></div></div><div class="rank-label">All Might (weakened)</div><div class="rank-pct" style="color:#10B981">39%</div></div><div class="rank-row"><div class="rank-num">5</div><div class="rank-bg"><div class="rank-bar" style="width:16.170212765957448%;background:#10B981"></div></div><div class="rank-label">Juan Soto #125</div><div class="rank-pct" style="color:#10B981">43%</div></div><div class="rank-row"><div class="rank-num">6</div><div class="rank-bg"><div class="rank-bar" style="width:13.22695035460993%;background:#10B981"></div></div><div class="rank-label">Reverse Flash /</div><div class="rank-pct" style="color:#10B981">26%</div></div><div class="rank-row"><div class="rank-num">7</div><div class="rank-bg"><div class="rank-bar" style="width:13.141843971631207%;background:#F59E0B"></div></div><div class="rank-label">Harry Potter #179</div><div class="rank-pct" style="color:#F59E0B">15%</div></div><div class="rank-row"><div class="rank-num">8</div><div class="rank-bg"><div class="rank-bar" style="width:11.508510638297873%;background:#10B981"></div></div><div class="rank-label">General Greivous #449</div><div class="rank-pct" style="color:#10B981">33%</div></div><div class="rank-row"><div class="rank-num">9</div><div class="rank-bg"><div class="rank-bar" style="width:11.146808510638296%;background:#10B981"></div></div><div class="rank-label">Luka Doncic #221</div><div class="rank-pct" style="color:#10B981">23%</div></div></div>
+        <div id="franq-bars"></div>
       </div>
       <div class="card">
         <div class="card-title"><i class="ti ti-alert-triangle" style="color:var(--text-3)"></i>Piezas a liquidar</div>
         <div class="card-sub">Margen negativo · acción requerida</div>
-        <div class="alerts-scroll" id="alerts-list"><div class="alert-item"><i class="ti ti-alert-circle" style="font-size:13px;color:#EF4444;flex-shrink:0;margin-top:2px"></i><div style="flex:1;min-width:0"><div class="alert-name">Trunks V-Rare Normal (x2)</div><div class="alert-detail">Costo $821 · Precio $400 · Pérdida $421 por unidad</div></div><div class="alert-loss" style="color:#EF4444">-$842</div></div><div class="alert-item"><i class="ti ti-alert-circle" style="font-size:13px;color:#EF4444;flex-shrink:0;margin-top:2px"></i><div style="flex:1;min-width:0"><div class="alert-name">Jim Halpert Chase</div><div class="alert-detail">Costo $999 · Precio $500 · Pérdida $499 por unidad</div></div><div class="alert-loss" style="color:#EF4444">-$499</div></div><div class="alert-item"><i class="ti ti-alert-circle" style="font-size:13px;color:#EF4444;flex-shrink:0;margin-top:2px"></i><div style="flex:1;min-width:0"><div class="alert-name">Po Kung Fu Panda Chase</div><div class="alert-detail">Costo $980 · Precio $500 · Pérdida $480 por unidad</div></div><div class="alert-loss" style="color:#EF4444">-$480</div></div><div class="alert-item"><i class="ti ti-alert-circle" style="font-size:13px;color:#F97316;flex-shrink:0;margin-top:2px"></i><div style="flex:1;min-width:0"><div class="alert-name">Marvel — 7 SKUs</div><div class="alert-detail">Jubilee, Magneto, Dazzler, Nimrod, HERBIE...</div></div><div class="alert-loss" style="color:#F97316">-$701</div></div><div class="alert-item"><i class="ti ti-alert-circle" style="font-size:13px;color:#F97316;flex-shrink:0;margin-top:2px"></i><div style="flex:1;min-width:0"><div class="alert-name">Star Wars — 5 SKUs</div><div class="alert-detail">Luke Skywalker x2, Obi-Wan, Boba Fett, C-3PO...</div></div><div class="alert-loss" style="color:#F97316">-$698</div></div></div>
+        <div class="alerts-scroll" id="alerts-list"></div>
       </div>
     </div>
     <div class="section-label">Acciones y comparativas</div>
@@ -301,13 +301,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       <div class="card">
         <div class="card-title"><i class="ti ti-bulb" style="color:#F59E0B"></i>Decisiones clave</div>
         <div class="card-sub" style="margin-bottom:8px">Basadas en los datos del negocio</div>
-        <div id="insights-list"><div class="insight-row"><div class="insight-icon" style="background:rgba(245,158,11,0.1)"><i class="ti ti-bolt" style="font-size:13px;color:#F59E0B"></i></div><div><div class="insight-title">FB Ads = 2.8× más rentable que Meli</div><div class="insight-body">34% vs 12% margen. Mover volumen a FB Ads tiene impacto enorme.</div></div></div><div class="insight-row"><div class="insight-icon" style="background:rgba(99,102,241,0.1)"><i class="ti ti-cards" style="font-size:13px;color:#6366F1"></i></div><div><div class="insight-title">Trading Cards: 22% margen promedio</div><div class="insight-body">Mayor retorno que Funko con igual inversión. Priorizar capital en esta categoría.</div></div></div><div class="insight-row"><div class="insight-icon" style="background:rgba(239,68,68,0.1)"><i class="ti ti-receipt-tax" style="font-size:13px;color:#EF4444"></i></div><div><div class="insight-title">Verificar RFC registrado en Meli</div><div class="insight-body">Con RFC: ~10.5% retención fiscal. Sin RFC: 36%. Corregirlo es gratis e inmediato.</div></div></div><div class="insight-row"><div class="insight-icon" style="background:rgba(16,185,129,0.1)"><i class="ti ti-trash" style="font-size:13px;color:#10B981"></i></div><div><div class="insight-title">Liquidar 30 SKUs con margen negativo</div><div class="insight-body">$4,710 inmovilizados. Recuperar capital para reinvertir donde sí rinde.</div></div></div></div>
+        <div id="insights-list"></div>
       </div>
       <div class="card">
         <div class="card-title"><i class="ti ti-chart-bar" style="color:#6366F1"></i>Ventas y ganancia por tipo</div>
         <div class="card-sub">Comparativa de rentabilidad</div>
         <div class="legend"><span class="leg-item"><span class="leg-sq" style="background:#FCD34D"></span>Ventas</span><span class="leg-item"><span class="leg-sq" style="background:#6EE7B7"></span>Ganancia</span></div>
-        <div style="position:relative;height:170px"><canvas id="c-tipo-chart" width="1144" height="340" style="display: block; box-sizing: border-box; height: 170px; width: 572px;"></canvas></div>
+        <div style="position:relative;height:170px"><canvas id="c-tipo-chart"></canvas></div>
       </div>
     </div>
   </div>
@@ -422,8 +422,8 @@ function processGvizData(data) {
 
 window.google.visualization.Query.setResponse = processGvizData;
 
-let GASTOS_OPS = 0;
-let GASTOS_DETAIL = {};
+window.GASTOS_OPS = 0;
+window.GASTOS_DETAIL = {};
 
 function processGastosData(data) {
   try {
@@ -439,12 +439,12 @@ function processGastosData(data) {
     });
     // Exclude Compra de Inventario
     const excluir = ['Compra de Inventario','Compra de inventario'];
-    GASTOS_OPS = 0;
-    GASTOS_DETAIL = {};
+    window.GASTOS_OPS = 0;
+    window.GASTOS_DETAIL = {};
     Object.entries(gastosTotales).forEach(([cat,total])=>{
       if(!excluir.includes(cat)){
-        GASTOS_OPS += total;
-        GASTOS_DETAIL[cat] = total;
+        window.GASTOS_OPS += total;
+        window.GASTOS_DETAIL[cat] = total;
       }
     });
     console.log('Gastos ops cargados:', GASTOS_OPS, GASTOS_DETAIL);
@@ -462,39 +462,7 @@ function loadAndRender() {
   window[cb] = processGvizData;
   window.google.visualization.Query.setResponse = processGvizData;
 
-let GASTOS_OPS = 0;
-let GASTOS_DETAIL = {};
 
-function processGastosData(data) {
-  try {
-    const rows = data.table.rows||[];
-    const gastosTotales = {};
-    rows.forEach(r => {
-      const c = r.c||[];
-      const cat = c[1]?.v||'';
-      const monto = parseN(c[2]?.f??c[2]?.v)||0;
-      if(cat && monto > 0) {
-        gastosTotales[cat] = (gastosTotales[cat]||0) + monto;
-      }
-    });
-    // Exclude Compra de Inventario
-    const excluir = ['Compra de Inventario','Compra de inventario'];
-    GASTOS_OPS = 0;
-    GASTOS_DETAIL = {};
-    Object.entries(gastosTotales).forEach(([cat,total])=>{
-      if(!excluir.includes(cat)){
-        GASTOS_OPS += total;
-        GASTOS_DETAIL[cat] = total;
-      }
-    });
-    console.log('Gastos ops cargados:', GASTOS_OPS, GASTOS_DETAIL);
-    // Always re-render PnL with new gastos data
-    renderPnL();
-  } catch(e) {
-    console.error('Gastos parse error:', e);
-  }
-}
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cb}&sheet=Ventas&range=A5:T200`;
   const old = document.getElementById('s0');
   if(old) old.remove();
   const s = document.createElement('script');
@@ -509,8 +477,7 @@ function processGastosData(data) {
     fetch(urlG)
       .then(r => r.text())
       .then(txt => {
-        // Strip JSONP wrapper: /*O_o*/ google.visualization.Query.setResponse({...});
-        const json = txt.replace(/^[^{]*/, '').replace(/\);?\s*$/, '');
+        const json = txt.replace(/^\/\*[^*]*\*\/\s*[^(]*\(/, '').replace(/\);?\s*$/, '');
         const data = JSON.parse(json);
         processGastosData(data);
       })
@@ -518,314 +485,7 @@ function processGastosData(data) {
   }, 1000);
 }
 
-function useFallback(){
-  ALL_ROWS=[
-    {fecha:new Date(2026,2,15),precioVenta:1200,plataforma:'Mercado Libre',gananciaNeta:180,costoInv:500,tipo:'Funko Pop',franquicia:'One Piece'},
-    {fecha:new Date(2026,3,1),precioVenta:1329,plataforma:'Mercado Libre',gananciaNeta:272,costoInv:576,tipo:'Trading Cards',franquicia:'Trading Cards'},
-    {fecha:new Date(2026,3,3),precioVenta:854,plataforma:'Mercado Libre',gananciaNeta:307,costoInv:181,tipo:'Funko Pop',franquicia:'One Piece'},
-    {fecha:new Date(2026,3,5),precioVenta:2700,plataforma:'FB Ads',gananciaNeta:1600,costoInv:700,tipo:'Funko Pop',franquicia:'Marvel'},
-    {fecha:new Date(2026,3,10),precioVenta:7396,plataforma:'Mercado Libre',gananciaNeta:1438,costoInv:3472,tipo:'Trading Cards',franquicia:'Trading Cards'},
-    {fecha:new Date(2026,3,15),precioVenta:700,plataforma:'FB Ads',gananciaNeta:220,costoInv:400,tipo:'Thrilljoy PIX!',franquicia:'Thrilljoy'},
-    {fecha:new Date(2026,4,1),precioVenta:1132,plataforma:'Mercado Libre',gananciaNeta:240,costoInv:498,tipo:'Trading Cards',franquicia:'Deportes'},
-    {fecha:new Date(2026,4,8),precioVenta:900,plataforma:'FB Ads',gananciaNeta:450,costoInv:300,tipo:'Funko Pop',franquicia:'Naruto'},
-    {fecha:new Date(2026,5,9),precioVenta:1099,plataforma:'Mercado Libre',gananciaNeta:239,costoInv:400,tipo:'Funko Pop',franquicia:'One Piece'},
-    {fecha:new Date(2026,5,10),precioVenta:1329,plataforma:'Mercado Libre',gananciaNeta:333,costoInv:496,tipo:'Trading Cards',franquicia:'Trading Cards'},
-    {fecha:new Date(2026,5,11),precioVenta:700,plataforma:'FB Ads',gananciaNeta:220,costoInv:400,tipo:'Thrilljoy PIX!',franquicia:'Thrilljoy'},
-  ];
-  document.getElementById('last-update').textContent='Datos de muestra';renderAll(currentPeriod);}
-
-function filterRows(p){if(p==='all'||p==='ytd')return ALL_ROWS;if(p==='q1')return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getMonth()<=2);if(p==='q2')return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getMonth()>=3&&r.fecha.getMonth()<=5);const m={abril:3,mayo:4,junio:5}[p];return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getMonth()===m);}
-
-function getColors(){const dark=document.documentElement.getAttribute('data-theme')==='dark';return{grid:dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',tick:dark?'#5A5D72':'#9CA3AF'};}
-
-function mkChart(id,type,labels,datasets,opts={}){
-  if(CHARTS[id])CHARTS[id].destroy();const ctx=document.getElementById(id);if(!ctx)return;
-  const{grid,tick}=getColors();
-  const defSc={x:{ticks:{color:tick,font:{size:10,family:'DM Sans'}},grid:{color:grid}},y:{ticks:{color:tick,font:{size:10,family:'DM Sans'},callback:opts.yfmt||(v=>'$'+Math.round(v/1000)+'K')},grid:{color:grid}}};
-  CHARTS[id]=new Chart(ctx,{type,data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'$'+Math.round(ctx.raw).toLocaleString('es-MX')}}},scales:type==='doughnut'?undefined:(opts.scales||defSc),...(opts.extra||{})}});}
-
-function renderKPIs(rows){
-  const V=rows.reduce((s,r)=>s+(r.precioVenta||0),0),G=rows.reduce((s,r)=>s+(r.gananciaNeta||0),0),T=rows.length;
-  const meli=rows.filter(r=>r.plataforma==='Mercado Libre'),fb=rows.filter(r=>r.plataforma==='FB Ads');
-  const mv=meli.reduce((s,r)=>s+(r.precioVenta||0),0),fv=fb.reduce((s,r)=>s+(r.precioVenta||0),0);
-  const mmg=mv>0?meli.reduce((s,r)=>s+(r.gananciaNeta||0),0)/mv:0,fmg=fv>0?fb.reduce((s,r)=>s+(r.gananciaNeta||0),0)/fv:0;
-  const piezas=rows.reduce((s,r)=>s+(r.piezas||1),0);
-  const kpis=[{lbl:'Ventas totales',val:fmtK(V),sub:T+' transacciones',c:'#F59E0B'},{lbl:'Ganancia neta',val:fmtK(G),sub:fmtP(V>0?G/V:0)+' margen',c:'#10B981'},{lbl:'Piezas vendidas',val:String(piezas),sub:'unidades despachadas',c:'#10B981'},{lbl:'Ticket promedio',val:fmtK(T>0?V/T:0),sub:'por venta',c:'#6366F1'},{lbl:'Margen Meli',val:fmtP(mmg),sub:'vs '+fmtP(fmg)+' FB Ads',c:'#EF4444'},{lbl:'Costo vendido',val:fmtK(rows.reduce((s,r)=>s+(r.costoInv||0),0)),sub:'capital en producto',c:'#F97316'}];
-  document.getElementById('kpi-row').innerHTML=kpis.map(k=>`<div class="kpi" style="border-left-color:${k.c}"><div class="kpi-label">${k.lbl}</div><div class="kpi-value" style="color:${k.c}">${k.val}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');}
-
-function renderTipoCards(rows){
-  const bT={};rows.forEach(r=>{const t=r.tipo||'Otro';if(!bT[t])bT[t]={v:0,g:0};bT[t].v+=r.precioVenta||0;bT[t].g+=r.gananciaNeta||0;});
-  const tipos=['Funko Pop','Trading Cards','Thrilljoy PIX!'].filter(t=>bT[t]);
-  const meta={'Funko Pop':{badge:'FUNKO',bg:'rgba(32,150,212,0.15)',txt:'#2096D4'},'Trading Cards':{badge:'TOPPS',bg:'rgba(204,0,0,0.12)',txt:'#CC0000'},'Thrilljoy PIX!':{badge:'PIX!',bg:'rgba(100,100,120,0.12)',txt:'#9094A8'}};
-  document.getElementById('tipo-cards').innerHTML=tipos.map(t=>{const d=bT[t]||{v:0,g:0},m=meta[t]||{badge:t,bg:'rgba(100,100,120,0.1)',txt:'#9094A8'};const mg=d.v>0?d.g/d.v:0;const mgColor=mg>=0.25?'#10B981':mg>=0.15?'#F59E0B':'#EF4444';return`<div class="tipo-card"><div class="tipo-badge" style="background:${m.bg};color:${m.txt}">${m.badge}</div><div><div class="tipo-name">${t}</div><div class="tipo-val">${fmtK(d.v)}</div><div class="tipo-mg" style="color:${mgColor}">${fmtP(mg)} margen · ${fmtK(d.g)} ganancia</div></div></div>`;}).join('');}
-
-function renderMonth(rows){
-  const tipoSel = document.getElementById('tipo-filter')?.value || 'all';
-  const filtered = tipoSel === 'all' ? rows : rows.filter(r => r.tipo === tipoSel);
-  const bM = {};
-  filtered.forEach(r => {
-    if(!r.fecha) return;
-    const k = r.fecha.toLocaleDateString('es-MX',{month:'short',year:'2-digit'});
-    if(!bM[k]) bM[k] = {meli:0, cogs:0, ops:0, gan:0, ventas:0};
-    const v = r.precioVenta || 0;
-    const g = r.gananciaNeta || 0;
-    const costo = r.costoInv || 0;
-    const meli = v * 0.082; // ~8.2% costos Meli promedio
-    const emb = v * 0.011; // ~1.1% embalaje
-    const ops = v * 0.024; // ~2.4% gastos operativos
-    bM[k].meli += meli;
-    bM[k].cogs += costo + emb;
-    bM[k].ops += ops;
-    bM[k].gan += g;
-    bM[k].ventas += v;
-  });
-  const L = Object.keys(bM);
-  const {grid,tick} = getColors();
-  if(CHARTS['c-month']) CHARTS['c-month'].destroy();
-  const ctx = document.getElementById('c-month'); if(!ctx) return;
-  CHARTS['c-month'] = new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels: L,
-      datasets:[
-        {label:'Costos Meli',     data:L.map(k=>Math.round(bM[k].meli)), backgroundColor:'#EF4444', stack:'s'},
-        {label:'Costo inventario',data:L.map(k=>Math.round(bM[k].cogs)), backgroundColor:'#F97316', stack:'s'},
-        {label:'Gastos operativos',data:L.map(k=>Math.round(bM[k].ops)), backgroundColor:'#8B5CF6', stack:'s'},
-        {label:'Ganancia neta',   data:L.map(k=>Math.round(bM[k].gan)), backgroundColor:'#10B981', stack:'s'},
-      ]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{
-          mode:'index', intersect:false,
-          callbacks:{
-            title: items => 'Mes: ' + items[0].label,
-            label: ctx => {
-              const v = ctx.raw;
-              const mes = ctx.label;
-              const total = bM[mes]?.ventas || 0;
-              const pct = total > 0 ? ' (' + Math.round(v/total*100) + '%)' : '';
-              return '  ' + ctx.dataset.label + ': $' + v.toLocaleString('es-MX') + pct;
-            },
-            afterBody: items => {
-              const mes = items[0].label;
-              const total = bM[mes]?.ventas || 0;
-              return ['', '  Total vendido: $' + Math.round(total).toLocaleString('es-MX')];
-            }
-          }
-        }
-      },
-      scales:{
-        x:{ticks:{color:tick,font:{size:10,family:'DM Sans'}},grid:{color:grid},stacked:true},
-        y:{ticks:{color:tick,font:{size:10,family:'DM Sans'},callback:v=>'$'+Math.round(v/1000)+'K'},grid:{color:grid},stacked:true}
-      }
-    }
-  });
-}
-
-function renderDonut(rows){const bT={};rows.forEach(r=>{const t=r.tipo||'Otro';bT[t]=(bT[t]||0)+(r.precioVenta||0);});const tipos=Object.keys(bT).sort((a,b)=>bT[b]-bT[a]);const colors=['#FCD34D','#EF4444','#6B7280','#9CA3AF'];const total=tipos.reduce((s,t)=>s+bT[t],0);document.getElementById('donut-legend').innerHTML=tipos.map((t,i)=>`<span class="leg-item"><span class="leg-sq" style="background:${colors[i]||'#9CA3AF'}"></span>${t} ${total>0?Math.round(bT[t]/total*100)+'%':''}</span>`).join('');mkChart('c-donut','doughnut',tipos,[{data:tipos.map(t=>bT[t]),backgroundColor:tipos.map((_,i)=>colors[i]||'#9CA3AF'),borderWidth:0,hoverOffset:4}],{extra:{cutout:'65%'}});}
-
-function renderPlat(rows){const bP={};rows.forEach(r=>{if(!r.plataforma)return;if(!bP[r.plataforma])bP[r.plataforma]={v:0,g:0};bP[r.plataforma].v+=r.precioVenta||0;bP[r.plataforma].g+=r.gananciaNeta||0;});const plats=Object.keys(bP).sort((a,b)=>bP[b].g-bP[a].g);const colors=plats.map(p=>p==='FB Ads'?'#10B981':p==='Mercado Libre'?'#3B82F6':'#9CA3AF');const{grid,tick}=getColors();mkChart('c-plat','bar',plats,[{label:'Ganancia',data:plats.map(p=>bP[p].g),backgroundColor:colors,borderRadius:4,borderSkipped:false}],{extra:{indexAxis:'y'},scales:{y:{ticks:{color:tick,font:{size:10}},grid:{display:false}},x:{ticks:{color:tick,font:{size:10},callback:v=>'$'+Math.round(v/1000)+'K'},grid:{color:grid}}}});const meli=bP['Mercado Libre'],fb=bP['FB Ads'];if(meli&&fb){const mm=meli.v>0?meli.g/meli.v:0,fm=fb.v>0?fb.g/fb.v:0;const el=document.getElementById('plat-insight');el.style.display='block';el.innerHTML=`<strong style="color:var(--text)">FB Ads = ${mm>0?(fm/mm).toFixed(1):'—'}× más rentable</strong> — ${fmtP(fm)} vs ${fmtP(mm)} margen neto`;}}
-
-function renderFranq(rows){const bF={};rows.filter(r=>r.tipo==='Funko Pop'&&r.franquicia).forEach(r=>{if(!bF[r.franquicia])bF[r.franquicia]={v:0,g:0};bF[r.franquicia].v+=r.precioVenta||0;bF[r.franquicia].g+=r.gananciaNeta||0;});const sorted=Object.entries(bF).map(([f,d])=>({f,g:d.g,mg:d.v>0?d.g/d.v:0})).sort((a,b)=>b.g-a.g).slice(0,9);const maxG=Math.max(...sorted.map(s=>Math.abs(s.g)),1);document.getElementById('franq-bars').innerHTML=sorted.map((s,i)=>{const c=s.mg>=0.2?'#10B981':s.mg>=0.1?'#F59E0B':s.mg>=0?'#F97316':'#EF4444';return`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-bg"><div class="rank-bar" style="width:${Math.abs(s.g)/maxG*100}%;background:${c}"></div></div><div class="rank-label">${s.f}</div><div class="rank-pct" style="color:${c}">${Math.round(s.mg*100)}%</div></div>`;}).join('');}
-
-function renderAlerts(){const alerts=[{name:'Trunks V-Rare Normal (x2)',detail:'Costo $821 · Precio $400 · Pérdida $421 por unidad',loss:'-$842',urgent:true},{name:'Jim Halpert Chase',detail:'Costo $999 · Precio $500 · Pérdida $499 por unidad',loss:'-$499',urgent:true},{name:'Po Kung Fu Panda Chase',detail:'Costo $980 · Precio $500 · Pérdida $480 por unidad',loss:'-$480',urgent:true},{name:'Marvel — 7 SKUs',detail:'Jubilee, Magneto, Dazzler, Nimrod, HERBIE...',loss:'-$701',urgent:false},{name:'Star Wars — 5 SKUs',detail:'Luke Skywalker x2, Obi-Wan, Boba Fett, C-3PO...',loss:'-$698',urgent:false}];document.getElementById('alerts-list').innerHTML=alerts.map(a=>{const ic=a.urgent?'#EF4444':'#F97316';return`<div class="alert-item"><i class="ti ti-alert-circle" style="font-size:13px;color:${ic};flex-shrink:0;margin-top:2px"></i><div style="flex:1;min-width:0"><div class="alert-name">${a.name}</div><div class="alert-detail">${a.detail}</div></div><div class="alert-loss" style="color:${ic}">${a.loss}</div></div>`;}).join('');}
-
-function renderInsights(rows){const meli=rows.filter(r=>r.plataforma==='Mercado Libre'),fb=rows.filter(r=>r.plataforma==='FB Ads');const mv=meli.reduce((s,r)=>s+(r.precioVenta||0),0),fv=fb.reduce((s,r)=>s+(r.precioVenta||0),0);const mmg=mv>0?meli.reduce((s,r)=>s+(r.gananciaNeta||0),0)/mv:0,fmg=fv>0?fb.reduce((s,r)=>s+(r.gananciaNeta||0),0)/fv:0;const cards=rows.filter(r=>r.tipo==='Trading Cards'),cv=cards.reduce((s,r)=>s+(r.precioVenta||0),0),cm=cv>0?cards.reduce((s,r)=>s+(r.gananciaNeta||0),0)/cv:0;const insights=[{icon:'ti-bolt',bg:'rgba(245,158,11,0.1)',ic:'#F59E0B',title:`FB Ads = ${mmg>0?(fmg/mmg).toFixed(1):'4'}× más rentable que Meli`,body:`${fmtP(fmg)} vs ${fmtP(mmg)} margen. Mover volumen a FB Ads tiene impacto enorme.`},{icon:'ti-cards',bg:'rgba(99,102,241,0.1)',ic:'#6366F1',title:`Trading Cards: ${Math.round(cm*100)}% margen promedio`,body:'Mayor retorno que Funko con igual inversión. Priorizar capital en esta categoría.'},{icon:'ti-receipt-tax',bg:'rgba(239,68,68,0.1)',ic:'#EF4444',title:'Verificar RFC registrado en Meli',body:'Con RFC: ~10.5% retención fiscal. Sin RFC: 36%. Corregirlo es gratis e inmediato.'},{icon:'ti-trash',bg:'rgba(16,185,129,0.1)',ic:'#10B981',title:'Liquidar 30 SKUs con margen negativo',body:'$4,710 inmovilizados. Recuperar capital para reinvertir donde sí rinde.'}];document.getElementById('insights-list').innerHTML=insights.map(ins=>`<div class="insight-row"><div class="insight-icon" style="background:${ins.bg}"><i class="ti ${ins.icon}" style="font-size:13px;color:${ins.ic}"></i></div><div><div class="insight-title">${ins.title}</div><div class="insight-body">${ins.body}</div></div></div>`).join('');}
-
-function renderTipoChart(rows){const bT={};rows.forEach(r=>{const t=r.tipo||'Otro';if(!bT[t])bT[t]={v:0,g:0};bT[t].v+=r.precioVenta||0;bT[t].g+=r.gananciaNeta||0;});const tipos=Object.keys(bT).sort((a,b)=>bT[b].v-bT[a].v);mkChart('c-tipo-chart','bar',tipos,[{label:'Ventas',data:tipos.map(t=>bT[t].v),backgroundColor:'#FCD34D',borderRadius:4,borderSkipped:false},{label:'Ganancia',data:tipos.map(t=>bT[t].g),backgroundColor:'#6EE7B7',borderRadius:4,borderSkipped:false}]);}
-
-function renderPnL() {
-  console.log('renderPnL called - GASTOS_OPS:', GASTOS_OPS, 'rows:', ALL_ROWS.length);
-  const rows = ALL_ROWS; // Use all rows regardless of period filter
-
-  // Calculate from real data
-  const ventas = rows.reduce((s,r)=>s+(r.precioVenta||0),0);
-  const cargosMeli = rows.reduce((s,r)=>s+(r.cargosMeli||0),0);
-  const enviosMeli = rows.reduce((s,r)=>s+(r.envioMeli||0),0);
-  const impuestosMeli = rows.reduce((s,r)=>s+(r.impuestosMeli||0),0);
-  const costosMeli = cargosMeli + enviosMeli + impuestosMeli;
-  const ingresoNeto = ventas - costosMeli;
-  const costoInv = rows.reduce((s,r)=>s+(r.costoInv||0),0);
-  const embalaje = rows.reduce((s,r)=>s+(r.embalaje||0),0);
-  const cogs = costoInv + embalaje;
-  const utilBruta = ingresoNeto - cogs;
-  const gastos = GASTOS_OPS; // From Gastos sheet (excl. Compra Inventario)
-  const utilNeta = utilBruta - gastos;
-  const margenPostMeli = ventas>0 ? ingresoNeto/ventas : 0;
-  const margenBruto = ventas>0 ? utilBruta/ventas : 0;
-  const margenNeto = ventas>0 ? utilNeta/ventas : 0;
-  const piezas = rows.reduce((s,r)=>s+(r.piezas||1),0);
-
-  const fmt = v => {
-    if(!v&&v!==0) return '$0';
-    const a=Math.abs(v),s=v<0?'-':'';
-    return s+'$'+(a>=1000000?(a/1000000).toFixed(1)+'M':a>=1000?Math.round(a/1000)+'K':Math.round(a).toLocaleString('es-MX'));
-  };
-  const fmtP = v => (v*100).toFixed(1)+'%';
-
-  // Summary cards
-  const sc = document.getElementById('pnl-summary-cards');
-  if(sc) sc.innerHTML = `
-    <div class="pnl-summary-card" style="border-top-color:#FCD34D">
-      <div class="pnl-summary-label">Ventas brutas</div>
-      <div class="pnl-summary-val" style="color:#F59E0B">${fmt(ventas)}</div>
-      <div class="pnl-summary-sub">${rows.length} ventas · ${piezas} piezas</div>
-    </div>
-    <div class="pnl-summary-card" style="border-top-color:#6EE7B7">
-      <div class="pnl-summary-label">Utilidad bruta</div>
-      <div class="pnl-summary-val" style="color:#10B981">${fmt(utilBruta)}</div>
-      <div class="pnl-summary-sub">después de Meli y producto</div>
-    </div>
-    <div class="pnl-summary-card" style="border-top-color:#10B981">
-      <div class="pnl-summary-label">Utilidad neta</div>
-      <div class="pnl-summary-val" style="color:#10B981">${fmt(utilNeta)}</div>
-      <div class="pnl-summary-sub">lo que queda al final</div>
-    </div>
-    <div class="pnl-summary-card" style="border-top-color:#6366F1">
-      <div class="pnl-summary-label">Margen neto</div>
-      <div class="pnl-summary-val" style="color:#6366F1">${fmtP(margenNeto)}</div>
-      <div class="pnl-summary-sub">de cada peso vendido</div>
-    </div>`;
-
-  // Margin cards
-  const existingMg = document.getElementById('pnl-margin-cards');
-  if(existingMg) existingMg.innerHTML = `
-    <div class="pnl-summary-card" style="border-top-color:#3B82F6">
-      <div class="pnl-summary-label">Margen post-Meli</div>
-      <div class="pnl-summary-val" style="color:#3B82F6">${fmtP(margenPostMeli)}</div>
-      <div class="pnl-summary-sub">después de comisiones y retenciones</div>
-    </div>
-    <div class="pnl-summary-card" style="border-top-color:#F59E0B">
-      <div class="pnl-summary-label">Margen bruto</div>
-      <div class="pnl-summary-val" style="color:#F59E0B">${fmtP(margenBruto)}</div>
-      <div class="pnl-summary-sub">después de Meli + costo de producto</div>
-    </div>
-    <div class="pnl-summary-card" style="border-top-color:#10B981">
-      <div class="pnl-summary-label">Margen operativo</div>
-      <div class="pnl-summary-val" style="color:#10B981">${fmtP(margenNeto)}</div>
-      <div class="pnl-summary-sub">después de todos los gastos</div>
-    </div>`;
-
-  // P&L rows
-  const pr = document.getElementById('pnl-rows');
-  if(pr) pr.innerHTML = `
-    <div class="pnl-block">
-      <div class="pnl-block-header" style="background:rgba(252,211,77,0.06)">
-        <span style="color:#F59E0B;font-size:16px">↑</span>
-        <span class="pnl-block-title" style="color:#F59E0B">Ingresos</span>
-      </div>
-      <div class="pnl-row">
-        <span class="pnl-label">Ventas brutas (precio de venta total)</span>
-        <span class="pnl-amount" style="color:#10B981">${fmt(ventas)}</span>
-      </div>
-    </div>
-
-    <div class="pnl-block">
-      <div class="pnl-block-header" style="background:rgba(239,68,68,0.06)">
-        <svg width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="48" ry="48" fill="#FFE600"/><path d="M22 55 Q50 28 78 55" stroke="#2D3277" stroke-width="8" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="68" rx="26" ry="12" fill="#2D3277"/></svg>
-        <span class="pnl-block-title">Costos de plataforma — Mercado Libre</span>
-      </div>
-      <div class="pnl-row indent">
-        <span class="pnl-label">Cargos plataforma Meli</span>
-        <span class="pnl-amount">-${fmt(cargosMeli)}</span>
-      </div>
-      <div class="pnl-row indent">
-        <span class="pnl-label">Envío (mi parte)</span>
-        <span class="pnl-amount">-${fmt(enviosMeli)}</span>
-      </div>
-      <div class="pnl-row indent">
-        <span class="pnl-label">Impuestos retenidos</span>
-        <span class="pnl-amount">-${fmt(impuestosMeli)}</span>
-      </div>
-      <div class="pnl-row subtotal">
-        <span class="pnl-label">Ingreso neto después de Meli</span>
-        <span class="pnl-amount" style="color:#F59E0B">${fmt(ingresoNeto)}</span>
-      </div>
-    </div>
-
-    <div class="pnl-block">
-      <div class="pnl-block-header" style="background:rgba(249,115,22,0.06)">
-        <span style="color:#F97316;font-size:16px">📦</span>
-        <span class="pnl-block-title">Costo del producto vendido (COGS)</span>
-      </div>
-      <div class="pnl-row indent">
-        <span class="pnl-label">Costo de inventario vendido</span>
-        <span class="pnl-amount">-${fmt(costoInv)}</span>
-      </div>
-      <div class="pnl-row indent">
-        <span class="pnl-label">Embalaje por venta</span>
-        <span class="pnl-amount">-${fmt(embalaje)}</span>
-      </div>
-      <div class="pnl-row subtotal">
-        <span class="pnl-label">Utilidad bruta</span>
-        <span class="pnl-amount" style="color:#10B981">${fmt(utilBruta)}</span>
-      </div>
-    </div>
-
-    <div class="pnl-block">
-      <div class="pnl-block-header" style="background:rgba(139,92,246,0.06)">
-        <span style="color:#8B5CF6;font-size:16px">🧾</span>
-        <span class="pnl-block-title">Gastos operativos</span>
-      </div>
-      ${Object.keys(GASTOS_DETAIL).length > 0
-        ? Object.entries(GASTOS_DETAIL).map(([cat,total])=>`
-          <div class="pnl-row indent">
-            <span class="pnl-label">${cat}</span>
-            <span class="pnl-amount" style="color:#EF4444">-${fmt(total)}</span>
-          </div>`).join('')
-        : `<div class="pnl-row indent"><span class="pnl-label" style="color:#9CA3AF">Cargando...</span><span class="pnl-amount" style="color:#9CA3AF">—</span></div>`
-      }
-      <div class="pnl-row subtotal">
-        <span class="pnl-label">Total gastos operativos</span>
-        <span class="pnl-amount" style="color:#EF4444">-${fmt(gastos)}</span>
-      </div>
-    </div>
-
-    <div class="pnl-block" style="margin-top:4px">
-      <div class="pnl-row result-positive" style="margin:8px">
-        <span style="font-size:16px;margin-right:8px">🏆</span>
-        <span class="pnl-label">UTILIDAD NETA DEL PERÍODO</span>
-        <span class="pnl-amount">${fmt(utilNeta)}</span>
-      </div>
-    </div>`;
-
-  // Dynamic explanation note
-  const nota = document.getElementById('pnl-nota');
-  if(nota) nota.innerHTML = `
-    <strong>¿Cómo leer esto?</strong><br>
-    Vendiste <strong>${fmt(ventas)}</strong> en total.<br>
-    Meli se llevó <strong>${fmt(costosMeli)}</strong> en comisiones, impuestos y envíos → te quedaron <strong>${fmt(ingresoNeto)}</strong>.<br>
-    Los productos vendidos te costaron <strong>${fmt(cogs)}</strong> → utilidad bruta: <strong>${fmt(utilBruta)}</strong>.<br>
-    Gastos operativos: <strong>${fmt(gastos)}</strong>${gastos>0?' ('+Object.keys(GASTOS_DETAIL).join(', ')+')':' (pendiente conectar hoja Gastos)'}.<br>
-    <strong style="color:#10B981">Utilidad neta del período: ${fmt(utilNeta)}</strong><br><br>
-    <em>La compra de inventario nuevo no es un gasto — es inversión en stock que se convertirá en ventas futuras.</em>`;
-
-  renderPnLChart(ventas, costosMeli, costoInv, embalaje, gastos, utilNeta);
-}
-
-function renderPnLChart(ventas, costosMeli, costoInv, embalaje, gastos, utilNeta){
-  const{grid,tick}=getColors();
-  if(CHARTS['c-pnl-chart'])CHARTS['c-pnl-chart'].destroy();
-  const ctx=document.getElementById('c-pnl-chart');if(!ctx)return;
-  const pct = v => ventas>0 ? Math.round(Math.abs(v)/ventas*1000)/10 : 0;
-  const labels=['Costos Meli','Costo inventario','Embalaje','Gastos operativos','Utilidad neta'];
-  const values=[pct(costosMeli),pct(costoInv),pct(embalaje),pct(gastos),pct(utilNeta)];
-  const colors=['#EF4444','#F97316','#F97316','#8B5CF6','#10B981'];
-  CHARTS['c-pnl-chart']=new Chart(ctx,{
-    type:'bar',
-    data:{labels,datasets:[{data:values,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw.toFixed(1)+'% de $100 vendido'}}},scales:{y:{ticks:{color:tick,font:{size:11,family:'DM Sans'}},grid:{display:false}},x:{ticks:{color:tick,font:{size:10},callback:v=>v+'%'},grid:{color:grid},max:100}}}
-  });}
-
-function renderAll(period){const rows=filterRows(period);renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderInsights(rows);renderTipoChart(rows);}
-
-function setPeriod(btn,period){document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');currentPeriod=period;renderAll(period);}
-
 loadAndRender();
 </script>
-
 
 </body></html>
