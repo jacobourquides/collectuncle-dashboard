@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_16.html -->
+<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_17.html -->
 <html lang="es" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -448,12 +448,10 @@ function processGastosData(data) {
       }
     });
     console.log('Gastos ops cargados:', GASTOS_OPS, GASTOS_DETAIL);
-    // Restore Ventas callback
-    window.google.visualization.Query.setResponse = processGvizData;
-    if(document.getElementById('panel-pnl').classList.contains('active')) renderPnL();
+    // Always re-render PnL with new gastos data
+    renderPnL();
   } catch(e) {
     console.error('Gastos parse error:', e);
-    window.google.visualization.Query.setResponse = processGvizData;
   }
 }
 
@@ -490,12 +488,10 @@ function processGastosData(data) {
       }
     });
     console.log('Gastos ops cargados:', GASTOS_OPS, GASTOS_DETAIL);
-    // Restore Ventas callback
-    window.google.visualization.Query.setResponse = processGvizData;
-    if(document.getElementById('panel-pnl').classList.contains('active')) renderPnL();
+    // Always re-render PnL with new gastos data
+    renderPnL();
   } catch(e) {
     console.error('Gastos parse error:', e);
-    window.google.visualization.Query.setResponse = processGvizData;
   }
 }
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cb}&sheet=Ventas&range=A5:T200`;
