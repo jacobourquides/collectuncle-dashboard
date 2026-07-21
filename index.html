@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_35.html -->
+<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_36.html -->
 <html lang="es" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -406,6 +406,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       #panel-cotizador .cfoot{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
       #panel-cotizador .cfoot .btn{flex:1;justify-content:center;padding:10px}
       #panel-cotizador .cnote{font-size:11px;color:var(--text-3);margin-top:12px;line-height:1.5}
+      #panel-cotizador textarea{width:100%;padding:9px 12px;font-size:13px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);font-family:inherit;resize:vertical}
+      #panel-cotizador textarea:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+      #panel-cotizador .cot-paste-status{font-size:11px;margin-top:5px;min-height:14px}
+      #panel-cotizador .cot-fxref{font-size:11px;color:var(--text-3);margin-top:5px}
+      #panel-cotizador .cot-fxref a{color:var(--gold);cursor:pointer;text-decoration:underline}
       #panel-cotizador .cot-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:100}
       #panel-cotizador .cot-toast.show{opacity:1}
     </style>
@@ -413,6 +418,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     <div class="cot-grid">
       <div class="cot-card">
         <div class="cot-h">Datos de la compra</div>
+        <label>Pegar orden de eBay <span class="hint">precio, envío y tax se llenan solos</span></label>
+        <textarea id="cot-paste" rows="3" placeholder="Pega el bloque de la orden. Ej:
+1 item      $43.00
+Shipping    $8.00
+Tax         $4.21"></textarea>
+        <div class="cot-paste-status" id="cot-paste-status"></div>
         <label>Producto</label>
         <input id="cot-prod" type="text" placeholder="Ej. Funko Batman #144">
         <div class="two">
@@ -424,7 +435,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
           <div><label>Comisión PO Box <span class="hint">%</span></label><input id="cot-pobox" type="number" step="0.01" min="0" value="16"></div>
         </div>
         <div class="two">
-          <div><label>TDC tarjeta <span class="hint">MXN/USD</span></label><input id="cot-tdc-card" type="number" step="0.0001" min="0" placeholder="ej. 19.50"></div>
+          <div><label>TDC tarjeta <span class="hint">MXN/USD</span></label><input id="cot-tdc-card" type="number" step="0.0001" min="0" placeholder="ej. 19.50"><div class="cot-fxref" id="cot-fxref">Mercado hoy: <strong>$17.44</strong> (ref., tu tarjeta cobra más) · <a id="cot-usefx">usar</a></div></div>
           <div><label>TDC PO Box <span class="hint">MXN/USD</span></label><input id="cot-tdc-pobox" type="number" step="0.0001" min="0" placeholder="ej. 21.00"></div>
         </div>
         <div class="cnote">El tax se calcula sobre <strong>precio + envío</strong> (confirmado con orden real: $51 × 8.25% = $4.21). La tasa depende de la dirección de entrega, no del vendedor; ajústala si algún caso sale distinto.</div>
@@ -455,6 +466,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     var mxn=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'});
     var usd=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
     var n=function(id){var v=parseFloat($(id).value);return isNaN(v)?0:v;};
+    var LS={get:function(k){try{return localStorage.getItem(k);}catch(e){return null;}},set:function(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
     function calc(){
       var precio=n('cot-price'),envio=n('cot-ship');
       var taxPct=n('cot-tax')/100,poboxPct=n('cot-pobox')/100;
@@ -474,13 +486,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       $('cot-o-pobox-mxn').innerHTML=tdcPobox?('× '+tdcPobox+' = <strong>'+mxn.format(poboxMXN)+'</strong>'):'ingresa TDC PO Box →';
       $('cot-o-total').textContent=(tdcCard||tdcPobox)?mxn.format(total):'—';
     }
+    // Parser de la orden pegada
+    function parseOrden(txt){
+      var st=$('cot-paste-status');
+      if(!txt||!txt.trim()){st.textContent='';return;}
+      var money=function(re){var m=txt.match(re);return m?parseFloat(m[1].replace(/,/g,'')):null;};
+      var precio=money(/item[s]?\D*\$?\s*([\d,]+\.?\d*)/i);
+      if(precio==null)precio=money(/precio\D*\$?\s*([\d,]+\.?\d*)/i);
+      var envio=money(/shipping\D*\$?\s*([\d,]+\.?\d*)/i);
+      if(envio==null)envio=money(/env[íi]o\D*\$?\s*([\d,]+\.?\d*)/i);
+      var tax=money(/tax\D*\$?\s*([\d,]+\.?\d*)/i);
+      if(tax==null)tax=money(/impuesto\D*\$?\s*([\d,]+\.?\d*)/i);
+      var got=[];
+      if(precio!=null){$('cot-price').value=precio;got.push('precio');}
+      if(envio!=null){$('cot-ship').value=envio;got.push('envío');}else if(precio!=null){$('cot-ship').value=0;}
+      if(tax!=null&&precio!=null){var base=precio+(envio||0);if(base>0){$('cot-tax').value=(tax/base*100).toFixed(2);got.push('tax');}}
+      if(got.length){st.style.color='var(--teal)';st.textContent='✓ Cargado: '+got.join(', ')+'. Verifica y ajusta si hace falta.';}
+      else{st.style.color='var(--red)';st.textContent='No pude leer los números — revisa el formato o llena a mano.';}
+      calc();
+    }
+    $('cot-paste').addEventListener('input',function(){parseOrden(this.value);});
+    // Referencia de tipo de cambio de mercado (NO es el de la tarjeta)
+    function loadFx(){
+      var ref=$('cot-fxref');ref.textContent='Consultando tipo de cambio…';
+      fetch('https://open.er-api.com/v6/latest/USD').then(function(r){return r.json();}).then(function(d){
+        if(d&&d.rates&&d.rates.MXN){var v=d.rates.MXN.toFixed(2);
+          ref.innerHTML='Mercado hoy: <strong>$'+v+'</strong> (ref., tu tarjeta cobra más) · <a id="cot-usefx">usar</a>';
+          $('cot-usefx').addEventListener('click',function(){$('cot-tdc-card').value=v;saveTdc();calc();});
+        }else ref.textContent='';
+      }).catch(function(){ref.textContent='';});
+    }
+    // Memoria de los TDC (persisten en el navegador)
+    function saveTdc(){LS.set('cu_tdc_card',$('cot-tdc-card').value);LS.set('cu_tdc_pobox',$('cot-tdc-pobox').value);}
+    (function(){var c=LS.get('cu_tdc_card'),p=LS.get('cu_tdc_pobox');if(c)$('cot-tdc-card').value=c;if(p)$('cot-tdc-pobox').value=p;})();
+    $('cot-tdc-card').addEventListener('input',saveTdc);
+    $('cot-tdc-pobox').addEventListener('input',saveTdc);
     ['cot-price','cot-ship','cot-tax','cot-pobox','cot-tdc-card','cot-tdc-pobox','cot-prod'].forEach(function(id){$(id).addEventListener('input',calc);});
     $('cot-copy').addEventListener('click',function(){
       var t='Cotización Collectuncle\nProducto: '+($('cot-prod').value||'(sin nombre)')+'\nPrecio: '+usd.format(n('cot-price'))+' | Envío: '+usd.format(n('cot-ship'))+'\nTOTAL: '+$('cot-o-total').textContent;
       navigator.clipboard.writeText(t).then(function(){var el=$('cot-toast');el.classList.add('show');setTimeout(function(){el.classList.remove('show');},1600);});
     });
-    $('cot-reset').addEventListener('click',function(){$('cot-prod').value='';$('cot-price').value='';$('cot-ship').value='';$('cot-tdc-card').value='';$('cot-tdc-pobox').value='';$('cot-tax').value='8.25';$('cot-pobox').value='16';calc();});
-    calc();
+    $('cot-reset').addEventListener('click',function(){
+      $('cot-prod').value='';$('cot-price').value='';$('cot-ship').value='';
+      $('cot-paste').value='';$('cot-paste-status').textContent='';
+      $('cot-tax').value='8.25';$('cot-pobox').value='16';
+      var c=LS.get('cu_tdc_card'),p=LS.get('cu_tdc_pobox');
+      $('cot-tdc-card').value=c||'';$('cot-tdc-pobox').value=p||'';
+      calc();
+    });
+    loadFx();calc();
   })();
   </script>
 
