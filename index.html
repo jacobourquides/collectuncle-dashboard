@@ -191,8 +191,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .ti-receipt::before{content:'🧾'}
 .ti-database::before{content:'🗄'}
 .ti-info::before{content:'ℹ'}
-</style>
-<script src="file:///Users/jacobo/Downloads/index_files/json.txt"></script><script src="file:///Users/jacobo/Downloads/index_files/json.txt"></script><script src="./index_files/json.txt"></script><script src="./index_files/json(1).txt"></script><script id="s0" src="./index_files/json(2).txt"></script></head>
+</style></head>
 <body>
 <div class="container">
 
@@ -302,7 +301,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
         <div id="franq-bars"><div class="rank-row"><div class="rank-num">1</div><div class="rank-bg"><div class="rank-bar" style="width:100%;background:#10B981"></div></div><div class="rank-label">Topps: Soccer 2025/2026</div><div class="rank-pct" style="color:#10B981">27%</div></div><div class="rank-row"><div class="rank-num">2</div><div class="rank-bg"><div class="rank-bar" style="width:61.40391425805789%;background:#10B981"></div></div><div class="rank-label">Rhaenyra Targaryen #06</div><div class="rank-pct" style="color:#10B981">100%</div></div><div class="rank-row"><div class="rank-num">3</div><div class="rank-bg"><div class="rank-bar" style="width:59.33411939542672%;background:#10B981"></div></div><div class="rank-label">John Snow Castle</div><div class="rank-pct" style="color:#10B981">100%</div></div><div class="rank-row"><div class="rank-num">4</div><div class="rank-bg"><div class="rank-bar" style="width:58.30336155383641%;background:#10B981"></div></div><div class="rank-label">Topps Chrome NFL</div><div class="rank-pct" style="color:#10B981">29%</div></div><div class="rank-row"><div class="rank-num">5</div><div class="rank-bg"><div class="rank-bar" style="width:52.13509689054718%;background:#10B981"></div></div><div class="rank-label">Topps Chrome 2025</div><div class="rank-pct" style="color:#10B981">21%</div></div><div class="rank-row"><div class="rank-num">6</div><div class="rank-bg"><div class="rank-bar" style="width:46.92963180419189%;background:#10B981"></div></div><div class="rank-label">Topps Chrome 2026</div><div class="rank-pct" style="color:#10B981">40%</div></div><div class="rank-row"><div class="rank-num">7</div><div class="rank-bg"><div class="rank-bar" style="width:40.810697251795375%;background:#10B981"></div></div><div class="rank-label">Topps Team Set</div><div class="rank-pct" style="color:#10B981">24%</div></div><div class="rank-row"><div class="rank-num">8</div><div class="rank-bg"><div class="rank-bar" style="width:36.321795146883%;background:#10B981"></div></div><div class="rank-label">Merlin Premier League</div><div class="rank-pct" style="color:#10B981">37%</div></div><div class="rank-row"><div class="rank-num">9</div><div class="rank-bg"><div class="rank-bar" style="width:32.178410797705844%;background:#10B981"></div></div><div class="rank-label">Tennis Jordan Sashiko</div><div class="rank-pct" style="color:#10B981">78%</div></div></div>
       </div>
       <div class="card">
-        <div class="card-title"><i class="ti ti-alert-triangle" style="color:var(--text-3)"></i>Piezas a liquidar</div>
+        <div class="card-title" onclick="filterInvLiquidar()" style="cursor:pointer" title="Ver lista completa"><i class="ti ti-alert-triangle" style="color:var(--text-3)"></i>Piezas a liquidar <span style="font-size:11px;color:var(--teal);font-weight:400">▸ ver todas</span></div>
         <div class="card-sub">Stock con pérdida o margen crítico · acción requerida</div>
         <div class="alerts-scroll" id="alerts-list"></div>
       </div>
@@ -323,11 +322,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     </div>
     <div style="margin-bottom:12px">
       <div class="card">
-        <div class="card-title"><i class="ti ti-alert-circle" style="color:#F59E0B"></i>Capital atascado · SKUs con más stock</div>
+        <div class="card-title" onclick="filterInvAtascado()" style="cursor:pointer" title="Ver lista completa"><i class="ti ti-alert-circle" style="color:#F59E0B"></i>Capital atascado · SKUs con más stock <span style="font-size:11px;color:var(--teal);font-weight:400">▸ ver todos</span></div>
         <div class="card-sub">Productos con varias piezas paradas · mucho capital en un solo artículo</div>
         <div id="inv-atascado"></div>
       </div>
     </div>
+    <div id="inv-detail" style="margin-bottom:12px;display:none"></div>
     <div class="section-label">Acciones y comparativas</div>
     <div class="row4">
       <div class="card">
@@ -853,6 +853,75 @@ function renderFranq(rows){
   document.getElementById('franq-bars').innerHTML=sorted.map((s,i)=>{const c=s.mg>=0.2?'#10B981':s.mg>=0.1?'#F59E0B':s.mg>=0?'#F97316':'#EF4444';return`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-bg"><div class="rank-bar" style="width:${Math.abs(s.g)/maxG*100}%;background:${c}"></div></div><div class="rank-label">${s.f}</div><div class="rank-pct" style="color:${c}">${Math.round(s.mg*100)}%</div></div>`;}).join('');
 }
 
+// Filtro de inventario activo (para poder togglear: click de nuevo cierra)
+let INV_FILTER_ACTIVE=null;
+
+// Muestra una lista de productos de inventario filtrada, debajo de la sección.
+// key = identificador único del filtro (para toggle); items = productos ya filtrados; titulo = encabezado.
+function showInvDetail(key,items,titulo,accent){
+  const box=document.getElementById('inv-detail');
+  if(!box)return;
+  // Toggle: si clickeo el mismo filtro activo, cierro
+  if(INV_FILTER_ACTIVE===key){ box.style.display='none'; INV_FILTER_ACTIVE=null; return; }
+  INV_FILTER_ACTIVE=key;
+  const col=accent||'var(--gold)';
+  const totalValor=items.reduce((s,p)=>s+(p.valor||0),0);
+  const totalPzs=items.reduce((s,p)=>s+(p.cant||0),0);
+  const rows=items.slice(0,200).map(p=>{
+    const mg=p.margen!=null?Math.round(p.margen*100)+'%':'—';
+    const mgCol=p.margen!=null?(p.margen<0?'#EF4444':p.margen<0.05?'#F97316':'var(--text-2)'):'var(--text-3)';
+    return `<tr>
+      <td style="padding:6px 8px;font-size:12px">${p.nombre||p.id}</td>
+      <td style="padding:6px 8px;font-size:11px;color:var(--text-2)">${p.cat}</td>
+      <td style="padding:6px 8px;font-size:11px;color:var(--text-2)">${p.marca}</td>
+      <td style="padding:6px 8px;font-size:12px;text-align:right">${p.cant}</td>
+      <td style="padding:6px 8px;font-size:12px;text-align:right;color:var(--gold)">$${Math.round(p.valor||0).toLocaleString('es-MX')}</td>
+      <td style="padding:6px 8px;font-size:12px;text-align:right;color:${mgCol}">${mg}</td>
+    </tr>`;
+  }).join('');
+  box.innerHTML=`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="card-title" style="margin:0"><span style="color:${col}">●</span> ${titulo}</div>
+      <button onclick="closeInvDetail()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-2);border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:inherit">✕ Cerrar</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-2);margin-bottom:10px">${items.length} productos · ${totalPzs} piezas · $${Math.round(totalValor).toLocaleString('es-MX')} en capital${items.length>200?' · (mostrando primeros 200)':''}</div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+      <thead><tr style="border-bottom:1px solid var(--border)">
+        <th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--text-3);font-weight:500">Producto</th>
+        <th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--text-3);font-weight:500">Categoría</th>
+        <th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--text-3);font-weight:500">Marca</th>
+        <th style="padding:6px 8px;text-align:right;font-size:11px;color:var(--text-3);font-weight:500">Stock</th>
+        <th style="padding:6px 8px;text-align:right;font-size:11px;color:var(--text-3);font-weight:500">Valor</th>
+        <th style="padding:6px 8px;text-align:right;font-size:11px;color:var(--text-3);font-weight:500">Margen</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+  </div>`;
+  box.style.display='block';
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeInvDetail(){
+  const box=document.getElementById('inv-detail');
+  if(box){box.style.display='none';}
+  INV_FILTER_ACTIVE=null;
+}
+// Filtros específicos (llamados desde los onclick de los cards)
+function filterInvEstado(estado){
+  const items=INVENTARIO.filter(p=>p.estado===estado).sort((a,b)=>(b.valor||0)-(a.valor||0));
+  const labels={OK:'Stock OK',BAJO:'Stock bajo',AGOTADO:'Agotados'};
+  const cols={OK:'#10B981',BAJO:'#F59E0B',AGOTADO:'#EF4444'};
+  showInvDetail('est-'+estado,items,labels[estado],cols[estado]);
+}
+function filterInvLiquidar(){
+  const items=INVENTARIO.filter(p=>p.cant>0&&p.costo>0&&(p.precio<p.costo||(p.margen!=null&&p.margen<0.05)))
+    .sort((a,b)=>{const pa=a.precio<a.costo?(a.costo-a.precio)*a.cant:0,pb=b.precio<b.costo?(b.costo-b.precio)*b.cant:0;return pb-pa;});
+  showInvDetail('liquidar',items,'Piezas a liquidar','#EF4444');
+}
+function filterInvAtascado(){
+  const items=INVENTARIO.filter(p=>p.cant>=3).sort((a,b)=>(b.valor||0)-(a.valor||0));
+  showInvDetail('atascado',items,'Capital atascado (SKUs con 3+ piezas)','#F59E0B');
+}
+
 function renderAlerts(){
   const el=document.getElementById('alerts-list');
   if(!el)return;
@@ -909,8 +978,8 @@ function renderInvSalud(){
   ];
   el.innerHTML=filas.map(f=>{
     const n=cont[f.k],pct=Math.round(n/total*100);
-    return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text-2)">${f.label}</span><span style="color:${f.color};font-weight:600">${n} (${pct}%)</span></div><div style="height:8px;background:var(--surface2);border-radius:6px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${f.color}"></div></div></div>`;
-  }).join('')+`<div style="font-size:11px;color:var(--text-3);margin-top:8px">${total} productos en catálogo · ${cont.AGOTADO+cont.BAJO} necesitan atención</div>`;
+    return `<div onclick="filterInvEstado('${f.k}')" style="margin-bottom:12px;cursor:pointer;padding:4px;border-radius:6px;transition:background .15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text-2)">${f.label}</span><span style="color:${f.color};font-weight:600">${n} (${pct}%)</span></div><div style="height:8px;background:var(--surface2);border-radius:6px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${f.color}"></div></div></div>`;
+  }).join('')+`<div style="font-size:11px;color:var(--text-3);margin-top:8px">${total} productos · ${cont.AGOTADO+cont.BAJO} necesitan atención · <span style="color:var(--teal)">click en cada estado para ver la lista</span></div>`;
 }
 
 // C) Capital atascado — SKUs con más piezas paradas (mucho valor en un solo artículo)
