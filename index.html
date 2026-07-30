@@ -192,6 +192,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .ti-database::before{content:'🗄'}
 .ti-info::before{content:'ℹ'}
 </style>
+<script src="file:///Users/jacobo/Downloads/index_files/json.txt"></script><script src="file:///Users/jacobo/Downloads/index_files/json.txt"></script><script src="./index_files/json.txt"></script><script src="./index_files/json(1).txt"></script><script id="s0" src="./index_files/json(2).txt"></script></head>
 <body>
 <div class="container">
 
@@ -302,8 +303,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       </div>
       <div class="card">
         <div class="card-title"><i class="ti ti-alert-triangle" style="color:var(--text-3)"></i>Piezas a liquidar</div>
-        <div class="card-sub">Margen negativo · acción requerida</div>
-        <div class="alerts-scroll" id="alerts-list"><div class="alert-item"><span style="color:#EF4444;flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">Trunks V-Rare Normal (x2)</div><div class="alert-detail">Costo $821 · Precio $400 · Pérdida $421 por unidad</div></div><div class="alert-loss" style="color:#EF4444">-$842</div></div><div class="alert-item"><span style="color:#EF4444;flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">Jim Halpert Chase</div><div class="alert-detail">Costo $999 · Precio $500 · Pérdida $499 por unidad</div></div><div class="alert-loss" style="color:#EF4444">-$499</div></div><div class="alert-item"><span style="color:#EF4444;flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">Po Kung Fu Panda Chase</div><div class="alert-detail">Costo $980 · Precio $500 · Pérdida $480 por unidad</div></div><div class="alert-loss" style="color:#EF4444">-$480</div></div><div class="alert-item"><span style="color:#F97316;flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">Marvel — 7 SKUs</div><div class="alert-detail">Jubilee, Magneto, Dazzler, Nimrod, HERBIE...</div></div><div class="alert-loss" style="color:#F97316">-$701</div></div><div class="alert-item"><span style="color:#F97316;flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">Star Wars — 5 SKUs</div><div class="alert-detail">Luke Skywalker x2, Obi-Wan, Boba Fett, C-3PO...</div></div><div class="alert-loss" style="color:#F97316">-$698</div></div></div>
+        <div class="card-sub">Stock con pérdida o margen crítico · acción requerida</div>
+        <div class="alerts-scroll" id="alerts-list"></div>
+      </div>
+    </div>
+    <div class="section-label">Inventario · capital y stock</div>
+    <div class="row4">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-package" style="color:var(--gold)"></i>Capital parado por categoría</div>
+        <div class="card-sub">Dónde está tu dinero invertido en stock</div>
+        <div style="position:relative;height:220px"><canvas id="c-inv-cat"></canvas></div>
+        <div id="inv-cap-total" style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-2)"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-bar" style="color:var(--teal)"></i>Salud del stock</div>
+        <div class="card-sub">Productos por estado de disponibilidad</div>
+        <div id="inv-salud"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-alert-circle" style="color:#F59E0B"></i>Capital atascado · SKUs con más stock</div>
+        <div class="card-sub">Productos con varias piezas paradas · mucho capital en un solo artículo</div>
+        <div id="inv-atascado"></div>
       </div>
     </div>
     <div class="section-label">Acciones y comparativas</div>
@@ -544,6 +566,7 @@ Tax         $4.21"></textarea>
 const SHEET_ID='1lZsWSFdUYrH-9k1cZAig2PBWecX8EsRaD3Pg5ADOm50';
 const CHARTS={};let ALL_ROWS=[];let currentPeriod='all';
 let ITEMS_BY_ORDER={};  // OrderID -> [{cat, precio, costo}, ...] desde Items_Ordenes
+let INVENTARIO=[];  // filas de la pestaña Inventario
 window.GASTOS_OPS=0;window.GASTOS_DETAIL={};
 
 function toggleTheme(){const html=document.documentElement;const isDark=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',isDark?'light':'dark');document.getElementById('theme-btn').innerHTML=isDark?'<i class="ti-moon"></i> Oscuro':'<i class="ti-sun"></i> Claro';renderAll(currentPeriod);}
@@ -831,14 +854,75 @@ function renderFranq(rows){
 }
 
 function renderAlerts(){
-  const alerts=[
-    {name:'Trunks V-Rare Normal (x2)',detail:'Costo $821 · Precio $400 · Pérdida $421 por unidad',loss:'-$842',urgent:true},
-    {name:'Jim Halpert Chase',detail:'Costo $999 · Precio $500 · Pérdida $499 por unidad',loss:'-$499',urgent:true},
-    {name:'Po Kung Fu Panda Chase',detail:'Costo $980 · Precio $500 · Pérdida $480 por unidad',loss:'-$480',urgent:true},
-    {name:'Marvel — 7 SKUs',detail:'Jubilee, Magneto, Dazzler, Nimrod, HERBIE...',loss:'-$701',urgent:false},
-    {name:'Star Wars — 5 SKUs',detail:'Luke Skywalker x2, Obi-Wan, Boba Fett, C-3PO...',loss:'-$698',urgent:false}
+  const el=document.getElementById('alerts-list');
+  if(!el)return;
+  if(!INVENTARIO.length){el.innerHTML='<div style="padding:12px;color:var(--text-3);font-size:12px">Sin datos de inventario.</div>';return;}
+  // Candidatos: stock>0 y (precio<costo [pérdida real] o margen<5% [crítico])
+  const cand=INVENTARIO.filter(p=>p.cant>0&&p.costo>0&&(p.precio<p.costo||(p.margen!=null&&p.margen<0.05)))
+    .map(p=>{
+      const perdida=p.precio<p.costo?(p.costo-p.precio)*p.cant:0;
+      const tipo=p.precio<p.costo?'perdida':'critico';
+      return{...p,perdida,tipo};
+    })
+    .sort((a,b)=>{ // pérdida real primero, luego por monto de pérdida/menor margen
+      if(a.tipo!==b.tipo)return a.tipo==='perdida'?-1:1;
+      if(a.tipo==='perdida')return b.perdida-a.perdida;
+      return (a.margen??1)-(b.margen??1);
+    });
+  const riesgo=cand.reduce((s,p)=>s+(p.valor||0),0);
+  const nPerd=cand.filter(p=>p.tipo==='perdida').length;
+  el.innerHTML=`<div style="font-size:11px;color:var(--text-2);margin-bottom:8px">${cand.length} productos · $${Math.round(riesgo).toLocaleString('es-MX')} en capital · ${nPerd} con pérdida real</div>`+
+    cand.slice(0,30).map(p=>{
+      const ic=p.tipo==='perdida'?'#EF4444':'#F97316';
+      const badge=p.tipo==='perdida'?`-$${Math.round(p.perdida).toLocaleString('es-MX')}`:`${Math.round((p.margen||0)*100)}%`;
+      const det=p.tipo==='perdida'
+        ?`Costo $${Math.round(p.costo)} · Precio $${Math.round(p.precio)} · ${p.cant} en stock`
+        :`Margen ${Math.round((p.margen||0)*100)}% · Costo $${Math.round(p.costo)} · ${p.cant} en stock`;
+      return `<div class="alert-item"><span style="color:${ic};flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">${p.nombre||p.id}</div><div class="alert-detail">${det}</div></div><div class="alert-loss" style="color:${ic}">${badge}</div></div>`;
+    }).join('');
+}
+
+// A) Capital parado por categoría (donut)
+function renderInvCapital(){
+  const ctx=document.getElementById('c-inv-cat');if(!ctx)return;
+  const byCat={};let total=0;
+  INVENTARIO.forEach(p=>{byCat[p.cat]=(byCat[p.cat]||0)+(p.valor||0);total+=(p.valor||0);});
+  const cats=Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a]);
+  const palette=['#D4AF37','#14B8A6','#6366F1','#F59E0B','#EF4444','#8B5CF6','#10B981'];
+  const {tick}=getColors();
+  if(CHARTS['c-inv-cat'])CHARTS['c-inv-cat'].destroy();
+  CHARTS['c-inv-cat']=new Chart(ctx,{type:'doughnut',data:{labels:cats,datasets:[{data:cats.map(c=>Math.round(byCat[c])),backgroundColor:cats.map((c,i)=>palette[i%palette.length]),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'right',labels:{color:tick,font:{size:10},boxWidth:10,padding:6}},tooltip:{callbacks:{label:c=>` ${c.label}: $${c.raw.toLocaleString('es-MX')} (${Math.round(c.raw/total*100)}%)`}}}}});
+  const t=document.getElementById('inv-cap-total');
+  if(t)t.innerHTML=`Capital total en inventario: <strong style="color:var(--gold)">$${Math.round(total).toLocaleString('es-MX')}</strong> · ${INVENTARIO.reduce((s,p)=>s+p.cant,0)} piezas`;
+}
+
+// B) Salud del stock (barras horizontales OK/Bajo/Agotado)
+function renderInvSalud(){
+  const el=document.getElementById('inv-salud');if(!el)return;
+  const cont={OK:0,BAJO:0,AGOTADO:0};
+  INVENTARIO.forEach(p=>{if(cont[p.estado]!=null)cont[p.estado]++;});
+  const total=cont.OK+cont.BAJO+cont.AGOTADO||1;
+  const filas=[
+    {k:'OK',label:'✅ OK · buen stock',color:'#10B981'},
+    {k:'BAJO',label:'⚠️ Bajo · reabastecer pronto',color:'#F59E0B'},
+    {k:'AGOTADO',label:'❌ Agotado · sin stock',color:'#EF4444'}
   ];
-  document.getElementById('alerts-list').innerHTML=alerts.map(a=>{const ic=a.urgent?'#EF4444':'#F97316';return`<div class="alert-item"><span style="color:${ic};flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">${a.name}</div><div class="alert-detail">${a.detail}</div></div><div class="alert-loss" style="color:${ic}">${a.loss}</div></div>`;}).join('');
+  el.innerHTML=filas.map(f=>{
+    const n=cont[f.k],pct=Math.round(n/total*100);
+    return `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text-2)">${f.label}</span><span style="color:${f.color};font-weight:600">${n} (${pct}%)</span></div><div style="height:8px;background:var(--surface2);border-radius:6px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${f.color}"></div></div></div>`;
+  }).join('')+`<div style="font-size:11px;color:var(--text-3);margin-top:8px">${total} productos en catálogo · ${cont.AGOTADO+cont.BAJO} necesitan atención</div>`;
+}
+
+// C) Capital atascado — SKUs con más piezas paradas (mucho valor en un solo artículo)
+function renderInvAtascado(){
+  const el=document.getElementById('inv-atascado');if(!el)return;
+  const top=INVENTARIO.filter(p=>p.cant>=3).sort((a,b)=>(b.valor||0)-(a.valor||0)).slice(0,10);
+  if(!top.length){el.innerHTML='<div style="padding:8px;color:var(--text-3);font-size:12px">Sin SKUs con stock acumulado.</div>';return;}
+  const maxV=Math.max(...top.map(p=>p.valor||0),1);
+  el.innerHTML=top.map((p,i)=>{
+    const w=(p.valor||0)/maxV*100;
+    return `<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-bg"><div class="rank-bar" style="width:${w}%;background:#F59E0B"></div></div><div class="rank-label" title="${p.nombre}">${p.nombre||p.id} <span style="color:var(--text-3)">· ${p.cant} pzs</span></div><div class="rank-pct" style="color:var(--gold)">$${Math.round(p.valor).toLocaleString('es-MX')}</div></div>`;
+  }).join('');
 }
 
 function renderInsights(rows){
@@ -1034,7 +1118,7 @@ function renderPnLChart(ventas,costosMeli,costoInv,embalaje,gastos,utilNeta){
 
 function renderAll(period){
   const rows=filterRows(period);
-  renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderInsights(rows);renderTipoChart(rows);renderWeekly();
+  renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderInvCapital();renderInvSalud();renderInvAtascado();renderInsights(rows);renderTipoChart(rows);renderWeekly();
 }
 
 function setPeriod(btn,period){
@@ -1097,14 +1181,55 @@ function loadGastos(cbNext){
   document.head.appendChild(sg);
 }
 
+// Lee la pestaña Inventario. Columnas A3:N -> A(0)=ID, B(1)=Marca, C(2)=Categoria,
+// E(4)=Nombre, H(7)=CostoUnit, I(8)=PrecioVenta, J(9)=Cantidad, K(10)=EstadoStock,
+// L(11)=ValorInventario, M(12)=Margen
+function processInventarioData(data){
+  try{
+    INVENTARIO=(data.table.rows||[]).map(r=>{
+      const c=r.c||[],g=i=>c[i]||null;
+      const id=String(g(0)?.v??'').trim();
+      if(!id)return null;
+      const estRaw=String(g(10)?.v??'');
+      let estado='OTRO';
+      if(estRaw.includes('OK'))estado='OK';
+      else if(estRaw.toUpperCase().includes('BAJO'))estado='BAJO';
+      else if(estRaw.toUpperCase().includes('AGOTADO'))estado='AGOTADO';
+      return{
+        id, marca:String(g(1)?.v??'?').trim()||'?',
+        cat:String(g(2)?.v??'?').trim()||'?',
+        nombre:String(g(4)?.v??'').trim(),
+        costo:parseN(g(7)?.f??g(7)?.v)||0,
+        precio:parseN(g(8)?.f??g(8)?.v)||0,
+        cant:parseN(g(9)?.v)||0,
+        estado,
+        valor:parseN(g(11)?.f??g(11)?.v)||0,
+        margen:parseN(g(12)?.f??g(12)?.v)
+      };
+    }).filter(x=>x);
+    console.log('Inventario cargado:',INVENTARIO.length,'productos');
+  }catch(e){console.error('Inventario error:',e);}
+}
+
+function loadInventario(cbNext){
+  const cbV='cuv_'+Date.now();
+  window[cbV]=function(data){ window.google.visualization.Query.setResponse(data); };
+  window.google.visualization.Query.setResponse=function(data){ processInventarioData(data); cbNext(); };
+  const urlV=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cbV}&sheet=Inventario&range=A3:N1000`;
+  const sv=document.createElement('script');sv.src=urlV;
+  sv.onerror=()=>{ console.log('Inventario no disponible'); cbNext(); };
+  document.head.appendChild(sv);
+}
+
 function loadAndRender(){
   document.getElementById('last-update').textContent='Actualizando...';
-  // Cadena secuencial (JSONP comparte un solo callback): Items -> Gastos -> Ventas.
-  // Items va primero para que ITEMS_BY_ORDER esté listo cuando Ventas arme el catBreakdown.
+  // Cadena secuencial (JSONP comparte un solo callback): Items -> Inventario -> Gastos -> Ventas.
   loadItems(function(){
-    loadGastos(function(){
-      window.google.visualization.Query.setResponse=processGvizData;
-      loadVentas();
+    loadInventario(function(){
+      loadGastos(function(){
+        window.google.visualization.Query.setResponse=processGvizData;
+        loadVentas();
+      });
     });
   });
   setTimeout(()=>{if(ALL_ROWS.length===0&&Object.keys(ITEMS_BY_ORDER).length===0)useFallback();},12000);
