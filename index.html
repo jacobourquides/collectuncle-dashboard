@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_37.html -->
+<!-- saved from url=(0044)file:///Users/jacobo/Downloads/index_38.html -->
 <html lang="es" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -569,15 +569,15 @@ function processGvizData(data){
       // O(14)=Ganancia desp. Plataforma, P(15)=Costo Inventario, Q(16)=Envío,
       // R(17)=Costo Embalaje, S(18)=Ganancia Neta, T(19)=Margen %, U(20)=Categoria
       const orderId=parseN(g(0)?.v);
-      const prod=g(2)?.v||'';
-      const tipo=(g(20)?.v||'').trim()||'Otro';
+      const prod=String(g(2)?.v??'');
+      const tipo=String(g(20)?.v??'').trim()||'Otro';
       return{
         orderId,
         fecha:parseFecha(g(1)),
-        estado:g(3)?.v||'',
+        estado:String(g(3)?.v??''),
         precioVenta:parseN(g(7)?.f??g(7)?.v),
         piezas:parseN(g(4)?.v)||1,
-        plataforma:g(5)?.v||'',
+        plataforma:String(g(5)?.v??''),
         cargosMeli:parseN(g(11)?.f??g(11)?.v)||0,
         envioMeli:parseN(g(12)?.f??g(12)?.v)||0,
         impuestosMeli:parseN(g(13)?.f??g(13)?.v)||0,
@@ -639,7 +639,7 @@ function processGastosData(data){
     const totales={};
     rows.forEach(r=>{
       const c=r.c||[];
-      const cat=c[1]?.v||'';
+      const cat=String(c[1]?.v??'');
       const monto=parseN(c[2]?.f??c[2]?.v)||0;
       if(cat&&monto>0)totales[cat]=(totales[cat]||0)+monto;
     });
@@ -1067,7 +1067,7 @@ function processItemsData(data){
       const c=r.c||[],g=i=>c[i]||null;
       const oid=parseN(g(0)?.v);
       if(oid==null)return;
-      const cat=(g(4)?.v||'').trim()||'Sin categoría';
+      const cat=String(g(4)?.v??'').trim()||'Sin categoría';
       const precio=parseN(g(9)?.f??g(9)?.v)||0;   // Precio_Total_Item
       const costo=parseN(g(10)?.f??g(10)?.v)||0;  // Costo_Total_Item
       if(!ITEMS_BY_ORDER[oid])ITEMS_BY_ORDER[oid]=[];
