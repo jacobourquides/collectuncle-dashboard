@@ -1273,7 +1273,7 @@ function processInventarioData(data){
         cant:parseN(g(9)?.v)||0,
         estado,
         valor:parseN(g(11)?.f??g(11)?.v)||0,
-        margen:parseN(g(12)?.f??g(12)?.v)
+        margen:parseN(g(12)?.v)  // usar .v (decimal crudo 0.05), NO .f ("5%") para no multiplicar dos veces
       };
     }).filter(x=>x);
     console.log('Inventario cargado:',INVENTARIO.length,'productos');
