@@ -9,9 +9,11 @@ Dashboard estático (GitHub Pages) para el negocio de importación y reventa de 
 
 ---
 
-## Arquitectura de datos (modelo de dos niveles)
+## Arquitectura de datos
 
-El negocio usa un modelo de dos niveles, porque una orden puede contener varios productos de distintas categorías. Antes se forzaba una sola categoría por orden, lo que distorsionaba el análisis por categoría.
+El dashboard lee cuatro pestañas del Sheet: `Ventas`, `Items_Ordenes`, `Inventario` y `Gastos`.
+
+Las dos primeras forman un **modelo de dos niveles** (orden y producto), porque una orden puede contener varios productos de distintas categorías. Antes se forzaba una sola categoría por orden, lo que distorsionaba el análisis por categoría. `Inventario` y `Gastos` son fuentes independientes: stock en existencia y egresos del negocio.
 
 ### Pestaña `Ventas` (nivel ORDEN)
 
@@ -55,14 +57,39 @@ Columnas (índice gviz A2:K = 0-based):
 
 > El dashboard usa **J y K (totales de línea)** para el prorrateo por categoría, no las columnas unitarias.
 
+### Pestaña `Inventario` (nivel PRODUCTO EN STOCK)
+
+Una fila por SKU en existencia. Alimenta toda la sección de Inventario y las alertas de liquidación. Datos desde la **fila 3**.
+
+Columnas (índice gviz A3:N = 0-based):
+- `ID` (A, idx 0) — identificador del producto; si viene vacío la fila se descarta
+- `Marca` (B, idx 1) — Topps, Panini, Funko, etc.
+- `Categoria` (C, idx 2) — categoría de inventario (`TCG`, `Funko`, …); **no** es la misma taxonomía que la columna `Categoria` de Ventas/Items
+- `Nombre` (E, idx 4)
+- `CostoUnit` (H, idx 7), `PrecioVenta` (I, idx 8), `Cantidad` (J, idx 9)
+- `EstadoStock` (K, idx 10) — se normaliza por coincidencia de texto a `OK` / `BAJO` / `AGOTADO` / `OTRO`
+- `ValorInventario` (L, idx 11) — capital parado en ese SKU
+- `Margen` (M, idx 12)
+
+> **Margen usa `.v`, no `.f`.** gviz devuelve `.f` como `"5%"` y `.v` como `0.05`. Leer `.f` multiplicaría el porcentaje dos veces. Es la única columna del proyecto donde se prefiere `.v` sobre `.f`.
+
+### Pestaña `Gastos`
+
+Rango `A2:C200`. `A` = fecha, `B` = categoría, `C` = monto.
+
+- Se suman todas las categorías **excepto** `Compra de Inventario` → `window.GASTOS_OPS` (gastos operativos, los que restan en el P&L). El desglose queda en `window.GASTOS_DETAIL`.
+- Las filas con categoría `Publicidad Meta` o `Publicidad Meli` (comparación en minúsculas, con trim) se guardan además en `window.GASTOS_ADS` como `{fecha, canal, monto}` para poder deducirlas por canal y por período.
+
 ---
 
-## Cómo el dashboard combina las dos pestañas
+## Cómo el dashboard combina las pestañas
 
-El dashboard carga **3 fuentes** por JSONP en cadena secuencial: **Items → Gastos → Ventas** (Items primero para que `ITEMS_BY_ORDER` esté listo cuando Ventas arma el desglose).
+El dashboard carga **4 fuentes** por JSONP en cadena secuencial: **Items → Inventario → Gastos → Ventas** (Items primero para que `ITEMS_BY_ORDER` esté listo cuando Ventas arma el desglose; Ventas al final porque su llegada dispara el render).
 
 - **Métricas de ORDEN** (KPIs, plataforma, evolución semanal, P&L): se calculan sobre `Ventas` directamente.
 - **Métricas por CATEGORÍA** (donut, tarjetas de tipo, comparativa, insights ROI/margen): usan `Items_Ordenes`.
+- **Sección de Inventario y alertas de liquidación**: usan `Inventario`, independiente de las ventas.
+- **P&L y deducción de publicidad por canal**: usan `Gastos`.
 
 ### Prorrateo de ganancia neta por categoría (Método B)
 
@@ -76,6 +103,58 @@ Funciones clave en el código: `processItemsData` (llena `ITEMS_BY_ORDER`), `bui
 
 ---
 
+## Sección de Inventario
+
+Cuatro tarjetas alimentadas por el array `INVENTARIO`. **Todas son interactivas**: al hacer click despliegan una tabla de detalle en el contenedor `#inv-detail`, debajo de la sección. El detalle funciona como toggle — click en el mismo filtro que ya está abierto lo cierra (`INV_FILTER_ACTIVE`). La tabla muestra máximo 200 productos y avisa cuando trunca.
+
+### A) Capital por categoría — `renderInvCapital()`
+
+Donut del valor de inventario (columna L) agrupado por categoría, ordenado de mayor a menor. Debajo, el capital total y el total de piezas. Es la única de las cuatro que no abre detalle al hacer click.
+
+### B) Salud del stock — `renderInvSalud()`
+
+Barras horizontales con el conteo y porcentaje de productos en `OK` / `BAJO` / `AGOTADO`. Cada barra abre la lista de ese estado ordenada por valor descendente (`filterInvEstado`).
+
+### C) Capital atascado — `renderInvAtascado()`
+
+Top 10 de SKUs con **3 o más piezas** en stock, ordenados por valor de inventario — dónde está parado el dinero en un solo artículo. El título abre la lista completa de SKUs con 3+ piezas (`filterInvAtascado`).
+
+### D) Auditor de datos — `renderInvAuditor()`
+
+Cuenta los productos con datos incompletos o mal categorizados y los agrupa por tipo de problema. El título abre la tabla con el detalle de cada falla (`filterInvAuditor`), pensada para corregir directamente en la pestaña `Inventario` del Sheet.
+
+`auditarInventario()` marca un producto cuando cumple alguna de estas reglas (un producto puede acumular varias fallas):
+
+| Regla | Condición |
+|---|---|
+| `sin precio` | `PrecioVenta` vacío o 0 |
+| `sin costo` | `CostoUnit` vacío o 0 |
+| `categoría "X" (debería ser TCG)` | la marca está en `MARCAS_TCG` pero la categoría no es `TCG` |
+| `N en stock sin precio` | `Cantidad > 0` y `PrecioVenta` vacío o 0 |
+
+**`MARCAS_TCG`** — marcas que siempre deben caer en categoría `TCG`: `Topps`, `Topps NOW`, `Panini`, `Pokemon`, `Upper Deck`, `Pulse`. La comparación es exacta en minúsculas contra la columna `Marca`, así que una variante de escritura en el Sheet (`Topps Now`, `panini prizm`, un espacio de más) **no** dispara la regla. Al agregar marcas nuevas de cartas hay que sumarlas a esa constante.
+
+### Piezas a liquidar — `renderAlerts()`
+
+Fuera de las cuatro tarjetas, esta lista sale también de `INVENTARIO`. Candidatos: productos con stock y costo > 0 que además tienen **precio por debajo del costo** (pérdida real) o **margen menor a 5%** (crítico). Se ordenan primero las pérdidas reales por monto perdido (`(costo − precio) × cantidad`), luego los críticos por margen ascendente. Muestra los primeros 30; el título abre la lista completa (`filterInvLiquidar`).
+
+---
+
+## Deducción de publicidad por canal
+
+Las categorías `Publicidad Meta` y `Publicidad Meli` de `Gastos` se descuentan del canal que les corresponde: **Meta → FB Ads**, **Meli → Mercado Libre**.
+
+`adsDelPeriodo(canal, desde, hasta)` suma el gasto de un canal dentro del rango de fechas activo. Con el período en `all` (sin rango) suma todo. El rango no viene del selector: se deriva de la primera y última fecha de las órdenes ya filtradas, para que ventas y publicidad se recorten igual.
+
+Afecta dos lugares:
+
+- **Gráfica de plataformas** (`renderPlat`): la barra es `ganancia neta − publicidad del canal` (`gNeta`), y el orden de las plataformas se calcula sobre ese valor, no sobre la ganancia bruta.
+- **Insights** (`renderInsights`): el margen por canal y el múltiplo "FB Ads = N× más rentable" usan el margen post-publicidad. Cuando hay gasto publicitario en el período, ambos textos lo indican con el monto descontado por canal.
+
+> Los márgenes por canal del dashboard **no** coinciden con los de la columna `Ganancia Neta` del Sheet: esa columna no conoce la publicidad. La diferencia es intencional.
+
+---
+
 ## Reglas de negocio críticas
 
 1. **Precio y costo son SIEMPRE por unidad** en las columnas G/H de Items_Ordenes. Las columnas de total (J/K) multiplican por piezas.
@@ -83,6 +162,8 @@ Funciones clave en el código: `processItemsData` (llena `ITEMS_BY_ORDER`), `bui
 3. **Categorías:** cinco válidas. `Multicategoria` no es una categoría de producto — las órdenes con productos de distinta categoría se dividen en varias filas.
 4. **Impuesto Texas (8.25%)** aplica sobre precio + envío, no solo precio. eBay lo cobra según dirección de destino (PO Box en Hidalgo, TX).
 5. **ThrillJoy** se excluye intencionalmente de la comparación TCG vs Funko en los insights.
+6. **Publicidad Meta/Meli** se descuenta del canal correspondiente en la gráfica de plataformas y en los insights, pero **no** de la `Ganancia Neta` a nivel de orden — no hay forma de atribuir el gasto publicitario a una venta individual.
+7. **La categoría de `Inventario` es independiente** de la de `Ventas`/`Items_Ordenes`. El auditor valida contra `TCG` (la de Inventario), no contra `TCG - Deportes` / `TCG - Animacion`.
 
 ---
 
@@ -107,7 +188,7 @@ Notas de ejecución:
 
 ## Notas técnicas del dashboard
 
-- **Carga de datos:** gviz JSONP siempre invoca `window.google.visualization.Query.setResponse()` sin importar el parámetro `responseHandler`. Esto impide cargar múltiples hojas por JSONP en paralelo (colisión de callback). Solución: carga secuencial reasignando el callback entre cada hoja (Items → Gastos → Ventas).
+- **Carga de datos:** gviz JSONP siempre invoca `window.google.visualization.Query.setResponse()` sin importar el parámetro `responseHandler`. Esto impide cargar múltiples hojas por JSONP en paralelo (colisión de callback). Solución: carga secuencial reasignando el callback entre cada hoja (Items → Inventario → Gastos → Ventas). Cada eslabón llama a `cbNext()` tanto al terminar como en `onerror`: si una hoja falla, la cadena sigue con las demás; si un eslabón nuevo se olvida de llamarlo, la cadena se cuelga y nunca carga Ventas. Hay timeouts de rescate a 9s (Ventas) y 12s (global) que disparan `useFallback()`.
 - `fetch()` sobre gviz falla por CORS tanto en local (`file://`) como en GitHub Pages. Usar el patrón JSONP (inyección de `<script>`).
 - **El dashboard SOLO funciona servido por HTTP (GitHub Pages), nunca abierto como archivo local `file://`** (gviz bloquea CORS desde file:// → cae a datos de muestra).
 - **Conversión de texto blindada:** gviz a veces devuelve categorías u otros campos como no-string. Todas las conversiones usan `String(...??'')` antes de `.trim()` para no romper el parseo.
@@ -125,8 +206,7 @@ Al subir `index.html` a GitHub, **nunca** hacer "descargar → abrir en navegado
 
 ## Pendientes / roadmap
 
-- **Sección "Piezas a liquidar":** actualmente tiene alertas hardcodeadas en el código (Trunks, Jim Halpert, etc.), no vienen del Sheet. Conectar a datos reales o quitar.
-- **Deducción de Meta Ads** del canal FB (bloqueado: requiere que Efraín divida la categoría `Publicidad` de Gastos en subcategorías Meta vs Meli). Al hacerlo, Gastos pasa a `A2:D1000`.
+- **Normalizar marcas del auditor:** `MARCAS_TCG` compara texto exacto, así que variantes de escritura en el Sheet se escapan de la validación. Falta normalizar (quitar acentos/espacios, comparar por prefijo) o cerrar la captura de `Marca` a una lista.
 - **Pestaña `Preventas / Apartados`** (aún no conectada). Riesgo de doble conteo: productos que aparecen tanto en tabs VIP/Preventas como en Ventas/Items. Clarificar si una preventa "se mueve" a Ventas al liquidarse o queda en ambas.
 - **Consolidar tabs de clientes VIP** (Jose Chavez, Andre Cavazos, Hugo Lozano, Daniel Nolasco) en Preventas/Apartados.
 - **Alertas WhatsApp** (Meta Cloud API o Twilio) / email (Gmail SMTP).
@@ -139,5 +219,6 @@ Al subir `index.html` a GitHub, **nunca** hacer "descargar → abrir en navegado
 ## Archivos de referencia
 
 - `index.html` — el dashboard completo (HTML/CSS/JS en un archivo, Chart.js inlined).
+- `CLAUDE.md` — guía de arquitectura para Claude Code (cadena de carga, estado global, trampas del parseo).
 - Script de sync — instalado en Apps Script del Sheet nativo (Extensions → Apps Script).
 - Sheet viejo `.xlsx` (ID `17DzG3o...`) — **abandonado**, solo respaldo histórico. La fuente de verdad es el Sheet nativo.
