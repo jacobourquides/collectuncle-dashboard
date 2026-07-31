@@ -1010,7 +1010,7 @@ function auditarInventario(){
     if(!p.precio||p.precio===0) fallas.push('sin precio');
     if(!p.costo||p.costo===0) fallas.push('sin costo');
     // (c) marca TCG en categoría incorrecta
-    if(MARCAS_TCG.includes((p.marca||'').toLowerCase()) && (p.cat||'').toUpperCase()!=='TCG')
+    if(MARCAS_TCG.includes((p.marca||'').trim().toLowerCase()) && (p.cat||'').toUpperCase()!=='TCG')
       fallas.push(`categoría "${p.cat}" (debería ser TCG)`);
     // (d) stock con precio $0
     if(p.cant>0 && (!p.precio||p.precio===0)) fallas.push(`${p.cant} en stock sin precio`);
