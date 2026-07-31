@@ -659,18 +659,28 @@ function processGastosData(data){
   try{
     const rows=data.table.rows||[];
     const totales={};
+    window.GASTOS_ADS=[];  // {fecha, canal:'meta'|'meli', monto} para deducción por período
     rows.forEach(r=>{
       const c=r.c||[];
       const cat=String(c[1]?.v??'');
       const monto=parseN(c[2]?.f??c[2]?.v)||0;
       if(cat&&monto>0)totales[cat]=(totales[cat]||0)+monto;
+      // Capturar publicidad por canal, con fecha (col A) para filtrar por período
+      const catL=cat.trim().toLowerCase();
+      if(monto>0&&(catL==='publicidad meta'||catL==='publicidad meli')){
+        window.GASTOS_ADS.push({
+          fecha:parseFecha(c[0]),
+          canal:catL==='publicidad meta'?'meta':'meli',
+          monto:monto
+        });
+      }
     });
     const excluir=['Compra de Inventario','Compra de inventario'];
     window.GASTOS_OPS=0;window.GASTOS_DETAIL={};
     Object.entries(totales).forEach(([cat,total])=>{
       if(!excluir.includes(cat.trim())){window.GASTOS_OPS+=total;window.GASTOS_DETAIL[cat]=total;}
     });
-    console.log('Gastos cargados:',window.GASTOS_OPS,window.GASTOS_DETAIL);
+    console.log('Gastos cargados:',window.GASTOS_OPS,'| Ads:',window.GASTOS_ADS.length,'registros');
     renderPnL();
   }catch(e){console.error('Gastos error:',e);}
 }
@@ -836,14 +846,44 @@ function renderDonut(rows){
   mkChart('c-donut','doughnut',tipos,[{data:tipos.map(t=>bT[t]),backgroundColor:tipos.map((_,i)=>colors[i]||'#9CA3AF'),borderWidth:0,hoverOffset:4}],{extra:{cutout:'65%'}});
 }
 
+// Suma la publicidad de un canal dentro del rango de fechas [desde, hasta].
+// Si no hay rango (período 'all'), suma todo el gasto de ese canal.
+function adsDelPeriodo(canal,desde,hasta){
+  const ads=window.GASTOS_ADS||[];
+  return ads.filter(a=>a.canal===canal&&(
+    (!desde||!hasta) ? true : (a.fecha&&a.fecha>=desde&&a.fecha<=hasta)
+  )).reduce((s,a)=>s+a.monto,0);
+}
+
 function renderPlat(rows){
   const bP={};rows.forEach(r=>{if(!r.plataforma)return;if(!bP[r.plataforma])bP[r.plataforma]={v:0,g:0};bP[r.plataforma].v+=r.precioVenta||0;bP[r.plataforma].g+=r.gananciaNeta||0;});
-  const plats=Object.keys(bP).sort((a,b)=>bP[b].g-bP[a].g);
+  // Rango de fechas del período activo (de las ventas mostradas), para filtrar los ads igual.
+  const fechas=rows.map(r=>r.fecha).filter(Boolean).sort((a,b)=>a-b);
+  const desde=currentPeriod==='all'?null:(fechas[0]||null);
+  const hasta=currentPeriod==='all'?null:(fechas[fechas.length-1]||null);
+  // Deducir publicidad por canal (Meta -> FB Ads, Meli -> Mercado Libre)
+  const adMeta=adsDelPeriodo('meta',desde,hasta);
+  const adMeli=adsDelPeriodo('meli',desde,hasta);
+  if(bP['FB Ads'])bP['FB Ads'].adSpend=adMeta;
+  if(bP['Mercado Libre'])bP['Mercado Libre'].adSpend=adMeli;
+  // Ganancia neta REAL (después de publicidad) por canal
+  Object.keys(bP).forEach(p=>{bP[p].gNeta=bP[p].g-(bP[p].adSpend||0);});
+  const plats=Object.keys(bP).sort((a,b)=>bP[b].gNeta-bP[a].gNeta);
   const colors=plats.map(p=>p==='FB Ads'?'#10B981':'#3B82F6');
   const{grid,tick}=getColors();
-  mkChart('c-plat','bar',plats,[{label:'Ganancia',data:plats.map(p=>bP[p].g),backgroundColor:colors,borderRadius:4,borderSkipped:false}],{extra:{indexAxis:'y'},scales:{y:{ticks:{color:tick,font:{size:10}},grid:{display:false}},x:{ticks:{color:tick,font:{size:10},callback:v=>'$'+Math.round(v/1000)+'K'},grid:{color:grid}}}});
+  mkChart('c-plat','bar',plats,[{label:'Ganancia neta (post-ads)',data:plats.map(p=>bP[p].gNeta),backgroundColor:colors,borderRadius:4,borderSkipped:false}],{extra:{indexAxis:'y'},scales:{y:{ticks:{color:tick,font:{size:10}},grid:{display:false}},x:{ticks:{color:tick,font:{size:10},callback:v=>'$'+Math.round(v/1000)+'K'},grid:{color:grid}}}});
   const meli=bP['Mercado Libre'],fb=bP['FB Ads'];
-  if(meli&&fb){const mm=meli.v>0?meli.g/meli.v:0,fm=fb.v>0?fb.g/fb.v:0;const el=document.getElementById('plat-insight');if(el){el.style.display='block';el.innerHTML=`<strong style="color:var(--text)">FB Ads = ${mm>0?(fm/mm).toFixed(1):'—'}× más rentable</strong> — ${fmtP(fm)} vs ${fmtP(mm)} margen neto`;}}
+  if(meli&&fb){
+    // Márgenes REALES: ganancia después de ads / ventas
+    const mm=meli.v>0?meli.gNeta/meli.v:0, fm=fb.v>0?fb.gNeta/fb.v:0;
+    const el=document.getElementById('plat-insight');
+    if(el){
+      el.style.display='block';
+      const veces=mm>0?(fm/mm).toFixed(1):'—';
+      const notaAds=(adMeta>0||adMeli>0)?` · ya descuenta publicidad (FB $${Math.round(adMeta).toLocaleString('es-MX')} / Meli $${Math.round(adMeli).toLocaleString('es-MX')})`:'';
+      el.innerHTML=`<strong style="color:var(--text)">FB Ads = ${veces}× más rentable</strong> — ${fmtP(fm)} vs ${fmtP(mm)} margen neto${notaAds}`;
+    }
+  }
 }
 
 function renderFranq(rows){
@@ -996,10 +1036,16 @@ function renderInvAtascado(){
 
 function renderInsights(rows){
   const sum=(arr,k)=>arr.reduce((s,r)=>s+(r[k]||0),0);
-  // --- Plataformas ---
+  // --- Plataformas (margen REAL, después de descontar publicidad por canal) ---
   const meli=rows.filter(r=>r.plataforma==='Mercado Libre'),fb=rows.filter(r=>r.plataforma==='FB Ads');
   const mv=sum(meli,'precioVenta'),fv=sum(fb,'precioVenta');
-  const mmg=mv>0?sum(meli,'gananciaNeta')/mv:0, fmg=fv>0?sum(fb,'gananciaNeta')/fv:0;
+  // Rango de fechas del período para filtrar la publicidad igual que las ventas
+  const _fechas=rows.map(r=>r.fecha).filter(Boolean).sort((a,b)=>a-b);
+  const _desde=currentPeriod==='all'?null:(_fechas[0]||null);
+  const _hasta=currentPeriod==='all'?null:(_fechas[_fechas.length-1]||null);
+  const _adMeta=(typeof adsDelPeriodo==='function')?adsDelPeriodo('meta',_desde,_hasta):0;
+  const _adMeli=(typeof adsDelPeriodo==='function')?adsDelPeriodo('meli',_desde,_hasta):0;
+  const mmg=mv>0?(sum(meli,'gananciaNeta')-_adMeli)/mv:0, fmg=fv>0?(sum(fb,'gananciaNeta')-_adMeta)/fv:0;
   // --- Acumulado por categoría: venta, ganancia e inversión (para ROI) ---
   // Usa el desglose por producto (Items_Ordenes) con prorrateo, no la categoría única.
   const cat=aggByCategory(rows);
@@ -1015,10 +1061,11 @@ function renderInsights(rows){
   const negLoss=sum(neg,'gananciaNeta');
 
   const insights=[];
-  // 1) Canal más rentable (con aclaración de que FB es antes de publicidad)
+  // 1) Canal más rentable (margen YA con publicidad descontada por canal)
   if(meli.length&&fb.length){
     const mult=mmg>0?(fmg/mmg).toFixed(1):'—';
-    insights.push({icon:'⚡',bg:'rgba(245,158,11,0.1)',title:`FB Ads = ${mult}× más rentable que Meli`,body:`${fmtP(fmg)} vs ${fmtP(mmg)} margen — FB antes de descontar publicidad. Mover volumen a FB sigue conviniendo.`});
+    const notaAds=(_adMeta>0||_adMeli>0)?`Ya descuenta publicidad por canal (FB $${Math.round(_adMeta).toLocaleString('es-MX')} / Meli $${Math.round(_adMeli).toLocaleString('es-MX')}).`:'Margen neto por canal.';
+    insights.push({icon:'⚡',bg:'rgba(245,158,11,0.1)',title:`FB Ads = ${mult}× más rentable que Meli`,body:`${fmtP(fmg)} vs ${fmtP(mmg)} margen. ${notaAds} Considera el volumen antes de mover capital.`});
   }
   // 2) TCG vs Funko por ROI (retorno sobre capital invertido)
   if(tcg.inv>0&&funko.inv>0){
