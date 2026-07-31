@@ -327,6 +327,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
         <div id="inv-atascado"></div>
       </div>
     </div>
+    <div style="margin-bottom:12px">
+      <div class="card">
+        <div class="card-title" onclick="filterInvAuditor()" style="cursor:pointer" title="Ver productos a revisar"><i class="ti ti-alert-triangle" style="color:#EF4444"></i>Revisar datos del inventario <span style="font-size:11px;color:var(--teal);font-weight:400">▸ ver detalle</span></div>
+        <div class="card-sub">Productos con datos incompletos o mal categorizados</div>
+        <div id="inv-auditor"></div>
+      </div>
+    </div>
     <div id="inv-detail" style="margin-bottom:12px;display:none"></div>
     <div class="section-label">Acciones y comparativas</div>
     <div class="row4">
@@ -991,6 +998,84 @@ function renderAlerts(){
     }).join('');
 }
 
+// Marcas que SIEMPRE deben estar en categoría TCG (si no, es error)
+const MARCAS_TCG=['topps','topps now','panini','pokemon','upper deck','pulse'];
+
+// Audita el inventario y devuelve los productos con problemas, con el detalle de cada uno.
+function auditarInventario(){
+  const problemas=[];
+  INVENTARIO.forEach(p=>{
+    const fallas=[];
+    // (a) sin precio o sin costo
+    if(!p.precio||p.precio===0) fallas.push('sin precio');
+    if(!p.costo||p.costo===0) fallas.push('sin costo');
+    // (c) marca TCG en categoría incorrecta
+    if(MARCAS_TCG.includes((p.marca||'').toLowerCase()) && (p.cat||'').toUpperCase()!=='TCG')
+      fallas.push(`categoría "${p.cat}" (debería ser TCG)`);
+    // (d) stock con precio $0
+    if(p.cant>0 && (!p.precio||p.precio===0)) fallas.push(`${p.cant} en stock sin precio`);
+    if(fallas.length) problemas.push({...p,fallas});
+  });
+  return problemas;
+}
+
+// Resumen en el card (cuántos productos a revisar, por tipo de problema)
+function renderInvAuditor(){
+  const el=document.getElementById('inv-auditor');if(!el)return;
+  const probs=auditarInventario();
+  if(!probs.length){el.innerHTML='<div style="padding:8px;color:#10B981;font-size:13px">✅ Todo en orden · sin problemas detectados</div>';return;}
+  // Contar por tipo
+  let sinPrecioCosto=0,malCat=0,stockSinPrecio=0;
+  probs.forEach(p=>{
+    if(p.fallas.some(f=>f.includes('sin precio')||f.includes('sin costo')))sinPrecioCosto++;
+    if(p.fallas.some(f=>f.includes('debería ser TCG')))malCat++;
+    if(p.fallas.some(f=>f.includes('en stock sin precio')))stockSinPrecio++;
+  });
+  el.innerHTML=`<div style="font-size:22px;font-weight:700;color:#EF4444;margin-bottom:6px">${probs.length} <span style="font-size:13px;font-weight:400;color:var(--text-2)">productos a revisar</span></div>`+
+    `<div style="font-size:12px;color:var(--text-2);line-height:1.8">`+
+    (sinPrecioCosto?`• ${sinPrecioCosto} sin precio o costo<br>`:'')+
+    (malCat?`• ${malCat} mal categorizados (marca de cartas fuera de TCG)<br>`:'')+
+    (stockSinPrecio?`• ${stockSinPrecio} con stock pero sin precio de venta`:'')+
+    `</div>`;
+}
+
+// Lista detallada al hacer click en el card
+function filterInvAuditor(){
+  const probs=auditarInventario();
+  const box=document.getElementById('inv-detail');
+  if(!box)return;
+  if(INV_FILTER_ACTIVE==='auditor'){box.style.display='none';INV_FILTER_ACTIVE=null;return;}
+  INV_FILTER_ACTIVE='auditor';
+  if(!probs.length){
+    box.innerHTML='<div class="card"><div style="padding:12px;color:#10B981">✅ Sin problemas detectados en el inventario.</div></div>';
+    box.style.display='block';return;
+  }
+  const rows=probs.map(p=>`<tr>
+    <td style="padding:6px 8px;font-size:12px">${p.nombre||p.id}</td>
+    <td style="padding:6px 8px;font-size:11px;color:var(--text-2)">${p.marca}</td>
+    <td style="padding:6px 8px;font-size:11px;color:var(--text-2)">${p.cat}</td>
+    <td style="padding:6px 8px;font-size:11px;color:#EF4444">${p.fallas.join(' · ')}</td>
+  </tr>`).join('');
+  box.innerHTML=`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="card-title" style="margin:0"><span style="color:#EF4444">●</span> Productos a revisar</div>
+      <button onclick="closeInvDetail()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-2);border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:inherit">✕ Cerrar</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-2);margin-bottom:10px">${probs.length} productos con datos incompletos o mal categorizados · corregir en la pestaña Inventario del Sheet</div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+      <thead><tr style="border-bottom:1px solid var(--border)">
+        <th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--text-3);font-weight:500">Producto</th>
+        <th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--text-3);font-weight:500">Marca</th>
+        <th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--text-3);font-weight:500">Categoría</th>
+        <th style="padding:6px 8px;text-align:left;font-size:11px;color:var(--text-3);font-weight:500">Problema</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+  </div>`;
+  box.style.display='block';
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
 // A) Capital parado por categoría (donut)
 function renderInvCapital(){
   const ctx=document.getElementById('c-inv-cat');if(!ctx)return;
@@ -1234,7 +1319,7 @@ function renderPnLChart(ventas,costosMeli,costoInv,embalaje,gastos,utilNeta){
 
 function renderAll(period){
   const rows=filterRows(period);
-  renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderInvCapital();renderInvSalud();renderInvAtascado();renderInsights(rows);renderTipoChart(rows);renderWeekly();
+  renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderInvCapital();renderInvSalud();renderInvAtascado();renderInvAuditor();renderInsights(rows);renderTipoChart(rows);renderWeekly();
 }
 
 function setPeriod(btn,period){
