@@ -493,26 +493,44 @@ Tax         $4.21"></textarea>
     if(!$('cot-price'))return;
     var mxn=new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'});
     var usd=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
-    var n=function(id){var v=parseFloat($(id).value);return isNaN(v)?0:v;};
+    var n=function(id){var el=$(id);if(!el)return 0;var v=parseFloat(el.value);return isNaN(v)?0:v;};
     var LS={get:function(k){try{return localStorage.getItem(k);}catch(e){return null;}},set:function(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+    function readInputs(){
+      return {
+        prod:String($('cot-prod').value||'').trim(),
+        price:n('cot-price'), ship:n('cot-ship'),
+        taxPct:n('cot-tax'), poboxPct:n('cot-pobox'),
+        tdcCard:n('cot-tdc-card'), tdcPobox:n('cot-tdc-pobox'),
+        utilPct:n('cot-util')
+      };
+    }
+    // Única definición de la fórmula. Pura: no lee ni escribe el DOM.
+    // La usan calc() y el render del historial, que la llama con objetos de localStorage.
+    function computeQuote(q){
+      var imp=(q.price+q.ship)*(q.taxPct/100);
+      var sub=q.price+q.ship+imp;
+      var com=sub*(q.poboxPct/100);
+      var cardMXN=sub*q.tdcCard, poboxMXN=com*q.tdcPobox;
+      var total=cardMXN+poboxMXN;
+      var venta=total*(1+(q.utilPct||0)/100);
+      var utilidad=venta-total;
+      return {imp:imp,sub:sub,com:com,cardMXN:cardMXN,poboxMXN:poboxMXN,
+              total:total,venta:venta,utilidad:utilidad,
+              margen:venta>0?(utilidad/venta*100):0,
+              hasTdc:!!(q.tdcCard||q.tdcPobox)};
+    }
     function calc(){
-      var precio=n('cot-price'),envio=n('cot-ship');
-      var taxPct=n('cot-tax')/100,poboxPct=n('cot-pobox')/100;
-      var tdcCard=n('cot-tdc-card'),tdcPobox=n('cot-tdc-pobox');
-      var imp=(precio+envio)*taxPct;
-      var sub=precio+envio+imp;
-      var com=sub*poboxPct;
-      var cardMXN=sub*tdcCard,poboxMXN=com*tdcPobox,total=cardMXN+poboxMXN;
-      $('cot-o-price').textContent=usd.format(precio);
-      $('cot-o-ship').textContent=usd.format(envio);
-      $('cot-o-tax-lbl').textContent='Impuesto ('+(n('cot-tax')||0)+'%)';
-      $('cot-o-tax').textContent=usd.format(imp);
-      $('cot-o-sub').textContent=usd.format(sub);
-      $('cot-o-sub-mxn').innerHTML=tdcCard?('× '+tdcCard+' = <strong>'+mxn.format(cardMXN)+'</strong>'):'ingresa TDC tarjeta →';
-      $('cot-o-pobox-lbl').textContent='Comisión PO Box ('+(n('cot-pobox')||0)+'%)';
-      $('cot-o-pobox').textContent=usd.format(com);
-      $('cot-o-pobox-mxn').innerHTML=tdcPobox?('× '+tdcPobox+' = <strong>'+mxn.format(poboxMXN)+'</strong>'):'ingresa TDC PO Box →';
-      $('cot-o-total').textContent=(tdcCard||tdcPobox)?mxn.format(total):'—';
+      var q=readInputs(), r=computeQuote(q);
+      $('cot-o-price').textContent=usd.format(q.price);
+      $('cot-o-ship').textContent=usd.format(q.ship);
+      $('cot-o-tax-lbl').textContent='Impuesto ('+q.taxPct+'%)';
+      $('cot-o-tax').textContent=usd.format(r.imp);
+      $('cot-o-sub').textContent=usd.format(r.sub);
+      $('cot-o-sub-mxn').innerHTML=q.tdcCard?('× '+q.tdcCard+' = <strong>'+mxn.format(r.cardMXN)+'</strong>'):'ingresa TDC tarjeta →';
+      $('cot-o-pobox-lbl').textContent='Comisión PO Box ('+q.poboxPct+'%)';
+      $('cot-o-pobox').textContent=usd.format(r.com);
+      $('cot-o-pobox-mxn').innerHTML=q.tdcPobox?('× '+q.tdcPobox+' = <strong>'+mxn.format(r.poboxMXN)+'</strong>'):'ingresa TDC PO Box →';
+      $('cot-o-total').textContent=r.hasTdc?mxn.format(r.total):'—';
     }
     // Parser de la orden pegada
     function parseOrden(txt){
