@@ -448,8 +448,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       #panel-cotizador .cot-fxref a{color:var(--gold);cursor:pointer;text-decoration:underline}
       #panel-cotizador .cot-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:100}
       #panel-cotizador .cot-toast.show{opacity:1}
+      #cot-hist-btn{margin-left:auto;text-transform:none;letter-spacing:0}
+      #cot-drawer-back{position:fixed;inset:0;background:rgba(0,0,0,0.45);opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:90}
+      #cot-drawer-back.open{opacity:1;pointer-events:auto}
+      #cot-drawer{position:fixed;top:0;right:0;bottom:0;width:340px;max-width:88vw;background:var(--surface);border-left:1px solid var(--border);transform:translateX(101%);transition:transform 0.22s;z-index:91;display:flex;flex-direction:column}
+      #cot-drawer.open{transform:none}
+      #cot-drawer .dh{display:flex;align-items:center;padding:16px 18px;border-bottom:1px solid var(--border)}
+      #cot-drawer .dh .t{font-size:13px;font-weight:600;color:var(--text)}
+      #cot-drawer .dh button{margin-left:auto;background:none;border:none;color:var(--text-2);cursor:pointer;font-size:20px;line-height:1;padding:0 4px;font-family:inherit}
+      #cot-drawer .dl{overflow-y:auto;flex:1;padding:6px 0}
+      #cot-drawer .qi{display:flex;align-items:flex-start;gap:8px;padding:11px 18px;cursor:pointer;border-left:3px solid transparent}
+      #cot-drawer .qi:hover{background:var(--surface2)}
+      #cot-drawer .qi.active{border-left-color:var(--gold);background:var(--surface2)}
+      #cot-drawer .qi .qb{flex:1;min-width:0}
+      #cot-drawer .qi .qt{font-size:13px;font-weight:600;color:var(--text);line-height:1.35;word-break:break-word}
+      #cot-drawer .qi .qt em{font-style:normal;color:var(--teal);font-variant-numeric:tabular-nums}
+      #cot-drawer .qi .qs{font-size:11px;color:var(--text-3);margin-top:3px;font-variant-numeric:tabular-nums}
+      #cot-drawer .qi .qd{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;line-height:1;padding:0 2px;font-family:inherit}
+      #cot-drawer .qi .qd:hover{color:var(--red)}
+      #cot-drawer .empty{padding:22px 18px;font-size:12px;color:var(--text-3);text-align:center;line-height:1.5}
     </style>
-    <div class="section-label">Cotizador de importación · eBay → PO Box McAllen</div>
+    <div class="section-label">Cotizador de importación · eBay → PO Box McAllen
+      <button class="btn btn-theme" id="cot-hist-btn"><i class="ti ti-history"></i> Mis cotizaciones (<span id="cot-hist-count">0</span>)</button>
+    </div>
     <div class="cot-grid">
       <div class="cot-card">
         <div class="cot-h">Datos de la compra</div>
@@ -500,6 +521,11 @@ Tax         $4.21"></textarea>
       </div>
     </div>
     <div class="cot-toast" id="cot-toast"></div>
+    <div id="cot-drawer-back"></div>
+    <div id="cot-drawer">
+      <div class="dh"><span class="t">Mis cotizaciones</span><button id="cot-drawer-close" title="Cerrar">×</button></div>
+      <div class="dl" id="cot-hist-list"></div>
+    </div>
   </div>
 
   <script>
@@ -611,8 +637,47 @@ Tax         $4.21"></textarea>
       quotesWrite(out);
     }
 
-    // La implementa el drawer del historial; autoSave ya la llama.
-    function renderHist(){}
+    function agoTxt(ts){
+      var ms=Date.now()-ts, d=Math.floor(ms/86400000), h=Math.floor(ms/3600000);
+      if(d>=1)return d===1?'ayer':'hace '+d+' días';
+      if(h>=1)return h===1?'hace 1 hora':'hace '+h+' horas';
+      return 'hace unos minutos';
+    }
+    function renderHist(){
+      var arr=quotesLoad(), el=$('cot-hist-list'), html='', i, q, r;
+      $('cot-hist-count').textContent=arr.length;
+      if(!arr.length){el.innerHTML='<div class="empty">Aún no hay cotizaciones guardadas.<br>Ponle nombre a un producto y se guarda sola.</div>';return;}
+      for(i=0;i<arr.length;i++){
+        q=arr[i];r=computeQuote(q);
+        html+='<div class="qi'+(q.id===ACTIVE_ID?' active':'')+'" data-id="'+esc(q.id)+'">'+
+          '<div class="qb">'+
+            '<div class="qt">'+esc(q.prod)+' <em>('+mxn.format(r.venta)+')</em></div>'+
+            '<div class="qs">'+agoTxt(q.ts)+' · '+(q.utilPct||0)+'% utilidad · costo '+mxn.format(r.total)+'</div>'+
+          '</div>'+
+          '<button class="qd" data-del="'+esc(q.id)+'" title="Borrar">×</button>'+
+        '</div>';
+      }
+      el.innerHTML=html;
+    }
+    // Asignar .value por código no dispara 'input', así que cargar una
+    // cotización no re-agenda un guardado.
+    function loadQuote(id){
+      var arr=quotesLoad(),i,q=null;
+      for(i=0;i<arr.length;i++)if(arr[i].id===id){q=arr[i];break;}
+      if(!q)return;
+      if(saveTimer){clearTimeout(saveTimer);saveTimer=null;}
+      $('cot-prod').value=q.prod||'';
+      $('cot-price').value=q.price;
+      $('cot-ship').value=q.ship;
+      $('cot-tax').value=q.taxPct;
+      $('cot-pobox').value=q.poboxPct;
+      $('cot-tdc-card').value=q.tdcCard||'';
+      $('cot-tdc-pobox').value=q.tdcPobox||'';
+      $('cot-util').value=q.utilPct;
+      $('cot-paste').value='';$('cot-paste-status').textContent='';
+      ACTIVE_ID=q.id;
+      calc();renderHist();closeDrawer();
+    }
 
     // Autoguardado: 800ms tras el último cambio, y solo si la cotización
     // tiene nombre y un costo real. Mientras se edita se actualiza la
@@ -670,7 +735,28 @@ Tax         $4.21"></textarea>
       ACTIVE_ID=null;
       calc();renderHist();
     });
-    loadFx();calc();
+    function openDrawer(){renderHist();$('cot-drawer').classList.add('open');$('cot-drawer-back').classList.add('open');}
+    function closeDrawer(){$('cot-drawer').classList.remove('open');$('cot-drawer-back').classList.remove('open');}
+    $('cot-hist-btn').addEventListener('click',openDrawer);
+    $('cot-drawer-close').addEventListener('click',closeDrawer);
+    $('cot-drawer-back').addEventListener('click',closeDrawer);
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDrawer();});
+    $('cot-hist-list').addEventListener('click',function(e){
+      var t=e.target, del=t.getAttribute?t.getAttribute('data-del'):null;
+      if(del){
+        e.stopPropagation();
+        if(confirm('¿Borrar esta cotización?')){
+          quotesDelete(del);
+          if(ACTIVE_ID===del)ACTIVE_ID=null;
+          renderHist();
+        }
+        return;
+      }
+      var row=t;
+      while(row&&row!==this&&!(row.className&&/(^|\s)qi(\s|$)/.test(row.className)))row=row.parentNode;
+      if(row&&row!==this)loadQuote(row.getAttribute('data-id'));
+    });
+    loadFx();calc();renderHist();
   })();
   </script>
 
