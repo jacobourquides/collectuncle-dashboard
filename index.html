@@ -495,11 +495,11 @@ Tax         $4.21"></textarea>
         </div>
         <div class="cfoot">
           <button class="btn btn-gold" id="cot-copy"><i class="ti ti-copy"></i> Copiar cotización</button>
-          <button class="btn btn-theme" id="cot-reset"><i class="ti ti-eraser"></i> Limpiar</button>
+          <button class="btn btn-theme" id="cot-reset"><i class="ti ti-plus"></i> Nueva cotización</button>
         </div>
       </div>
     </div>
-    <div class="cot-toast" id="cot-toast">Cotización copiada</div>
+    <div class="cot-toast" id="cot-toast"></div>
   </div>
 
   <script>
@@ -510,6 +510,8 @@ Tax         $4.21"></textarea>
     var usd=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
     var n=function(id){var el=$(id);if(!el)return 0;var v=parseFloat(el.value);return isNaN(v)?0:v;};
     var LS={get:function(k){try{return localStorage.getItem(k);}catch(e){return null;}},set:function(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+    function showToast(msg){var el=$('cot-toast');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show');},1900);}
+    function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
     function readInputs(){
       return {
         prod:String($('cot-prod').value||'').trim(),
@@ -568,16 +570,73 @@ Tax         $4.21"></textarea>
       if(tax!=null&&precio!=null){var base=precio+(envio||0);if(base>0){$('cot-tax').value=(tax/base*100).toFixed(2);got.push('tax');}}
       if(got.length){st.style.color='var(--teal)';st.textContent='✓ Cargado: '+got.join(', ')+'. Verifica y ajusta si hace falta.';}
       else{st.style.color='var(--red)';st.textContent='No pude leer los números — revisa el formato o llena a mano.';}
-      calc();
+      calc();scheduleSave();
     }
     $('cot-paste').addEventListener('input',function(){parseOrden(this.value);});
+    // ---- Historial de cotizaciones (localStorage) ----
+    var QKEY='cu_cotizaciones', MAX_QUOTES=200;
+    var ACTIVE_ID=null, idSeq=0, saveTimer=null, warnedLS=false;
+
+    function newId(){return String(Date.now())+'-'+(idSeq++);}
+
+    function quotesLoad(){
+      try{
+        var raw=LS.get(QKEY);
+        if(!raw)return[];
+        var a=JSON.parse(raw);
+        return Object.prototype.toString.call(a)==='[object Array]'?a:[];
+      }catch(e){return[];}
+    }
+    // Escritura directa: LS.set traga el error y aquí sí importa saberlo.
+    function quotesWrite(arr){
+      try{localStorage.setItem(QKEY,JSON.stringify(arr));return true;}
+      catch(e){
+        if(!warnedLS){warnedLS=true;showToast('Este navegador no permite guardar el historial');}
+        return false;
+      }
+    }
+    function quotesSave(q){
+      var arr=quotesLoad(),i,found=-1;
+      for(i=0;i<arr.length;i++){if(arr[i].id===q.id){found=i;break;}}
+      q.ts=Date.now();
+      if(found>=0)arr[found]=q;else arr.push(q);
+      arr.sort(function(a,b){return b.ts-a.ts;});
+      if(arr.length>MAX_QUOTES)arr=arr.slice(0,MAX_QUOTES);
+      quotesWrite(arr);
+      return q;
+    }
+    function quotesDelete(id){
+      var arr=quotesLoad(),out=[],i;
+      for(i=0;i<arr.length;i++)if(arr[i].id!==id)out.push(arr[i]);
+      quotesWrite(out);
+    }
+
+    // La implementa el drawer del historial; autoSave ya la llama.
+    function renderHist(){}
+
+    // Autoguardado: 800ms tras el último cambio, y solo si la cotización
+    // tiene nombre y un costo real. Mientras se edita se actualiza la
+    // cotización activa, así teclear el nombre no crea una entrada por letra.
+    function scheduleSave(){
+      if(saveTimer)clearTimeout(saveTimer);
+      saveTimer=setTimeout(autoSave,800);
+    }
+    function autoSave(){
+      var q=readInputs(), r=computeQuote(q);
+      if(!q.prod||!(r.total>0))return;
+      q.id=ACTIVE_ID||newId();
+      quotesSave(q);
+      ACTIVE_ID=q.id;
+      renderHist();
+    }
+
     // Referencia de tipo de cambio de mercado (NO es el de la tarjeta)
     function loadFx(){
       var ref=$('cot-fxref');ref.textContent='Consultando tipo de cambio…';
       fetch('https://open.er-api.com/v6/latest/USD').then(function(r){return r.json();}).then(function(d){
         if(d&&d.rates&&d.rates.MXN){var v=d.rates.MXN.toFixed(2);
           ref.innerHTML='Mercado hoy: <strong>$'+v+'</strong> (ref., tu tarjeta cobra más) · <a id="cot-usefx">usar</a>';
-          $('cot-usefx').addEventListener('click',function(){$('cot-tdc-card').value=v;savePrefs();calc();});
+          $('cot-usefx').addEventListener('click',function(){$('cot-tdc-card').value=v;savePrefs();onEdit();});
         }else ref.textContent='';
       }).catch(function(){ref.textContent='';});
     }
@@ -587,7 +646,8 @@ Tax         $4.21"></textarea>
     $('cot-tdc-card').addEventListener('input',savePrefs);
     $('cot-tdc-pobox').addEventListener('input',savePrefs);
     $('cot-util').addEventListener('input',savePrefs);
-    ['cot-price','cot-ship','cot-tax','cot-pobox','cot-tdc-card','cot-tdc-pobox','cot-util','cot-prod'].forEach(function(id){$(id).addEventListener('input',calc);});
+    function onEdit(){calc();scheduleSave();}
+    ['cot-price','cot-ship','cot-tax','cot-pobox','cot-tdc-card','cot-tdc-pobox','cot-util','cot-prod'].forEach(function(id){$(id).addEventListener('input',onEdit);});
     $('cot-copy').addEventListener('click',function(){
       var rq=readInputs();
       var t='Cotización Collectuncle\nProducto: '+(rq.prod||'(sin nombre)')+
@@ -595,7 +655,7 @@ Tax         $4.21"></textarea>
         '\nTOTAL: '+$('cot-o-total').textContent+
         '\nPrecio de venta: '+$('cot-o-venta').textContent+
         '\nUtilidad: '+$('cot-o-utilidad').textContent+' ('+rq.utilPct+'%)';
-      navigator.clipboard.writeText(t).then(function(){var el=$('cot-toast');el.classList.add('show');setTimeout(function(){el.classList.remove('show');},1600);});
+      navigator.clipboard.writeText(t).then(function(){showToast('Cotización copiada');});
     });
     $('cot-reset').addEventListener('click',function(){
       $('cot-prod').value='';$('cot-price').value='';$('cot-ship').value='';
@@ -603,7 +663,12 @@ Tax         $4.21"></textarea>
       $('cot-tax').value='8.25';$('cot-pobox').value='16';
       var c=LS.get('cu_tdc_card'),p=LS.get('cu_tdc_pobox');
       $('cot-tdc-card').value=c||'';$('cot-tdc-pobox').value=p||'';
-      calc();
+      var u=LS.get('cu_util_pct');$('cot-util').value=u||'40';
+      // Sin esto, un guardado ya agendado se dispararía después del reset y
+      // escribiría campos vacíos sobre la cotización que se acaba de desligar.
+      if(saveTimer){clearTimeout(saveTimer);saveTimer=null;}
+      ACTIVE_ID=null;
+      calc();renderHist();
     });
     loadFx();calc();
   })();
