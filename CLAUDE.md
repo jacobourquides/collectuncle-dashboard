@@ -68,7 +68,22 @@ Detalles que ya causaron bugs y no hay que revertir:
 
 ### UI
 
-Tres paneles (`showPanel`): Dashboard, Estado de Resultados (`renderPnL`), Cotizador. El Cotizador es un bloque de JS independiente (ES5, líneas ~490-567) que no toca el estado del dashboard: calcula costos de importación en USD→MXN, persiste tipos de cambio en `localStorage` y consulta `open.er-api.com/v6/latest/USD` (keyless, CORS abierto).
+Tres paneles (`showPanel`): Dashboard, Estado de Resultados (`renderPnL`), Cotizador. El Cotizador es un bloque de JS independiente (ES5, líneas ~531-761) que no toca el estado del dashboard: calcula costos de importación en USD→MXN, deriva precio de venta y utilidad, persiste preferencias e historial en `localStorage` y consulta `open.er-api.com/v6/latest/USD` (keyless, CORS abierto).
+
+### Cotizador
+
+`computeQuote(inputs)` es la **única** definición de la fórmula: pura, sin tocar el DOM. La usan `calc()` para pintar el desglose y `renderHist()` para pintar cada renglón del historial. Si cambias la fórmula, cámbiala solo ahí.
+
+El campo "Utilidad deseada" es **markup sobre el costo** (`venta = total × (1 + p/100)`), no margen sobre la venta. El margen que se muestra abajo es derivado e informativo — es el que se puede comparar con el "margen" que reporta el dashboard, que se calcula al revés.
+
+Claves de `localStorage`: `cu_tdc_card`, `cu_tdc_pobox`, `cu_util_pct` (preferencias) y `cu_cotizaciones` (historial, máx. 200). **El historial guarda solo inputs, nunca resultados** — así una corrección de la fórmula se refleja en todo el historial sin migrar datos. No agregues campos calculados al objeto que se persiste.
+
+El autoguardado tiene debounce de 800 ms y actualiza `ACTIVE_ID`, la cotización en edición; por eso teclear el nombre no crea una entrada por letra. Dos trampas que ya se resolvieron y no hay que revertir:
+
+- Asignar `.value` por código **no** dispara el evento `input`. `parseOrden()`, el botón "usar" del tipo de cambio y `loadQuote()` tienen que llamar al autoguardado (o cancelarlo) a mano.
+- `loadQuote()` y el botón "Nueva cotización" hacen `clearTimeout(saveTimer)`. Sin eso, un guardado ya agendado se dispara después y sobrescribe la cotización que se acaba de desligar.
+
+El nombre del producto se inserta con `innerHTML` en el historial, así que pasa por `esc()`.
 
 Tema dark/light por `data-theme` en `<html>` + variables CSS (`--gold`, `--teal`, `--surface`). Cambiar de tema fuerza un `renderAll` completo porque los colores de Chart.js se leen del tema en cada render.
 
