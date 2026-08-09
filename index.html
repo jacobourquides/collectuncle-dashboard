@@ -806,7 +806,7 @@ function processGvizData(data){
         producto:prod,tipo,
         franquicia:prod.split(' ').slice(0,3).join(' ')
       };
-    }).filter(r=>r.precioVenta>0&&r.plataforma&&(r.estado==='Venta'||r.estado.trim()==='Venta - Pendiente liq.'));
+    }).filter(r=>r.precioVenta>0&&r.plataforma&&r.estado==='Venta');
     // Construir el desglose por categoría de cada orden usando Items_Ordenes (prorrateo B)
     ALL_ROWS.forEach(r=>{ r.catBreakdown = buildCatBreakdown(r); });
     document.getElementById('last-update').textContent='Al '+new Date().toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
