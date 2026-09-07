@@ -65,6 +65,7 @@ Detalles que ya causaron bugs y no hay que revertir:
 - Para montos se prefiere `.f` sobre `.v` (`c[i]?.f ?? c[i]?.v`) porque `.f` trae el valor formateado del Sheet.
 - Excepción: el margen de `Inventario` (col M) usa `.v` a propósito — `.f` viene como `"5%"` y multiplicaría dos veces.
 - Se usan las columnas J/K de `Items_Ordenes` (totales de línea), no G/H (unitarios).
+- Los parsers guardan también valores crudos sin trim (`tipoRaw`/`piezasRaw` en Ventas, `piezas` por item, `raw:{}` en Inventario). Los consume el validador `auditarCaptura()` de la card "Datos por corregir"; si los normalizas, el check de espacios sobrantes deja de detectar nada.
 
 ### UI
 

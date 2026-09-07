@@ -178,6 +178,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .ti-trophy::before{content:'🏆'}
 .ti-alert-triangle::before{content:'⚠'}
 .ti-alert-circle::before{content:'⚠'}
+.ti-tool::before{content:'🔧'}
 .ti-bulb::before{content:'💡'}
 .ti-bolt::before{content:'⚡'}
 .ti-cards::before{content:'🃏'}
@@ -300,6 +301,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
         <div class="card-title" onclick="filterInvLiquidar()" style="cursor:pointer" title="Ver lista completa"><i class="ti ti-alert-triangle" style="color:var(--text-3)"></i>Piezas a liquidar <span style="font-size:11px;color:var(--teal);font-weight:400">▸ ver todas</span></div>
         <div class="card-sub">Stock con pérdida o margen crítico · acción requerida</div>
         <div class="alerts-scroll" id="alerts-list"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-tool" style="color:var(--teal)"></i>Datos por corregir <span id="dq-count" style="font-size:11px;font-weight:400;color:var(--text-2)"></span></div>
+        <div class="card-sub">Errores de captura en el Sheet · al corregir la celda y recargar, la alerta desaparece sola</div>
+        <div class="alerts-scroll" id="dq-list"></div>
       </div>
     </div>
     <div class="section-label">Inventario · capital y stock</div>
@@ -797,9 +805,11 @@ function processGvizData(data){
       // R(17)=Costo Embalaje, S(18)=Ganancia Neta, T(19)=Margen %, U(20)=Categoria
       const orderId=parseN(g(0)?.v);
       const prod=String(g(2)?.v??'');
-      const tipo=String(g(20)?.v??'').trim()||'Otro';
+      const tipoRaw=String(g(20)?.v??'');          // crudo, sin trim: lo usa el validador de captura
+      const tipo=tipoRaw.trim()||'Otro';
       return{
-        orderId,
+        orderId,tipoRaw,
+        piezasRaw:parseN(g(4)?.v),                   // null si la celda está vacía (piezas abajo asume 1)
         fecha:parseFecha(g(1)),
         estado:String(g(3)?.v??''),
         precioVenta:parseN(g(7)?.f??g(7)?.v),
@@ -1250,6 +1260,81 @@ function renderAlerts(){
     }).join('');
 }
 
+// ---- Datos por corregir: validador automático de calidad de captura ----
+// Solo lectura. Todo sale de ALL_ROWS / ITEMS_BY_ORDER / INVENTARIO ya cargados, así que
+// cuando se corrige la celda en el Sheet y se recarga, el hallazgo desaparece solo.
+const DQ_CATS_VALIDAS=['Funko','TCG - Deportes','TCG - Animacion','ThrillJoy','Otros'];
+const DQ_GRUPOS=[ // orden = severidad (dinero → piezas → cosmético)
+  {k:'money', t:'Descuadre $ orden vs items',      c:'#EF4444'},
+  {k:'pzs',   t:'Descuadre de piezas orden vs items', c:'#F97316'},
+  {k:'frac',  t:'Piezas fraccionarias en Inventario', c:'#F59E0B'},
+  {k:'cat',   t:'Categoría inválida en Ventas',     c:'#F59E0B'},
+  {k:'trim',  t:'Espacios sobrantes',               c:'var(--teal)'},
+  {k:'legacy',t:'Categoría legacy por migrar',      c:'var(--text-3)'}
+];
+const dqMoney=n=>(n<0?'-':'')+'$'+Math.round(Math.abs(n)).toLocaleString('es-MX');
+const dqEsc=x=>String(x).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+// Devuelve [{k, tab, id, det, badge, mag}] sin ordenar. `mag` ordena dentro de cada grupo (mayor primero).
+function auditarCaptura(){
+  const out=[];
+  const trimCheck=(tab,id,col,v)=>{
+    if(typeof v!=='string'||v===v.trim())return;
+    const donde=v!==v.trimStart()?(v!==v.trimEnd()?'al inicio y al final':'al inicio'):'al final';
+    out.push({k:'trim',tab,id,det:`${col}: "${v}" — espacio ${donde}`,badge:col,mag:0});
+  };
+  ALL_ROWS.forEach(r=>{
+    if(r.orderId==null||typeof r.tipoRaw!=='string')return; // filas de fallback/muestra no traen los campos crudos
+    const oid='Orden '+r.orderId;
+    const items=ITEMS_BY_ORDER[r.orderId]||[];
+    const sumP=items.reduce((s,x)=>s+(x.precio||0),0);
+    const dif=(r.precioVenta||0)-sumP;
+    if(Math.abs(dif)>1){
+      const sinPrecio=items.filter(x=>!x.precio).length;
+      const extra=!items.length?' · sin filas en Items_Ordenes':(sinPrecio?` · ${sinPrecio} de ${items.length} items sin precio`:'');
+      out.push({k:'money',tab:'Ventas ↔ Items',id:oid,det:`Ventas dice ${dqMoney(r.precioVenta)}, items suman ${dqMoney(sumP)} (dif ${dqMoney(dif)})${extra}`,badge:dqMoney(dif),mag:Math.abs(dif)});
+    }
+    if(r.piezasRaw!=null&&items.length){
+      const sumQ=items.reduce((s,x)=>s+(x.piezas||0),0);
+      const dq=r.piezasRaw-sumQ;
+      if(Math.abs(dq)>0.001)out.push({k:'pzs',tab:'Ventas ↔ Items',id:oid,det:`Ventas dice ${r.piezasRaw} pzs, items suman ${sumQ} (dif ${dq>0?'+':''}${dq})`,badge:`${dq>0?'+':''}${dq} pzs`,mag:Math.abs(dq)});
+    }
+    trimCheck('Ventas',oid,'Categoria',r.tipoRaw);
+    const cat=r.tipoRaw.trim();
+    if(cat==='Multicategoria')out.push({k:'legacy',tab:'Ventas',id:oid,det:'Categoria "Multicategoria" — reasignar a una categoría del catálogo actual',badge:'legacy',mag:0});
+    else if(!cat)out.push({k:'cat',tab:'Ventas',id:oid,det:'Categoria vacía — capturar una de: '+DQ_CATS_VALIDAS.join(', '),badge:'vacía',mag:1});
+    else if(!DQ_CATS_VALIDAS.includes(cat))out.push({k:'cat',tab:'Ventas',id:oid,det:`Categoria "${cat}" no está en el catálogo (${DQ_CATS_VALIDAS.join(', ')})`,badge:cat,mag:0});
+  });
+  INVENTARIO.forEach(p=>{
+    if(p.cant&&Math.abs(p.cant-Math.round(p.cant))>1e-9)out.push({k:'frac',tab:'Inventario',id:p.id,det:`Cantidad ${p.cant} — debe ser entero`,badge:p.cant+' pzs',mag:1});
+    if(p.raw){trimCheck('Inventario',p.id,'Marca',p.raw.marca);trimCheck('Inventario',p.id,'Categoria',p.raw.cat);trimCheck('Inventario',p.id,'Colección',p.raw.coleccion);}
+  });
+  return out;
+}
+function renderDatosCorregir(){
+  const el=document.getElementById('dq-list'),cnt=document.getElementById('dq-count');
+  if(!el)return;
+  if(!ALL_ROWS.length&&!INVENTARIO.length){el.innerHTML='<div style="padding:12px;color:var(--text-3);font-size:12px">Sin datos.</div>';if(cnt)cnt.textContent='';return;}
+  const hall=auditarCaptura();
+  if(!hall.length){
+    if(cnt)cnt.textContent='';
+    el.innerHTML='<div style="padding:6px 0 2px;color:#10B981;font-size:12px;font-weight:500">✅ Sin errores de captura detectados</div>';
+    return;
+  }
+  const MAX=15;let vistos=0;const partes=[];
+  DQ_GRUPOS.forEach(gr=>{
+    const items=hall.filter(h=>h.k===gr.k).sort((a,b)=>b.mag-a.mag||String(a.id).localeCompare(String(b.id),'es',{numeric:true}));
+    if(!items.length||vistos>=MAX)return;
+    partes.push(`<div style="font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;margin:8px 0 2px">${gr.t} · ${items.length}</div>`);
+    items.slice(0,MAX-vistos).forEach(h=>{
+      partes.push(`<div class="alert-item"><span style="color:${gr.c};flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">${dqEsc(h.id)} <span style="font-size:9px;font-weight:400;color:var(--text-2);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0 5px;margin-left:4px">${dqEsc(h.tab)}</span></div><div class="alert-detail">${dqEsc(h.det)}</div></div><div class="alert-loss" style="color:${gr.c}">${dqEsc(h.badge)}</div></div>`);
+    });
+    vistos+=Math.min(items.length,MAX-vistos);
+  });
+  if(hall.length>vistos)partes.push(`<div style="padding:8px 0 2px;font-size:11px;color:var(--text-3)">y ${hall.length-vistos} más…</div>`);
+  if(cnt)cnt.textContent=`· ${hall.length} hallazgo${hall.length===1?'':'s'}`;
+  el.innerHTML=partes.join('');
+}
+
 // Marcas que SIEMPRE deben estar en categoría TCG (si no, es error)
 const MARCAS_TCG=['topps','topps now','panini','pokemon','upper deck','pulse'];
 
@@ -1585,7 +1670,7 @@ function renderPnLChart(ventas,costosMeli,costoInv,embalaje,gastos,utilNeta){
 
 function renderAll(period){
   const rows=filterRows(period);
-  renderPeriodPills();renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderInvCapital();renderInvSalud();renderInvAtascado();renderInvAuditor();renderInsights(rows);renderTipoChart(rows);renderWeekly();
+  renderPeriodPills();renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderDatosCorregir();renderInvCapital();renderInvSalud();renderInvAtascado();renderInvAuditor();renderInsights(rows);renderTipoChart(rows);renderWeekly();
 }
 
 function setPeriod(btn,period){
@@ -1620,8 +1705,9 @@ function processItemsData(data){
       const cat=String(g(4)?.v??'').trim()||'Sin categoría';
       const precio=parseN(g(9)?.f??g(9)?.v)||0;   // Precio_Total_Item
       const costo=parseN(g(10)?.f??g(10)?.v)||0;  // Costo_Total_Item
+      const piezas=parseN(g(3)?.v)||0;            // Piezas de la línea (col D); lo usa el validador de captura
       if(!ITEMS_BY_ORDER[oid])ITEMS_BY_ORDER[oid]=[];
-      ITEMS_BY_ORDER[oid].push({cat,precio,costo});
+      ITEMS_BY_ORDER[oid].push({cat,precio,costo,piezas});
     });
     console.log('Items cargados:',Object.keys(ITEMS_BY_ORDER).length,'órdenes');
   }catch(e){console.error('Items error:',e);}
@@ -1671,7 +1757,8 @@ function processInventarioData(data){
         cant:parseN(g(9)?.v)||0,
         estado,
         valor:parseN(g(11)?.f??g(11)?.v)||0,
-        margen:parseN(g(12)?.v)  // usar .v (decimal crudo 0.05), NO .f ("5%") para no multiplicar dos veces
+        margen:parseN(g(12)?.v),  // usar .v (decimal crudo 0.05), NO .f ("5%") para no multiplicar dos veces
+        raw:{marca:String(g(1)?.v??''),cat:String(g(2)?.v??''),coleccion:String(g(3)?.v??'')} // sin trim: lo usa el validador de captura
       };
     }).filter(x=>x);
     console.log('Inventario cargado:',INVENTARIO.length,'productos');

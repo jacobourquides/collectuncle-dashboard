@@ -138,6 +138,21 @@ Cuenta los productos con datos incompletos o mal categorizados y los agrupa por 
 
 Fuera de las cuatro tarjetas, esta lista sale también de `INVENTARIO`. Candidatos: productos con stock y costo > 0 que además tienen **precio por debajo del costo** (pérdida real) o **margen menor a 5%** (crítico). Se ordenan primero las pérdidas reales por monto perdido (`(costo − precio) × cantidad`), luego los críticos por margen ascendente. Muestra los primeros 30; el título abre la lista completa (`filterInvLiquidar`).
 
+### Datos por corregir — `renderDatosCorregir()`
+
+Validador automático de calidad de captura. Es **solo lectura**: cruza `ALL_ROWS`, `ITEMS_BY_ORDER` e `INVENTARIO` ya cargados y lista lo que no cuadra; al corregir la celda en el Sheet y recargar, el hallazgo desaparece solo. La lógica vive en `auditarCaptura()`, que devuelve los hallazgos, y `renderDatosCorregir()` los agrupa por tipo en orden de severidad (máx. 15 visibles + "y N más…"). Con cero hallazgos muestra "✅ Sin errores de captura detectados".
+
+| Check | Condición | Tab |
+|---|---|---|
+| Descuadre $ orden vs items | `Precio Venta` de la orden vs suma de `Precio_Total_Item` de sus filas; dif > $1. Incluye órdenes sin filas en Items y con items sin precio | Ventas ↔ Items |
+| Descuadre de piezas | `Piezas` de la orden vs suma de `Piezas` de sus items; dif > 0 (solo si la orden tiene items) | Ventas ↔ Items |
+| Piezas fraccionarias | `Cantidad` con decimales | Inventario |
+| Categoría inválida | orden `Venta` con `Categoria` vacía o fuera de `Funko`, `TCG - Deportes`, `TCG - Animacion`, `ThrillJoy`, `Otros` | Ventas |
+| Espacios sobrantes | texto ≠ texto.trim() en `Marca`, `Categoria`, `Colección` (Inventario) y `Categoria` (Ventas) | Inventario / Ventas |
+| Categoría legacy | `Categoria` = `Multicategoria` (severidad baja, por migrar) | Ventas |
+
+Para que estos checks funcionen, los parsers conservan campos crudos **sin trim** además de los normalizados: `tipoRaw` y `piezasRaw` en cada fila de `ALL_ROWS`, `piezas` en cada item de `ITEMS_BY_ORDER`, y `raw:{marca, cat, coleccion}` en cada producto de `INVENTARIO`. No los quites ni les apliques `.trim()`.
+
 ---
 
 ## Deducción de publicidad por canal
