@@ -1320,17 +1320,22 @@ function renderDatosCorregir(){
     el.innerHTML='<div style="padding:6px 0 2px;color:#10B981;font-size:12px;font-weight:500">✅ Sin errores de captura detectados</div>';
     return;
   }
-  const MAX=15;let vistos=0;const partes=[];
-  DQ_GRUPOS.forEach(gr=>{
-    const items=hall.filter(h=>h.k===gr.k).sort((a,b)=>b.mag-a.mag||String(a.id).localeCompare(String(b.id),'es',{numeric:true}));
-    if(!items.length||vistos>=MAX)return;
-    partes.push(`<div style="font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;margin:8px 0 2px">${gr.t} · ${items.length}</div>`);
-    items.slice(0,MAX-vistos).forEach(h=>{
-      partes.push(`<div class="alert-item"><span style="color:${gr.c};flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">${dqEsc(h.id)} <span style="font-size:9px;font-weight:400;color:var(--text-2);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0 5px;margin-left:4px">${dqEsc(h.tab)}</span></div><div class="alert-detail">${dqEsc(h.det)}</div></div><div class="alert-loss" style="color:${gr.c}">${dqEsc(h.badge)}</div></div>`);
+  // Cupo de ~15 filas: cada grupo con hallazgos muestra al menos 2 (para que lo cosmético no quede
+  // oculto detrás de los descuadres) y el resto del cupo se reparte en orden de severidad.
+  const MAX=15,MIN_POR_GRUPO=2;
+  const grupos=DQ_GRUPOS.map(gr=>({gr,items:hall.filter(h=>h.k===gr.k).sort((a,b)=>b.mag-a.mag||String(a.id).localeCompare(String(b.id),'es',{numeric:true}))})).filter(g=>g.items.length);
+  const cupo=grupos.map(g=>Math.min(g.items.length,MIN_POR_GRUPO));
+  let resto=MAX-cupo.reduce((s,n)=>s+n,0);
+  grupos.forEach((g,i)=>{if(resto<=0)return;const add=Math.min(g.items.length-cupo[i],resto);cupo[i]+=add;resto-=add;});
+  const partes=[];let vistos=0;
+  grupos.forEach((g,i)=>{
+    partes.push(`<div style="font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;margin:8px 0 2px">${g.gr.t} · ${g.items.length}</div>`);
+    g.items.slice(0,cupo[i]).forEach(h=>{
+      partes.push(`<div class="alert-item"><span style="color:${g.gr.c};flex-shrink:0">⚠</span><div style="flex:1;min-width:0"><div class="alert-name">${dqEsc(h.id)} <span style="font-size:9px;font-weight:400;color:var(--text-2);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0 5px;margin-left:4px">${dqEsc(h.tab)}</span></div><div class="alert-detail">${dqEsc(h.det)}</div></div><div class="alert-loss" style="color:${g.gr.c}">${dqEsc(h.badge)}</div></div>`);
     });
-    vistos+=Math.min(items.length,MAX-vistos);
+    if(g.items.length>cupo[i])partes.push(`<div style="padding:4px 0 2px 20px;font-size:10px;color:var(--text-3)">y ${g.items.length-cupo[i]} más de este tipo…</div>`);
+    vistos+=cupo[i];
   });
-  if(hall.length>vistos)partes.push(`<div style="padding:8px 0 2px;font-size:11px;color:var(--text-3)">y ${hall.length-vistos} más…</div>`);
   if(cnt)cnt.textContent=`· ${hall.length} hallazgo${hall.length===1?'':'s'}`;
   el.innerHTML=partes.join('');
 }

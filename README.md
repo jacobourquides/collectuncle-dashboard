@@ -140,7 +140,7 @@ Fuera de las cuatro tarjetas, esta lista sale también de `INVENTARIO`. Candidat
 
 ### Datos por corregir — `renderDatosCorregir()`
 
-Validador automático de calidad de captura. Es **solo lectura**: cruza `ALL_ROWS`, `ITEMS_BY_ORDER` e `INVENTARIO` ya cargados y lista lo que no cuadra; al corregir la celda en el Sheet y recargar, el hallazgo desaparece solo. La lógica vive en `auditarCaptura()`, que devuelve los hallazgos, y `renderDatosCorregir()` los agrupa por tipo en orden de severidad (máx. 15 visibles + "y N más…"). Con cero hallazgos muestra "✅ Sin errores de captura detectados".
+Validador automático de calidad de captura. Es **solo lectura**: cruza `ALL_ROWS`, `ITEMS_BY_ORDER` e `INVENTARIO` ya cargados y lista lo que no cuadra; al corregir la celda en el Sheet y recargar, el hallazgo desaparece solo. La lógica vive en `auditarCaptura()`, que devuelve los hallazgos, y `renderDatosCorregir()` los agrupa por tipo en orden de severidad. Cupo de ~15 filas visibles: cada grupo muestra al menos 2 y el resto se reparte por severidad, con "y N más de este tipo…" por grupo. Con cero hallazgos muestra "✅ Sin errores de captura detectados".
 
 | Check | Condición | Tab |
 |---|---|---|
