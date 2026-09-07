@@ -305,8 +305,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     <div class="section-label">Inventario · capital y stock</div>
     <div class="row4">
       <div class="card">
-        <div class="card-title"><i class="ti ti-package" style="color:var(--gold)"></i>Capital parado por categoría</div>
-        <div class="card-sub">Dónde está tu dinero invertido en stock</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <div class="card-title"><i class="ti ti-package" style="color:var(--gold)"></i>Capital parado por categoría</div>
+            <div class="card-sub">Dónde está tu dinero invertido en stock</div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <button class="ptab itab on" data-mode="cat" onclick="setInvCapMode('cat')">Temática</button>
+            <button class="ptab itab" data-mode="marca" onclick="setInvCapMode('marca')">Marca</button>
+          </div>
+        </div>
         <div style="position:relative;height:220px"><canvas id="c-inv-cat"></canvas></div>
         <div id="inv-cap-total" style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-2)"></div>
       </div>
@@ -1321,15 +1329,29 @@ function filterInvAuditor(){
 }
 
 // A) Capital parado por categoría (donut)
+let INV_CAP_MODE='cat'; // 'cat' (temática, col C) | 'marca' (col B). No persiste: cada carga arranca en temática.
+function setInvCapMode(mode){INV_CAP_MODE=mode;renderInvCapital();}
 function renderInvCapital(){
   const ctx=document.getElementById('c-inv-cat');if(!ctx)return;
-  const byCat={};let total=0;
-  INVENTARIO.forEach(p=>{byCat[p.cat]=(byCat[p.cat]||0)+(p.valor||0);total+=(p.valor||0);});
-  const cats=Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a]);
+  const key=INV_CAP_MODE==='marca'?'marca':'cat';
+  const byKey={};let total=0;
+  INVENTARIO.forEach(p=>{byKey[p[key]]=(byKey[p[key]]||0)+(p.valor||0);total+=(p.valor||0);});
+  let labels=Object.keys(byKey).sort((a,b)=>byKey[b]-byKey[a]);
+  if(key==='marca'&&total>0){
+    // Marcas con <3% del capital se agrupan en "Otras" para no saturar la dona (solo si son 2+, si no sería renombrar una).
+    const minor=labels.filter(l=>byKey[l]/total<0.03);
+    if(minor.length>1){
+      byKey['Otras']=minor.reduce((s,l)=>s+byKey[l],0);
+      minor.forEach(l=>delete byKey[l]);
+      labels=labels.filter(l=>!minor.includes(l)).concat('Otras');
+    }
+  }
   const palette=['#D4AF37','#14B8A6','#6366F1','#F59E0B','#EF4444','#8B5CF6','#10B981'];
   const {tick}=getColors();
   if(CHARTS['c-inv-cat'])CHARTS['c-inv-cat'].destroy();
-  CHARTS['c-inv-cat']=new Chart(ctx,{type:'doughnut',data:{labels:cats,datasets:[{data:cats.map(c=>Math.round(byCat[c])),backgroundColor:cats.map((c,i)=>palette[i%palette.length]),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'right',labels:{color:tick,font:{size:10},boxWidth:10,padding:6}},tooltip:{callbacks:{label:c=>` ${c.label}: $${c.raw.toLocaleString('es-MX')} (${Math.round(c.raw/total*100)}%)`}}}}});
+  CHARTS['c-inv-cat']=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data:labels.map(l=>Math.round(byKey[l])),backgroundColor:labels.map((l,i)=>palette[i%palette.length]),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'right',labels:{color:tick,font:{size:10},boxWidth:10,padding:6}},tooltip:{callbacks:{label:c=>` ${c.label}: $${c.raw.toLocaleString('es-MX')} (${Math.round(c.raw/total*100)}%)`}}}}});
+  // setPeriod() apaga todos los .ptab que no sean .wtab; se resincroniza aquí porque renderAll() vuelve a pasar por esta función.
+  document.querySelectorAll('.itab').forEach(b=>b.classList.toggle('on',b.dataset.mode===INV_CAP_MODE));
   const t=document.getElementById('inv-cap-total');
   if(t)t.innerHTML=`Capital total en inventario: <strong style="color:var(--gold)">$${Math.round(total).toLocaleString('es-MX')}</strong> · ${INVENTARIO.reduce((s,p)=>s+p.cant,0)} piezas`;
 }
