@@ -1576,7 +1576,7 @@ function loadVentas(){
   const cb='cu_'+Date.now();
   window[cb]=processGvizData;
   window.google.visualization.Query.setResponse=processGvizData;
-  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cb}&sheet=Ventas&range=A4:V500`;
+  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cb}&sheet=Ventas&range=A4:V3000`;
   const oldS=document.getElementById('s0');if(oldS)oldS.remove();
   const s=document.createElement('script');s.id='s0';s.src=url;
   s.onerror=()=>{document.getElementById('last-update').textContent='Sin conexión';useFallback();};
@@ -1609,7 +1609,7 @@ function loadItems(cbNext){
   const cbI='cui_'+Date.now();
   window[cbI]=function(data){ window.google.visualization.Query.setResponse(data); };
   window.google.visualization.Query.setResponse=function(data){ processItemsData(data); cbNext(); };
-  const urlI=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cbI}&sheet=Items_Ordenes&range=A2:K1000`;
+  const urlI=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cbI}&sheet=Items_Ordenes&range=A2:K5000`;
   const si=document.createElement('script');si.src=urlI;
   si.onerror=()=>{ console.log('Items no disponible'); cbNext(); };
   document.head.appendChild(si);
@@ -1620,7 +1620,7 @@ function loadGastos(cbNext){
   window.google.visualization.Query.setResponse=function(data){ processGastosData(data); cbNext(); };
   const cbG='cug_'+Date.now();
   window[cbG]=function(data){ window.google.visualization.Query.setResponse(data); };
-  const urlG=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cbG}&sheet=Gastos&range=A2:C200`;
+  const urlG=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cbG}&sheet=Gastos&range=A2:C1000`;
   const sg=document.createElement('script');sg.src=urlG;
   sg.onerror=()=>{ console.log('Gastos no disponible'); cbNext(); };
   document.head.appendChild(sg);

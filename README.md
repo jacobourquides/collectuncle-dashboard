@@ -75,7 +75,7 @@ Columnas (índice gviz A3:N = 0-based):
 
 ### Pestaña `Gastos`
 
-Rango `A2:C200`. `A` = fecha, `B` = categoría, `C` = monto.
+Rango `A2:C1000`. `A` = fecha, `B` = categoría, `C` = monto.
 
 - Se suman todas las categorías **excepto** `Compra de Inventario` → `window.GASTOS_OPS` (gastos operativos, los que restan en el P&L). El desglose queda en `window.GASTOS_DETAIL`.
 - Las filas con categoría `Publicidad Meta` o `Publicidad Meli` (comparación en minúsculas, con trim) se guardan además en `window.GASTOS_ADS` como `{fecha, canal, monto}` para poder deducirlas por canal y por período.

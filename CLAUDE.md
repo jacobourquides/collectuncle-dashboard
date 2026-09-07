@@ -58,7 +58,7 @@ Una orden puede tener productos de varias categorías. Los KPIs, plataforma, evo
 
 ### Índices de columnas gviz
 
-Todo el parseo es posicional por índice 0-based (`processGvizData`, `processItemsData`, `processGastosData`, `processInventarioData`), con los rangos codificados en las URLs (`A4:V500`, `A2:K1000`, `A2:C200`, `A3:N1000`). **Agregar o quitar una columna en el Sheet rompe el dashboard en silencio**: hay que reajustar índices y rango a la vez. El mapeo completo está en el README.
+Todo el parseo es posicional por índice 0-based (`processGvizData`, `processItemsData`, `processGastosData`, `processInventarioData`), con los rangos codificados en las URLs (`A4:V3000`, `A2:K5000`, `A2:C1000`, `A3:N1000`). **Agregar o quitar una columna en el Sheet rompe el dashboard en silencio**: hay que reajustar índices y rango a la vez. El mapeo completo está en el README.
 
 Detalles que ya causaron bugs y no hay que revertir:
 - Toda conversión de texto usa `String(x ?? '')` antes de `.trim()` — gviz devuelve no-strings.
