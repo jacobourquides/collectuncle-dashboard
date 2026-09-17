@@ -231,6 +231,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     <div class="kpi-grid" id="kpi-row"><div class="kpi" style="border-left-color:#F59E0B"><div class="kpi-label">Ventas totales</div><div class="kpi-value" style="color:#F59E0B">$560K</div><div class="kpi-sub">369 transacciones</div></div><div class="kpi" style="border-left-color:#10B981"><div class="kpi-label">Ganancia neta</div><div class="kpi-value" style="color:#10B981">$136K</div><div class="kpi-sub">24% margen</div></div><div class="kpi" style="border-left-color:#10B981"><div class="kpi-label">Piezas vendidas</div><div class="kpi-value" style="color:#10B981">680</div><div class="kpi-sub">unidades despachadas</div></div><div class="kpi" style="border-left-color:#6366F1"><div class="kpi-label">Ticket promedio</div><div class="kpi-value" style="color:#6366F1">$2K</div><div class="kpi-sub">por venta</div></div><div class="kpi" style="border-left-color:#EF4444"><div class="kpi-label">Margen Meli</div><div class="kpi-value" style="color:#EF4444">18%</div><div class="kpi-sub">vs 37% FB Ads</div></div><div class="kpi" style="border-left-color:#F97316"><div class="kpi-label">Costo vendido</div><div class="kpi-value" style="color:#F97316">$263K</div><div class="kpi-sub">capital en producto</div></div></div>
     <div class="section-label">Por tipo de producto</div>
     <div class="tipo-grid" id="tipo-cards"><div class="tipo-card"><div class="tipo-badge" style="background:rgba(204,0,0,0.12);color:#CC0000">DEPORT</div><div><div class="tipo-name">TCG - Deportes</div><div class="tipo-val">$349K</div><div class="tipo-mg" style="color:#10B981">27% margen · $95K ganancia</div></div></div><div class="tipo-card"><div class="tipo-badge" style="background:rgba(32,150,212,0.15);color:#2096D4">FUNKO</div><div><div class="tipo-name">Funko</div><div class="tipo-val">$124K</div><div class="tipo-mg" style="color:#EF4444">13% margen · $16K ganancia</div></div></div><div class="tipo-card"><div class="tipo-badge" style="background:rgba(99,102,241,0.15);color:#6366F1">ANIM</div><div><div class="tipo-name">TCG - Animacion</div><div class="tipo-val">$37K</div><div class="tipo-mg" style="color:#10B981">27% margen · $10K ganancia</div></div></div><div class="tipo-card"><div class="tipo-badge" style="background:rgba(100,100,120,0.12);color:#9094A8">PIX!</div><div><div class="tipo-name">ThrillJoy</div><div class="tipo-val">$33K</div><div class="tipo-mg" style="color:#F59E0B">24% margen · $8K ganancia</div></div></div><div class="tipo-card"><div class="tipo-badge" style="background:rgba(156,163,175,0.12);color:#9CA3AF">OTROS</div><div><div class="tipo-name">Otros</div><div class="tipo-val">$17K</div><div class="tipo-mg" style="color:#10B981">44% margen · $8K ganancia</div></div></div></div>
+    <div class="section-label">TCG por formato</div>
+    <div style="margin-bottom:12px">
+      <div class="card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <div class="card-title"><i class="ti ti-cards" style="color:var(--gold)"></i>Ventas TCG por formato</div>
+            <div class="card-sub">Hanger, Blaster, Hobby… · solo órdenes con estado Venta del período</div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <div style="display:flex;gap:4px">
+              <button class="ptab ftab on" data-mode="ventas" onclick="setTcgFmtMode('ventas')">$ Ventas</button>
+              <button class="ptab ftab" data-mode="piezas" onclick="setTcgFmtMode('piezas')"># Piezas</button>
+              <button class="ptab ftab" data-mode="margen" onclick="setTcgFmtMode('margen')">Margen bruto %</button>
+            </div>
+            <div style="display:flex;gap:4px">
+              <button class="ptab fctab" data-cat="deportes" onclick="setTcgFmtCat('deportes')">Deportes</button>
+              <button class="ptab fctab" data-cat="animacion" onclick="setTcgFmtCat('animacion')">Animación</button>
+              <button class="ptab fctab on" data-cat="ambas" onclick="setTcgFmtCat('ambas')">Ambas</button>
+            </div>
+          </div>
+        </div>
+        <div style="position:relative;height:240px;margin-top:10px"><canvas id="c-tcg-fmt"></canvas></div>
+        <div id="tcg-fmt-summary" style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-2)"></div>
+      </div>
+    </div>
     <div class="section-label">Evolución semanal de ventas</div>
     <div class="card">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
@@ -1070,6 +1095,91 @@ function renderTipoCards(rows){
   document.getElementById('tipo-cards').innerHTML=tipos.map(t=>{const d=bT[t]||{v:0,g:0},m=meta[t]||{badge:t.slice(0,6),bg:'rgba(100,100,120,0.1)',txt:'#9094A8'};const mg=d.v>0?d.g/d.v:0;const mgColor=mg>=0.25?'#10B981':mg>=0.15?'#F59E0B':'#EF4444';return`<div class="tipo-card"><div class="tipo-badge" style="background:${m.bg};color:${m.txt}">${m.badge}</div><div><div class="tipo-name">${t}</div><div class="tipo-val">${fmtK(d.v)}</div><div class="tipo-mg" style="color:${mgColor}">${fmtP(mg)} margen · ${fmtK(d.g)} ganancia</div></div></div>`;}).join('');
 }
 
+// ---- Card "TCG por formato" ----
+// Fuente: ITEMS_BY_ORDER (nivel producto), solo items cuya categoría empieza con "TCG".
+// El período y el estado (solo "Venta") vienen de las órdenes ya filtradas en Ventas (rows),
+// no de la fecha de Items_Ordenes. No prorratea nada: usa precio/costo de línea tal cual.
+const TCG_FORMATOS=['Hanger','Value/Blaster','Mega','Hobby','Jumbo','Fat Pack','Slab/Graded','Otro'];
+let TCG_FMT_MODE='ventas'; // 'ventas' | 'piezas' | 'margen'. No persiste.
+let TCG_FMT_CAT='ambas';   // 'deportes' | 'animacion' | 'ambas'
+function setTcgFmtMode(m){TCG_FMT_MODE=m;renderTcgFormato(filterRows(currentPeriod));}
+function setTcgFmtCat(c){TCG_FMT_CAT=c;renderTcgFormato(filterRows(currentPeriod));}
+const _sinAcentos=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+// Normaliza el texto de la col Formato a una etiqueta canónica. Vacío -> "Sin formato".
+// Un valor no reconocido se muestra tal cual (no se esconde en "Otro") para que se note el error de captura.
+function tcgFormatoLabel(raw){
+  const f=_sinAcentos(raw).replace(/\s+/g,' ');
+  if(!f)return 'Sin formato';
+  if(f==='hanger')return 'Hanger';
+  if(f==='value'||f==='blaster'||f==='value/blaster'||f==='value / blaster'||f==='blaster/value')return 'Value/Blaster';
+  if(f==='mega')return 'Mega';
+  if(f==='hobby')return 'Hobby';
+  if(f==='jumbo')return 'Jumbo';
+  if(f==='fat pack'||f==='fatpack')return 'Fat Pack';
+  if(f==='slab'||f==='graded'||f==='slab/graded'||f==='slab / graded'||f==='graded/slab')return 'Slab/Graded';
+  if(f==='otro'||f==='otros')return 'Otro';
+  return String(raw).trim();
+}
+function tcgCatOk(cat){
+  const n=_sinAcentos(cat);
+  if(!n.startsWith('tcg'))return false;
+  if(TCG_FMT_CAT==='deportes')return n.includes('deport');
+  if(TCG_FMT_CAT==='animacion')return n.includes('anim');
+  return true;
+}
+function renderTcgFormato(rows){
+  const ctx=document.getElementById('c-tcg-fmt');if(!ctx)return;
+  // setPeriod() apaga todos los .ptab que no sean .wtab; se resincronizan aquí (mismo patrón que .itab).
+  document.querySelectorAll('.ftab').forEach(b=>b.classList.toggle('on',b.dataset.mode===TCG_FMT_MODE));
+  document.querySelectorAll('.fctab').forEach(b=>b.classList.toggle('on',b.dataset.cat===TCG_FMT_CAT));
+  const agg={};let totV=0,totP=0,totG=0;
+  rows.forEach(r=>{
+    const items=(r.orderId!=null?ITEMS_BY_ORDER[r.orderId]:null)||[];
+    items.forEach(it=>{
+      if(!tcgCatOk(it.cat))return;
+      const k=tcgFormatoLabel(it.formato);
+      if(!agg[k])agg[k]={v:0,c:0,p:0};
+      const v=it.precio||0,c=it.costo||0,p=it.piezas||0;
+      agg[k].v+=v;agg[k].c+=c;agg[k].p+=p;totV+=v;totP+=p;totG+=v-c;
+    });
+  });
+  const mode=TCG_FMT_MODE;
+  const val=k=>{const d=agg[k];if(mode==='piezas')return d.p;if(mode==='margen')return d.v>0?(d.v-d.c)/d.v*100:0;return d.v;};
+  const labels=Object.keys(agg).sort((a,b)=>val(b)-val(a)||agg[b].v-agg[a].v); // empate -> gana el de más ventas
+  const summary=document.getElementById('tcg-fmt-summary');
+  if(CHARTS['c-tcg-fmt'])CHARTS['c-tcg-fmt'].destroy();
+  if(!labels.length||totV<=0){
+    if(summary)summary.textContent='Sin ventas TCG en este período';
+    return;
+  }
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  const {grid,tick}=getColors();
+  const txt=dark?'#F1F1F5':'#111827';
+  const mgColor=m=>m>=25?'#10B981':m>=15?'#F59E0B':'#EF4444';
+  const colors=labels.map(k=>mode==='margen'?mgColor(val(k)):mode==='piezas'?'#10B981':'#F59E0B');
+  // Texto que va al final de cada barra: monto y % del total TCG (o margen y $ de ganancia bruta).
+  const barText=k=>{
+    const d=agg[k];
+    if(mode==='piezas')return `${d.p} pzs · ${Math.round(totP>0?d.p/totP*100:0)}%`;
+    if(mode==='margen')return `${Math.round(val(k))}% · ${fmtK(d.v-d.c)} bruto`;
+    return `${fmtK(d.v)} · ${Math.round(d.v/totV*100)}%`;
+  };
+  const barLabels={id:'tcgBarLabels',afterDatasetsDraw(chart){
+    const {ctx:c}=chart,meta=chart.getDatasetMeta(0);
+    c.save();c.font='500 10px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif';c.fillStyle=txt;c.textAlign='left';c.textBaseline='middle';
+    meta.data.forEach((bar,i)=>{c.fillText(barText(labels[i]),bar.x+6,bar.y);});
+    c.restore();
+  }};
+  const xfmt=v=>mode==='piezas'?v:mode==='margen'?v+'%':fmtK(v);
+  CHARTS['c-tcg-fmt']=new Chart(ctx,{type:'bar',plugins:[barLabels],
+    data:{labels,datasets:[{data:labels.map(k=>Math.round(val(k)*100)/100),backgroundColor:colors,borderRadius:4,borderSkipped:false,barThickness:16}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:110}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const d=agg[c.label];return[` ${fmtK(d.v)} en ventas · ${d.p} pzs`,` ${fmtK(d.v-d.c)} ganancia bruta · ${Math.round(d.v>0?(d.v-d.c)/d.v*100:0)}% margen`];}}}},
+      scales:{x:{beginAtZero:true,max:mode==='margen'?100:undefined,ticks:{color:tick,font:{size:10},callback:xfmt},grid:{color:grid}},y:{ticks:{color:tick,font:{size:10}},grid:{display:false}}}}});
+  const lider=labels.slice().sort((a,b)=>agg[b].v-agg[a].v)[0];
+  if(summary)summary.innerHTML=`<strong style="color:var(--text)">${totP} piezas</strong> · <strong style="color:var(--gold)">${fmtK(totV)}</strong> en ventas · formato líder: <strong style="color:var(--text)">${esc(lider)}</strong> (${Math.round(agg[lider].v/totV*100)}%)`;
+}
+
 function renderMonth(rows){
   const tipoSel=document.getElementById('tipo-filter')?.value||'all';
   const bM={};
@@ -1681,7 +1791,7 @@ function renderPnLChart(ventas,costosMeli,costoInv,embalaje,gastos,utilNeta){
 
 function renderAll(period){
   const rows=filterRows(period);
-  renderPeriodPills();renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderDatosCorregir();renderInvCapital();renderInvSalud();renderInvAtascado();renderInvAuditor();renderInsights(rows);renderTipoChart(rows);renderWeekly();
+  renderPeriodPills();renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderDatosCorregir();renderInvCapital();renderInvSalud();renderInvAtascado();renderInvAuditor();renderInsights(rows);renderTipoChart(rows);renderTcgFormato(rows);renderWeekly();
 }
 
 function setPeriod(btn,period){
