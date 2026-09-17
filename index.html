@@ -1269,6 +1269,7 @@ const DQ_GRUPOS=[ // orden = severidad (dinero → piezas → cosmético)
   {k:'pzs',   t:'Descuadre de piezas orden vs items', c:'#F97316'},
   {k:'frac',  t:'Piezas fraccionarias en Inventario', c:'#F59E0B'},
   {k:'cat',   t:'Categoría inválida en Ventas',     c:'#F59E0B'},
+  {k:'fmt',   t:'TCG sin formato',                  c:'#F59E0B'},
   {k:'trim',  t:'Espacios sobrantes',               c:'var(--teal)'},
   {k:'legacy',t:'Categoría legacy por migrar',      c:'var(--text-3)'}
 ];
@@ -1303,6 +1304,11 @@ function auditarCaptura(){
     if(cat==='Multicategoria')out.push({k:'legacy',tab:'Ventas',id:oid,det:'Categoria "Multicategoria" — reasignar a una categoría del catálogo actual',badge:'legacy',mag:0});
     else if(!cat)out.push({k:'cat',tab:'Ventas',id:oid,det:'Categoria vacía — capturar una de: '+DQ_CATS_VALIDAS.join(', '),badge:'vacía',mag:1});
     else if(!DQ_CATS_VALIDAS.includes(cat))out.push({k:'cat',tab:'Ventas',id:oid,det:`Categoria "${cat}" no está en el catálogo (${DQ_CATS_VALIDAS.join(', ')})`,badge:cat,mag:0});
+    // TCG sin formato: toda fila TCG de Items_Ordenes debe traer Formato (col F) capturado
+    items.forEach(x=>{
+      if(typeof x.formato!=='string')return; // items de fallback/muestra no traen el campo
+      if(x.cat.startsWith('TCG')&&!x.formato)out.push({k:'fmt',tab:'Items_Ordenes',id:oid,det:`${x.producto||'(sin nombre de producto)'} — Categoria "${x.cat}" sin Formato`,badge:'sin formato',mag:0});
+    });
   });
   INVENTARIO.forEach(p=>{
     if(p.cant&&Math.abs(p.cant-Math.round(p.cant))>1e-9)out.push({k:'frac',tab:'Inventario',id:p.id,det:`Cantidad ${p.cant} — debe ser entero`,badge:p.cant+' pzs',mag:1});
@@ -1696,9 +1702,11 @@ function loadVentas(){
   setTimeout(()=>{if(ALL_ROWS.length===0)useFallback();},9000);
 }
 
-// Lee Items_Ordenes y llena ITEMS_BY_ORDER (OrderID -> [{cat,precio,costo}]).
-// Columnas Items_Ordenes A:K -> A(0)=OrderID, E(4)=Categoria,
+// Lee Items_Ordenes y llena ITEMS_BY_ORDER (OrderID -> [{cat,producto,formato,precio,costo,piezas}]).
+// Columnas Items_Ordenes A:K -> A(0)=OrderID, B(1)=ItemNum, C(2)=Producto, D(3)=Piezas,
+// E(4)=Categoria, F(5)=Formato, G(6)=Fecha, H(7)=Precio_Item, I(8)=Costo_Inventario_Item,
 // J(9)=Precio_Total_Item, K(10)=Costo_Total_Item (ya multiplicados por piezas).
+// Las unitarias G/H/I no se usan aquí: el prorrateo va con los totales J/K.
 // Usamos los TOTALES de línea para que el prorrateo por categoría sea correcto.
 function processItemsData(data){
   try{
@@ -1708,11 +1716,13 @@ function processItemsData(data){
       const oid=parseN(g(0)?.v);
       if(oid==null)return;
       const cat=String(g(4)?.v??'').trim()||'Sin categoría';
+      const producto=String(g(2)?.v??'').trim();      // Producto (col C); lo usa el validador de captura
+      const formato=String(g(5)?.v??'').trim();       // Formato (col F); vacío = sin capturar
       const precio=parseN(g(9)?.f??g(9)?.v)||0;   // Precio_Total_Item
       const costo=parseN(g(10)?.f??g(10)?.v)||0;  // Costo_Total_Item
       const piezas=parseN(g(3)?.v)||0;            // Piezas de la línea (col D); lo usa el validador de captura
       if(!ITEMS_BY_ORDER[oid])ITEMS_BY_ORDER[oid]=[];
-      ITEMS_BY_ORDER[oid].push({cat,precio,costo,piezas});
+      ITEMS_BY_ORDER[oid].push({cat,producto,formato,precio,costo,piezas});
     });
     console.log('Items cargados:',Object.keys(ITEMS_BY_ORDER).length,'órdenes');
   }catch(e){console.error('Items error:',e);}

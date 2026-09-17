@@ -48,10 +48,10 @@ Columnas (índice gviz A2:K = 0-based):
 - `Producto` (C, idx 2)
 - `Piezas` (D, idx 3)
 - `Categoria` (E, idx 4) — una de: `Funko`, `TCG - Deportes`, `TCG - Animacion`, `ThrillJoy`, `Otros`
-- `Fecha` (F, idx 5) — traída de Ventas (columna temporal)
-- `Precio_Item` (G, idx 6) — precio de venta **por unidad**
-- `Costo_Inventario_Item` (H, idx 7) — costo de inventario **por unidad**
-- (I, idx 8) — columna vacía separadora
+- `Formato` (F, idx 5) — formato del producto (obligatorio en categorías TCG; el validador de captura marca las vacías)
+- `Fecha` (G, idx 6) — traída de Ventas (columna temporal)
+- `Precio_Item` (H, idx 7) — precio de venta **por unidad**
+- `Costo_Inventario_Item` (I, idx 8) — costo de inventario **por unidad**
 - `Precio_Total_Item` (J, idx 9) — `=Precio_Item * Piezas`
 - `Costo_Total_Item` (K, idx 10) — `=Costo_Inventario_Item * Piezas`
 
@@ -172,7 +172,7 @@ Afecta dos lugares:
 
 ## Reglas de negocio críticas
 
-1. **Precio y costo son SIEMPRE por unidad** en las columnas G/H de Items_Ordenes. Las columnas de total (J/K) multiplican por piezas.
+1. **Precio y costo son SIEMPRE por unidad** en las columnas H/I de Items_Ordenes. Las columnas de total (J/K) multiplican por piezas.
 2. **Gastos a nivel de orden** (envío, cargos de plataforma, impuestos, embalaje) viven solo en `Ventas`, nunca se reparten entre productos en Items_Ordenes.
 3. **Categorías:** cinco válidas. `Multicategoria` no es una categoría de producto — las órdenes con productos de distinta categoría se dividen en varias filas.
 4. **Impuesto Texas (8.25%)** aplica sobre precio + envío, no solo precio. eBay lo cobra según dirección de destino (PO Box en Hidalgo, TX).
