@@ -1105,6 +1105,7 @@ let TCG_FMT_CAT='ambas';   // 'deportes' | 'animacion' | 'ambas'
 function setTcgFmtMode(m){TCG_FMT_MODE=m;renderTcgFormato(filterRows(currentPeriod));}
 function setTcgFmtCat(c){TCG_FMT_CAT=c;renderTcgFormato(filterRows(currentPeriod));}
 const _sinAcentos=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+const _escHtml=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); // esc() del Cotizador vive en su IIFE, no es global
 // Normaliza el texto de la col Formato a una etiqueta canónica. Vacío -> "Sin formato".
 // Un valor no reconocido se muestra tal cual (no se esconde en "Otro") para que se note el error de captura.
 function tcgFormatoLabel(raw){
@@ -1177,7 +1178,7 @@ function renderTcgFormato(rows){
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const d=agg[c.label];return[` ${fmtK(d.v)} en ventas · ${d.p} pzs`,` ${fmtK(d.v-d.c)} ganancia bruta · ${Math.round(d.v>0?(d.v-d.c)/d.v*100:0)}% margen`];}}}},
       scales:{x:{beginAtZero:true,max:mode==='margen'?100:undefined,ticks:{color:tick,font:{size:10},callback:xfmt},grid:{color:grid}},y:{ticks:{color:tick,font:{size:10}},grid:{display:false}}}}});
   const lider=labels.slice().sort((a,b)=>agg[b].v-agg[a].v)[0];
-  if(summary)summary.innerHTML=`<strong style="color:var(--text)">${totP} piezas</strong> · <strong style="color:var(--gold)">${fmtK(totV)}</strong> en ventas · formato líder: <strong style="color:var(--text)">${esc(lider)}</strong> (${Math.round(agg[lider].v/totV*100)}%)`;
+  if(summary)summary.innerHTML=`<strong style="color:var(--text)">${totP} piezas</strong> · <strong style="color:var(--gold)">${fmtK(totV)}</strong> en ventas · formato líder: <strong style="color:var(--text)">${_escHtml(lider)}</strong> (${Math.round(agg[lider].v/totV*100)}%)`;
 }
 
 function renderMonth(rows){
