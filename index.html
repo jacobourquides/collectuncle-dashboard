@@ -148,6 +148,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
 .pnl-divider{height:1px;background:var(--border);margin:16px 0}
 
 .pnl-note{background:var(--surface2);border-radius:var(--radius);padding:14px 16px;margin-top:16px;font-size:11px;color:var(--text-2);line-height:1.8}
+.pnl-canales{justify-content:center;margin-top:12px}
+.pnl-canal-nota{color:var(--text-2);font-size:11px;text-align:center;padding:12px 16px;background:var(--surface2);border-radius:var(--radius);margin:4px 0 10px}
+.pnl-tabla{width:100%;border-collapse:collapse;font-size:12px}
+.pnl-tabla th{font-size:10px;font-weight:500;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em;text-align:right;padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.pnl-tabla th:first-child,.pnl-tabla td:first-child{text-align:left}
+.pnl-tabla td{padding:8px 10px;text-align:right;border-bottom:0.5px solid var(--border);white-space:nowrap}
+.pnl-tabla tr.total td{font-weight:600;border-top:1px solid var(--border);border-bottom:0}
 .pnl-note strong{color:var(--text)}
 .pnl-note em{color:var(--text-3)}
 
@@ -394,18 +401,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       <div class="pnl-header">
         <div class="pnl-title">Estado de Resultados</div>
         <div class="pnl-period" id="pnl-period">Collectuncle</div>
+        <div class="filter-group pnl-canales" id="pnl-canal-pills"></div>
       </div>
 
       <!-- Summary cards -->
       <div class="pnl-summary-grid" id="pnl-summary-cards">
     <div class="pnl-summary-card" style="border-top-color:#FCD34D"><div class="pnl-summary-label">Ventas brutas</div><div class="pnl-summary-val" style="color:#F59E0B">$0</div><div class="pnl-summary-sub">0 ventas · 0 piezas</div></div>
-    <div class="pnl-summary-card" style="border-top-color:#6EE7B7"><div class="pnl-summary-label">Utilidad bruta</div><div class="pnl-summary-val" style="color:#10B981">$0</div><div class="pnl-summary-sub">después de Meli y producto</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#6EE7B7"><div class="pnl-summary-label">Utilidad bruta</div><div class="pnl-summary-val" style="color:#10B981">$0</div><div class="pnl-summary-sub">después de plataforma y producto</div></div>
     <div class="pnl-summary-card" style="border-top-color:#10B981"><div class="pnl-summary-label">Utilidad neta</div><div class="pnl-summary-val" style="color:#10B981">-$114K</div><div class="pnl-summary-sub">lo que queda al final</div></div>
     <div class="pnl-summary-card" style="border-top-color:#6366F1"><div class="pnl-summary-label">Margen neto</div><div class="pnl-summary-val" style="color:#6366F1">0.0%</div><div class="pnl-summary-sub">de cada peso vendido</div></div></div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px;margin-bottom:20px" id="pnl-margin-cards">
-    <div class="pnl-summary-card" style="border-top-color:#3B82F6"><div class="pnl-summary-label">Margen post-Meli</div><div class="pnl-summary-val" style="color:#3B82F6">0.0%</div><div class="pnl-summary-sub">después de comisiones y retenciones</div></div>
-    <div class="pnl-summary-card" style="border-top-color:#F59E0B"><div class="pnl-summary-label">Margen bruto</div><div class="pnl-summary-val" style="color:#F59E0B">0.0%</div><div class="pnl-summary-sub">después de Meli + costo de producto</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#3B82F6"><div class="pnl-summary-label">Margen después de plataforma</div><div class="pnl-summary-val" style="color:#3B82F6">0.0%</div><div class="pnl-summary-sub">después de comisiones y retenciones</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#F59E0B"><div class="pnl-summary-label">Margen bruto</div><div class="pnl-summary-val" style="color:#F59E0B">0.0%</div><div class="pnl-summary-sub">después de plataforma + costo de producto</div></div>
     <div class="pnl-summary-card" style="border-top-color:#10B981"><div class="pnl-summary-label">Margen operativo</div><div class="pnl-summary-val" style="color:#10B981">0.0%</div><div class="pnl-summary-sub">después de todos los gastos</div></div></div>
+
+      <!-- POR CANAL: tabla fija, una fila por valor de Plataforma (depende del período, no de la pill) -->
+      <div id="pnl-canales"></div>
 
       <!-- MARGENES -->
       
@@ -413,11 +424,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       <!-- P&L rows — dynamic -->
       <div id="pnl-rows">
     <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(252,211,77,0.06)"><span style="color:#F59E0B">↑</span><span class="pnl-block-title" style="color:#F59E0B">Ingresos</span></div><div class="pnl-row"><span class="pnl-label">Ventas brutas (precio de venta total)</span><span class="pnl-amount" style="color:#10B981">$0</span></div></div>
-    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(239,68,68,0.06)"><svg width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="48" ry="48" fill="#FFE600"></ellipse><path d="M22 55 Q50 28 78 55" stroke="#2D3277" stroke-width="8" fill="none" stroke-linecap="round"></path><ellipse cx="50" cy="68" rx="26" ry="12" fill="#2D3277"></ellipse></svg><span class="pnl-block-title">Costos Mercado Libre</span></div>
+    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(239,68,68,0.06)"><svg width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="48" ry="48" fill="#FFE600"></ellipse><path d="M22 55 Q50 28 78 55" stroke="#2D3277" stroke-width="8" fill="none" stroke-linecap="round"></path><ellipse cx="50" cy="68" rx="26" ry="12" fill="#2D3277"></ellipse></svg><span class="pnl-block-title">Costos de plataforma</span></div>
       <div class="pnl-row indent"><span class="pnl-label">Cargos plataforma</span><span class="pnl-amount">-$0</span></div>
       <div class="pnl-row indent"><span class="pnl-label">Envío (mi parte)</span><span class="pnl-amount">-$0</span></div>
       <div class="pnl-row indent"><span class="pnl-label">Impuestos retenidos</span><span class="pnl-amount">-$0</span></div>
-      <div class="pnl-row subtotal"><span class="pnl-label">Ingreso neto después de Meli</span><span class="pnl-amount" style="color:#F59E0B">$0</span></div></div>
+      <div class="pnl-row subtotal"><span class="pnl-label">Ingreso neto después de plataforma</span><span class="pnl-amount" style="color:#F59E0B">$0</span></div></div>
     <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(249,115,22,0.06)"><span style="color:#F97316">📦</span><span class="pnl-block-title">Costo del producto vendido (COGS)</span></div>
       <div class="pnl-row indent"><span class="pnl-label">Costo de inventario vendido</span><span class="pnl-amount">-$0</span></div>
       <div class="pnl-row indent"><span class="pnl-label">Embalaje por venta</span><span class="pnl-amount">-$0</span></div>
@@ -803,9 +814,16 @@ Tax         $4.21"></textarea>
 <script>
 const SHEET_ID='1lZsWSFdUYrH-9k1cZAig2PBWecX8EsRaD3Pg5ADOm50';
 const CHARTS={};let ALL_ROWS=[];let currentPeriod='all';
+// Agrupación de canales para el Estado de Resultados (valores de la columna Plataforma de Ventas).
+// Cualquier valor que no esté aquí cae en "Otro".
+const CANAL_GRUPOS={"Mercado Libre":"Mercado Libre","Ecommerce":"Página","Venta directa":"Directo","Recompra":"Directo","FB Ads":"Directo"};
+const canalGrupo=p=>CANAL_GRUPOS[String(p||'').trim()]||'Otro';
+let pnlCanal='Todos';
+// Color de margen (fracción 0-1): mismos umbrales verde/ámbar/rojo que las barras de margen TCG (25% / 15%).
+const margenColor=m=>m>=0.25?'#10B981':m>=0.15?'#F59E0B':'#EF4444';
 let ITEMS_BY_ORDER={};  // OrderID -> [{cat, precio, costo}, ...] desde Items_Ordenes
 let INVENTARIO=[];  // filas de la pestaña Inventario
-window.GASTOS_OPS=0;window.GASTOS_DETAIL={};
+window.GASTOS_OPS=0;window.GASTOS_DETAIL={};window.GASTOS_LIST=[];
 
 function toggleTheme(){const html=document.documentElement;const isDark=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',isDark?'light':'dark');document.getElementById('theme-btn').innerHTML=isDark?'<i class="ti-moon"></i> Oscuro':'<i class="ti-sun"></i> Claro';renderAll(currentPeriod);}
 function showPanel(name,btn){
@@ -854,7 +872,6 @@ function processGvizData(data){
     ALL_ROWS.forEach(r=>{ r.catBreakdown = buildCatBreakdown(r); });
     document.getElementById('last-update').textContent='Al '+new Date().toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
     renderAll(currentPeriod);
-    if(document.getElementById('panel-pnl').classList.contains('active'))renderPnL();
   }catch(e){console.error('Parse error:',e);useFallback();}
 }
 
@@ -899,12 +916,15 @@ function processGastosData(data){
   try{
     const rows=data.table.rows||[];
     const totales={};
+    const excluir=['Compra de Inventario','Compra de inventario'];
     window.GASTOS_ADS=[];  // {fecha, canal:'meta'|'meli', monto} para deducción por período
+    window.GASTOS_LIST=[]; // {fecha, cat, monto} de gastos operativos (sin compra de inventario), para el P&L por período
     rows.forEach(r=>{
       const c=r.c||[];
       const cat=String(c[1]?.v??'');
       const monto=parseN(c[2]?.f??c[2]?.v)||0;
       if(cat&&monto>0)totales[cat]=(totales[cat]||0)+monto;
+      if(cat&&monto>0&&!excluir.includes(cat.trim()))window.GASTOS_LIST.push({fecha:parseFecha(c[0]),cat,monto});
       // Capturar publicidad por canal, con fecha (col A) para filtrar por período
       const catL=cat.trim().toLowerCase();
       if(monto>0&&(catL==='publicidad meta'||catL==='publicidad meli')){
@@ -915,7 +935,6 @@ function processGastosData(data){
         });
       }
     });
-    const excluir=['Compra de Inventario','Compra de inventario'];
     window.GASTOS_OPS=0;window.GASTOS_DETAIL={};
     Object.entries(totales).forEach(([cat,total])=>{
       if(!excluir.includes(cat.trim())){window.GASTOS_OPS+=total;window.GASTOS_DETAIL[cat]=total;}
@@ -943,31 +962,33 @@ function useFallback(){
   renderAll(currentPeriod);
 }
 
-function filterRows(p){
-  if(p==='all')return ALL_ROWS;
-  // YTD por año: "ytd-2026" -> todas las ventas de ese año
-  if(p==='ytd'||p==='ytd-2026'||/^ytd-\d{4}$/.test(p)){
-    if(p==='ytd')return ALL_ROWS;
-    const y=Number(p.split('-')[1]);
-    return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getFullYear()===y);
-  }
+// ¿La fecha f cae dentro del período p? Misma semántica que tenía filterRows; también se usa para los gastos del P&L.
+function matchPeriod(f,p){
+  if(p==='all'||p==='ytd')return true;
+  // YTD por año: "ytd-2026" -> todo ese año
+  const my=p.match(/^ytd-(\d{4})$/);
+  if(my)return f.getFullYear()===Number(my[1]);
   // Trimestre con año: "q3-2026" -> meses de ese trimestre en ese año
   const mq=p.match(/^q([1-4])-(\d{4})$/);
   if(mq){
-    const q=Number(mq[1]), y=Number(mq[2]);
-    const mesIni=(q-1)*3, mesFin=mesIni+2;
-    return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getFullYear()===y&&r.fecha.getMonth()>=mesIni&&r.fecha.getMonth()<=mesFin);
+    const y=Number(mq[2]), mesIni=(Number(mq[1])-1)*3;
+    return f.getFullYear()===y&&f.getMonth()>=mesIni&&f.getMonth()<=mesIni+2;
   }
   // Compatibilidad: q1/q2 sin año (por si quedan referencias viejas)
-  if(p==='q1')return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getMonth()<=2);
-  if(p==='q2')return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getMonth()>=3&&r.fecha.getMonth()<=5);
+  if(p==='q1')return f.getMonth()<=2;
+  if(p==='q2')return f.getMonth()>=3&&f.getMonth()<=5;
   // Mes específico: "2026-08"
   if(/^\d{4}-\d{2}$/.test(p)){
     const [y,m]=p.split('-').map(Number);
-    return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getFullYear()===y&&r.fecha.getMonth()===m-1);
+    return f.getFullYear()===y&&f.getMonth()===m-1;
   }
   const m={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11}[p];
-  return ALL_ROWS.filter(r=>r.fecha&&r.fecha.getMonth()===m);
+  return f.getMonth()===m;
+}
+
+function filterRows(p){
+  if(p==='all'||p==='ytd')return ALL_ROWS;
+  return ALL_ROWS.filter(r=>r.fecha&&matchPeriod(r.fecha,p));
 }
 
 function renderPeriodPills(){
@@ -1156,7 +1177,7 @@ function renderTcgFormato(rows){
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
   const {grid,tick}=getColors();
   const txt=dark?'#F1F1F5':'#111827';
-  const mgColor=m=>m>=25?'#10B981':m>=15?'#F59E0B':'#EF4444';
+  const mgColor=m=>margenColor(m/100);
   const colors=labels.map(k=>mode==='margen'?mgColor(val(k)):mode==='piezas'?'#10B981':'#F59E0B');
   // Texto que va al final de cada barra: monto y % del total TCG (o margen y $ de ganancia bruta).
   const barText=k=>{
@@ -1720,94 +1741,172 @@ function renderTipoChart(rows){
   mkChart('c-tipo-chart','bar',tipos,[{label:'Ventas',data:tipos.map(t=>bT[t].v),backgroundColor:'#FCD34D',borderRadius:4,borderSkipped:false},{label:'Ganancia',data:tipos.map(t=>bT[t].g),backgroundColor:'#6EE7B7',borderRadius:4,borderSkipped:false}]);
 }
 
-// Subtítulo del Estado de Resultados: rango real de la primera a la última venta (estado "Venta").
+const MESES_ES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// Rango real de la primera a la última venta (estado "Venta") de las filas dadas.
 // Mismo año: "Abril – Octubre 2026"; distinto año: "Abr 2026 – Ene 2027"; un solo mes: "Octubre 2026".
 function pnlPeriodoLabel(rows){
-  const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const fechas=rows.filter(r=>r.estado==='Venta'&&r.fecha instanceof Date&&!isNaN(r.fecha)).map(r=>r.fecha);
   if(!fechas.length)return '';
   const ini=new Date(Math.min(...fechas)), fin=new Date(Math.max(...fechas));
   const y0=ini.getFullYear(), y1=fin.getFullYear(), m0=ini.getMonth(), m1=fin.getMonth();
-  if(y0!==y1)return `${MESES[m0].slice(0,3)} ${y0} – ${MESES[m1].slice(0,3)} ${y1}`;
-  if(m0===m1)return `${MESES[m0]} ${y0}`;
-  return `${MESES[m0]} – ${MESES[m1]} ${y0}`;
+  if(y0!==y1)return `${MESES_ES[m0].slice(0,3)} ${y0} – ${MESES_ES[m1].slice(0,3)} ${y1}`;
+  if(m0===m1)return `${MESES_ES[m0]} ${y0}`;
+  return `${MESES_ES[m0]} – ${MESES_ES[m1]} ${y0}`;
+}
+
+// Nombre del período activo para el subtítulo (null cuando el rango de meses ya lo describe, p. ej. un mes suelto).
+function periodoNombre(p){
+  if(p==='all')return 'todo el periodo';
+  const my=p.match(/^ytd-(\d{4})$/);if(my)return `YTD ${my[1]}`;
+  const mq=p.match(/^q([1-4])-(\d{4})$/);if(mq)return `Q${mq[1]} ${mq[2]}`;
+  return null;
+}
+
+// Agregación base del Estado de Resultados sobre un conjunto de ventas. La usan la vista principal y la tabla por canal.
+function aggPnL(rows){
+  const sum=k=>rows.reduce((s,r)=>s+(r[k]||0),0);
+  const a={n:rows.length,piezas:rows.reduce((s,r)=>s+(r.piezas||1),0),ventas:sum('precioVenta'),
+    cargos:sum('cargosMeli'),envios:sum('envioMeli'),impuestos:sum('impuestosMeli'),costoInv:sum('costoInv'),embalaje:sum('embalaje')};
+  a.costosPlat=a.cargos+a.envios+a.impuestos;
+  a.ingresoNeto=a.ventas-a.costosPlat;
+  a.cogs=a.costoInv+a.embalaje;
+  a.utilBruta=a.ingresoNeto-a.cogs;
+  a.margenPostPlat=a.ventas>0?a.ingresoNeto/a.ventas:0;
+  a.margenBruto=a.ventas>0?a.utilBruta/a.ventas:0;
+  return a;
+}
+
+// Gastos operativos del período: en "Todo" los totales del Sheet; en otro período, solo los gastos con fecha dentro de él.
+// Nunca se prorratean por canal: solo existen a nivel negocio.
+// Los gastos sin fecha no se pueden asignar a un período: se reportan aparte (sinFecha) y solo cuentan en "Todo".
+function gastosDelPeriodo(p){
+  if(p==='all'||p==='ytd')return{total:window.GASTOS_OPS,detalle:window.GASTOS_DETAIL,sinFecha:0};
+  const detalle={};let total=0,sinFecha=0;
+  (window.GASTOS_LIST||[]).forEach(g=>{
+    if(!g.fecha){sinFecha+=g.monto;return;}
+    if(matchPeriod(g.fecha,p)){detalle[g.cat]=(detalle[g.cat]||0)+g.monto;total+=g.monto;}
+  });
+  return{total,detalle,sinFecha};
+}
+
+function setPnlCanal(c){pnlCanal=c;renderPnL();}
+
+// Pills de canal: Todos / Mercado Libre / Página / Directo (+ Otro solo si hay ventas con plataforma no mapeada).
+// setPeriod() apaga todos los .ptab que no sean .wtab; se resincronizan aquí porque renderPnL() vuelve a pasar por esta función.
+function renderPnlCanalPills(rowsPeriodo){
+  const el=document.getElementById('pnl-canal-pills');if(!el)return;
+  const grupos=['Todos','Mercado Libre','Página','Directo'];
+  if(rowsPeriodo.some(r=>canalGrupo(r.plataforma)==='Otro'))grupos.push('Otro');
+  if(!grupos.includes(pnlCanal))pnlCanal='Todos';
+  el.innerHTML='';
+  grupos.forEach(g=>{const b=document.createElement('button');b.className='ptab'+(g===pnlCanal?' on':'');b.textContent=g;b.onclick=()=>setPnlCanal(g);el.appendChild(b);});
+}
+
+// Tabla "Por canal": una fila por valor original de Plataforma (sin agrupar) + Total. Depende del período, no de la pill.
+function renderPnlCanales(rowsPeriodo){
+  const el=document.getElementById('pnl-canales');if(!el)return;
+  const porPlat={};
+  rowsPeriodo.forEach(r=>{const k=String(r.plataforma||'').trim()||'Sin canal';(porPlat[k]=porPlat[k]||[]).push(r);});
+  const tot=aggPnL(rowsPeriodo);
+  const filas=Object.entries(porPlat).map(([k,rs])=>[k,aggPnL(rs)]).sort((x,y)=>y[1].ventas-x[1].ventas);
+  const pct=v=>(tot.ventas>0?v/tot.ventas*100:0).toFixed(1)+'%';
+  const fila=(nombre,a,cls)=>`<tr${cls?` class="${cls}"`:''}><td>${nombre}</td><td>${a.n}</td><td>${fmtK(a.ventas)}</td><td>${pct(a.ventas)}</td><td>${fmtK(a.costosPlat)}</td><td>${fmtK(a.ingresoNeto)}</td><td>${fmtK(a.cogs)}</td><td>${fmtK(a.utilBruta)}</td><td style="color:${margenColor(a.margenBruto)};font-weight:600">${(a.margenBruto*100).toFixed(1)}%</td></tr>`;
+  el.innerHTML=`<div class="pnl-block"><div class="pnl-block-header" style="background:rgba(59,130,246,0.06)"><span style="color:#3B82F6">📊</span><span class="pnl-block-title">Por canal</span><span style="margin-left:auto;font-size:11px;color:var(--text-2)">cargos = comisiones + envío + retenciones · costo producto = inventario + embalaje</span></div>
+    <div style="overflow-x:auto;padding:4px 6px 8px"><table class="pnl-tabla"><thead><tr><th>Canal</th><th># ventas</th><th>Ventas $</th><th>% del total</th><th>Cargos plataforma $</th><th>Neto después de plataforma $</th><th>Costo producto $</th><th>Utilidad bruta $</th><th>Margen bruto %</th></tr></thead>
+    <tbody>${filas.map(([k,a])=>fila(k,a,'')).join('')}${fila('Total',tot,'total')}</tbody></table></div></div>`;
 }
 
 function renderPnL(){
-  const rows=ALL_ROWS;
-  const elPeriodo=document.getElementById('pnl-period');
-  if(elPeriodo){const lbl=pnlPeriodoLabel(rows);elPeriodo.textContent='Collectuncle'+(lbl?` · ${lbl} · todo el periodo`:'');}
-  const ventas=rows.reduce((s,r)=>s+(r.precioVenta||0),0);
-  const cargosMeli=rows.reduce((s,r)=>s+(r.cargosMeli||0),0);
-  const enviosMeli=rows.reduce((s,r)=>s+(r.envioMeli||0),0);
-  const impuestosMeli=rows.reduce((s,r)=>s+(r.impuestosMeli||0),0);
-  const costosMeli=cargosMeli+enviosMeli+impuestosMeli;
-  const ingresoNeto=ventas-costosMeli;
-  const costoInv=rows.reduce((s,r)=>s+(r.costoInv||0),0);
-  const embalaje=rows.reduce((s,r)=>s+(r.embalaje||0),0);
-  const cogs=costoInv+embalaje;
-  const utilBruta=ingresoNeto-cogs;
-  const gastos=window.GASTOS_OPS;
-  const utilNeta=utilBruta-gastos;
-  const piezas=rows.reduce((s,r)=>s+(r.piezas||1),0);
-  const margenPostMeli=ventas>0?ingresoNeto/ventas:0;
-  const margenBruto=ventas>0?utilBruta/ventas:0;
-  const margenNeto=ventas>0?utilNeta/ventas:0;
-  const fmt=v=>{if(!v&&v!==0)return'$0';const a=Math.abs(v),sg=v<0?'-':'';return sg+'$'+(a>=1000000?(a/1000000).toFixed(1)+'M':a>=1000?Math.round(a/1000)+'K':Math.round(a).toLocaleString('es-MX'));};
+  const rowsPeriodo=filterRows(currentPeriod);
+  renderPnlCanalPills(rowsPeriodo);
+  renderPnlCanales(rowsPeriodo);
+  const todos=pnlCanal==='Todos';
+  const rows=todos?rowsPeriodo:rowsPeriodo.filter(r=>canalGrupo(r.plataforma)===pnlCanal);
+  const a=aggPnL(rows);
+  // Gastos operativos y utilidad neta: solo en "Todos" (los gastos no se registran por canal; no se prorratean)
+  const {total:gastos,detalle:gastosDetalle,sinFecha:gastosSinFecha}=gastosDelPeriodo(currentPeriod);
+  const utilNeta=a.utilBruta-gastos;
+  const margenNeto=a.ventas>0?utilNeta/a.ventas:0;
+  const fmt=fmtK;
   const fP=v=>(v*100).toFixed(1)+'%';
 
+  const elPeriodo=document.getElementById('pnl-period');
+  if(elPeriodo)elPeriodo.textContent=['Collectuncle',pnlPeriodoLabel(rowsPeriodo),periodoNombre(currentPeriod),todos?null:pnlCanal].filter(Boolean).join(' · ');
+
   const sc=document.getElementById('pnl-summary-cards');
-  if(sc)sc.innerHTML=`
-    <div class="pnl-summary-card" style="border-top-color:#FCD34D"><div class="pnl-summary-label">Ventas brutas</div><div class="pnl-summary-val" style="color:#F59E0B">${fmt(ventas)}</div><div class="pnl-summary-sub">${rows.length} ventas · ${piezas} piezas</div></div>
-    <div class="pnl-summary-card" style="border-top-color:#6EE7B7"><div class="pnl-summary-label">Utilidad bruta</div><div class="pnl-summary-val" style="color:#10B981">${fmt(utilBruta)}</div><div class="pnl-summary-sub">después de Meli y producto</div></div>
+  if(sc)sc.innerHTML=todos?`
+    <div class="pnl-summary-card" style="border-top-color:#FCD34D"><div class="pnl-summary-label">Ventas brutas</div><div class="pnl-summary-val" style="color:#F59E0B">${fmt(a.ventas)}</div><div class="pnl-summary-sub">${a.n} ventas · ${a.piezas} piezas</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#6EE7B7"><div class="pnl-summary-label">Utilidad bruta</div><div class="pnl-summary-val" style="color:#10B981">${fmt(a.utilBruta)}</div><div class="pnl-summary-sub">después de plataforma y producto</div></div>
     <div class="pnl-summary-card" style="border-top-color:#10B981"><div class="pnl-summary-label">Utilidad neta</div><div class="pnl-summary-val" style="color:#10B981">${fmt(utilNeta)}</div><div class="pnl-summary-sub">lo que queda al final</div></div>
-    <div class="pnl-summary-card" style="border-top-color:#6366F1"><div class="pnl-summary-label">Margen neto</div><div class="pnl-summary-val" style="color:#6366F1">${fP(margenNeto)}</div><div class="pnl-summary-sub">de cada peso vendido</div></div>`;
+    <div class="pnl-summary-card" style="border-top-color:#6366F1"><div class="pnl-summary-label">Margen neto</div><div class="pnl-summary-val" style="color:#6366F1">${fP(margenNeto)}</div><div class="pnl-summary-sub">de cada peso vendido</div></div>`:`
+    <div class="pnl-summary-card" style="border-top-color:#FCD34D"><div class="pnl-summary-label">Ventas brutas</div><div class="pnl-summary-val" style="color:#F59E0B">${fmt(a.ventas)}</div><div class="pnl-summary-sub">${a.n} ventas · ${a.piezas} piezas · ${pnlCanal}</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#3B82F6"><div class="pnl-summary-label">Neto después de plataforma</div><div class="pnl-summary-val" style="color:#3B82F6">${fmt(a.ingresoNeto)}</div><div class="pnl-summary-sub">después de comisiones, envío y retenciones</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#F97316"><div class="pnl-summary-label">Costo de producto</div><div class="pnl-summary-val" style="color:#F97316">${fmt(a.cogs)}</div><div class="pnl-summary-sub">inventario + embalaje</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#6EE7B7"><div class="pnl-summary-label">Utilidad bruta</div><div class="pnl-summary-val" style="color:#10B981">${fmt(a.utilBruta)}</div><div class="pnl-summary-sub">después de plataforma y producto</div></div>`;
 
   const mg=document.getElementById('pnl-margin-cards');
-  if(mg)mg.innerHTML=`
-    <div class="pnl-summary-card" style="border-top-color:#3B82F6"><div class="pnl-summary-label">Margen post-Meli</div><div class="pnl-summary-val" style="color:#3B82F6">${fP(margenPostMeli)}</div><div class="pnl-summary-sub">después de comisiones y retenciones</div></div>
-    <div class="pnl-summary-card" style="border-top-color:#F59E0B"><div class="pnl-summary-label">Margen bruto</div><div class="pnl-summary-val" style="color:#F59E0B">${fP(margenBruto)}</div><div class="pnl-summary-sub">después de Meli + costo de producto</div></div>
-    <div class="pnl-summary-card" style="border-top-color:#10B981"><div class="pnl-summary-label">Margen operativo</div><div class="pnl-summary-val" style="color:#10B981">${fP(margenNeto)}</div><div class="pnl-summary-sub">después de todos los gastos</div></div>`;
+  if(mg){
+    mg.style.gridTemplateColumns=todos?'repeat(3,1fr)':'repeat(2,1fr)';
+    mg.innerHTML=`
+    <div class="pnl-summary-card" style="border-top-color:#3B82F6"><div class="pnl-summary-label">Margen después de plataforma</div><div class="pnl-summary-val" style="color:#3B82F6">${fP(a.margenPostPlat)}</div><div class="pnl-summary-sub">después de comisiones y retenciones</div></div>
+    <div class="pnl-summary-card" style="border-top-color:#F59E0B"><div class="pnl-summary-label">Margen bruto</div><div class="pnl-summary-val" style="color:#F59E0B">${fP(a.margenBruto)}</div><div class="pnl-summary-sub">después de plataforma + costo de producto</div></div>`+(todos?`
+    <div class="pnl-summary-card" style="border-top-color:#10B981"><div class="pnl-summary-label">Margen operativo</div><div class="pnl-summary-val" style="color:#10B981">${fP(margenNeto)}</div><div class="pnl-summary-sub">después de todos los gastos</div></div>`:'');
+  }
+
+  const gastosCargados=Object.keys(window.GASTOS_DETAIL||{}).length>0;
+  const bloqueGastos=`
+    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(139,92,246,0.06)"><span style="color:#8B5CF6">🧾</span><span class="pnl-block-title">Gastos operativos</span></div>
+      ${Object.keys(gastosDetalle).length>0
+        ?Object.entries(gastosDetalle).map(([cat,total])=>`<div class="pnl-row indent"><span class="pnl-label">${cat.trim()}</span><span class="pnl-amount" style="color:#EF4444">-${fmt(total)}</span></div>`).join('')
+        :`<div class="pnl-row indent"><span class="pnl-label" style="color:#9CA3AF">${gastosCargados?'Sin gastos con fecha en este período':'Cargando gastos...'}</span><span class="pnl-amount" style="color:#9CA3AF">—</span></div>`}
+      ${gastosSinFecha>0?`<div class="pnl-row indent"><span class="pnl-label" style="color:#9CA3AF">Gastos sin fecha en el Sheet (no asignables a este período; solo cuentan en Todo)</span><span class="pnl-amount" style="color:#9CA3AF">${fmt(gastosSinFecha)}</span></div>`:''}
+      <div class="pnl-row subtotal"><span class="pnl-label">Total gastos operativos</span><span class="pnl-amount" style="color:#EF4444">-${fmt(gastos)}</span></div></div>
+    <div class="pnl-block" style="margin-top:4px"><div class="pnl-row result-positive" style="margin:8px"><span style="font-size:16px;margin-right:8px">🏆</span><span class="pnl-label">UTILIDAD NETA DEL PERÍODO</span><span class="pnl-amount">${fmt(utilNeta)}</span></div></div>`;
+  const notaCanal=`<div class="pnl-canal-nota">Gastos operativos y utilidad neta solo disponibles en Todos (los gastos no se registran por canal)</div>`;
 
   const pr=document.getElementById('pnl-rows');
   if(pr)pr.innerHTML=`
-    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(252,211,77,0.06)"><span style="color:#F59E0B">↑</span><span class="pnl-block-title" style="color:#F59E0B">Ingresos</span></div><div class="pnl-row"><span class="pnl-label">Ventas brutas (precio de venta total)</span><span class="pnl-amount" style="color:#10B981">${fmt(ventas)}</span></div></div>
-    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(239,68,68,0.06)"><svg width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="48" ry="48" fill="#FFE600"/><path d="M22 55 Q50 28 78 55" stroke="#2D3277" stroke-width="8" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="68" rx="26" ry="12" fill="#2D3277"/></svg><span class="pnl-block-title">Costos Mercado Libre</span></div>
-      <div class="pnl-row indent"><span class="pnl-label">Cargos plataforma</span><span class="pnl-amount">-${fmt(cargosMeli)}</span></div>
-      <div class="pnl-row indent"><span class="pnl-label">Envío (mi parte)</span><span class="pnl-amount">-${fmt(enviosMeli)}</span></div>
-      <div class="pnl-row indent"><span class="pnl-label">Impuestos retenidos</span><span class="pnl-amount">-${fmt(impuestosMeli)}</span></div>
-      <div class="pnl-row subtotal"><span class="pnl-label">Ingreso neto después de Meli</span><span class="pnl-amount" style="color:#F59E0B">${fmt(ingresoNeto)}</span></div></div>
+    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(252,211,77,0.06)"><span style="color:#F59E0B">↑</span><span class="pnl-block-title" style="color:#F59E0B">Ingresos</span></div><div class="pnl-row"><span class="pnl-label">Ventas brutas (precio de venta total)</span><span class="pnl-amount" style="color:#10B981">${fmt(a.ventas)}</span></div></div>
+    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(239,68,68,0.06)"><svg width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="48" ry="48" fill="#FFE600"/><path d="M22 55 Q50 28 78 55" stroke="#2D3277" stroke-width="8" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="68" rx="26" ry="12" fill="#2D3277"/></svg><span class="pnl-block-title">Costos de plataforma</span></div>
+      <div class="pnl-row indent"><span class="pnl-label">Cargos plataforma</span><span class="pnl-amount">-${fmt(a.cargos)}</span></div>
+      <div class="pnl-row indent"><span class="pnl-label">Envío (mi parte)</span><span class="pnl-amount">-${fmt(a.envios)}</span></div>
+      <div class="pnl-row indent"><span class="pnl-label">Impuestos retenidos</span><span class="pnl-amount">-${fmt(a.impuestos)}</span></div>
+      <div class="pnl-row subtotal"><span class="pnl-label">Ingreso neto después de plataforma</span><span class="pnl-amount" style="color:#F59E0B">${fmt(a.ingresoNeto)}</span></div></div>
     <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(249,115,22,0.06)"><span style="color:#F97316">📦</span><span class="pnl-block-title">Costo del producto vendido (COGS)</span></div>
-      <div class="pnl-row indent"><span class="pnl-label">Costo de inventario vendido</span><span class="pnl-amount">-${fmt(costoInv)}</span></div>
-      <div class="pnl-row indent"><span class="pnl-label">Embalaje por venta</span><span class="pnl-amount">-${fmt(embalaje)}</span></div>
-      <div class="pnl-row subtotal"><span class="pnl-label">Utilidad bruta</span><span class="pnl-amount" style="color:#10B981">${fmt(utilBruta)}</span></div></div>
-    <div class="pnl-block"><div class="pnl-block-header" style="background:rgba(139,92,246,0.06)"><span style="color:#8B5CF6">🧾</span><span class="pnl-block-title">Gastos operativos</span></div>
-      ${Object.keys(window.GASTOS_DETAIL).length>0
-        ?Object.entries(window.GASTOS_DETAIL).map(([cat,total])=>`<div class="pnl-row indent"><span class="pnl-label">${cat.trim()}</span><span class="pnl-amount" style="color:#EF4444">-${fmt(total)}</span></div>`).join('')
-        :'<div class="pnl-row indent"><span class="pnl-label" style="color:#9CA3AF">Cargando gastos...</span><span class="pnl-amount" style="color:#9CA3AF">—</span></div>'}
-      <div class="pnl-row subtotal"><span class="pnl-label">Total gastos operativos</span><span class="pnl-amount" style="color:#EF4444">-${fmt(gastos)}</span></div></div>
-    <div class="pnl-block" style="margin-top:4px"><div class="pnl-row result-positive" style="margin:8px"><span style="font-size:16px;margin-right:8px">🏆</span><span class="pnl-label">UTILIDAD NETA DEL PERÍODO</span><span class="pnl-amount">${fmt(utilNeta)}</span></div></div>`;
+      <div class="pnl-row indent"><span class="pnl-label">Costo de inventario vendido</span><span class="pnl-amount">-${fmt(a.costoInv)}</span></div>
+      <div class="pnl-row indent"><span class="pnl-label">Embalaje por venta</span><span class="pnl-amount">-${fmt(a.embalaje)}</span></div>
+      <div class="pnl-row subtotal"><span class="pnl-label">Utilidad bruta</span><span class="pnl-amount" style="color:#10B981">${fmt(a.utilBruta)}</span></div>
+      ${todos?'':`<div class="pnl-row subtotal"><span class="pnl-label">Margen bruto</span><span class="pnl-amount" style="color:${margenColor(a.margenBruto)}">${fP(a.margenBruto)}</span></div>`}</div>
+    ${todos?bloqueGastos:notaCanal}`;
 
   const nota=document.getElementById('pnl-nota');
-  if(nota)nota.innerHTML=`<strong>¿Cómo leer esto?</strong><br>Vendiste <strong>${fmt(ventas)}</strong> en total.<br>Meli se llevó <strong>${fmt(costosMeli)}</strong> → te quedaron <strong>${fmt(ingresoNeto)}</strong>.<br>Los productos te costaron <strong>${fmt(cogs)}</strong> → utilidad bruta: <strong>${fmt(utilBruta)}</strong>.<br>Gastos operativos: <strong>${fmt(gastos)}</strong>.<br><strong style="color:#10B981">Utilidad neta: ${fmt(utilNeta)}</strong><br><br><em>La compra de inventario nuevo no es un gasto — es inversión en stock.</em>`;
+  if(nota)nota.innerHTML=todos
+    ?`<strong>¿Cómo leer esto?</strong><br>Vendiste <strong>${fmt(a.ventas)}</strong> en total.<br>Las plataformas se llevaron <strong>${fmt(a.costosPlat)}</strong> → te quedaron <strong>${fmt(a.ingresoNeto)}</strong>.<br>Los productos te costaron <strong>${fmt(a.cogs)}</strong> → utilidad bruta: <strong>${fmt(a.utilBruta)}</strong>.<br>Gastos operativos: <strong>${fmt(gastos)}</strong>.<br><strong style="color:#10B981">Utilidad neta: ${fmt(utilNeta)}</strong><br><br><em>La compra de inventario nuevo no es un gasto — es inversión en stock.</em>`
+    :`<strong>¿Cómo leer esto?</strong><br>Vendiste <strong>${fmt(a.ventas)}</strong> por <strong>${pnlCanal}</strong>.<br>La plataforma se llevó <strong>${fmt(a.costosPlat)}</strong> → te quedaron <strong>${fmt(a.ingresoNeto)}</strong>.<br>Los productos te costaron <strong>${fmt(a.cogs)}</strong> → utilidad bruta: <strong>${fmt(a.utilBruta)}</strong> (margen bruto ${fP(a.margenBruto)}).<br><br><em>Gastos operativos y utilidad neta solo en Todos: los gastos no se registran por canal.</em>`;
 
-  renderPnLChart(ventas,costosMeli,costoInv,embalaje,gastos,utilNeta);
+  renderPnLChart(a.ventas,todos
+    ?[['Costos plataforma',a.costosPlat,'#EF4444'],['Costo inventario',a.costoInv,'#F97316'],['Embalaje',a.embalaje,'#F97316'],['Gastos operativos',gastos,'#8B5CF6'],['Utilidad neta',utilNeta,'#10B981']]
+    :[['Costos plataforma',a.costosPlat,'#EF4444'],['Costo inventario',a.costoInv,'#F97316'],['Embalaje',a.embalaje,'#F97316'],['Utilidad bruta',a.utilBruta,'#10B981']]);
 }
 
-function renderPnLChart(ventas,costosMeli,costoInv,embalaje,gastos,utilNeta){
+// segmentos: [[etiqueta, monto, color], ...] → % de cada $100 vendido
+function renderPnLChart(ventas,segmentos){
   const{grid,tick}=getColors();
   if(CHARTS['c-pnl-chart'])CHARTS['c-pnl-chart'].destroy();
   const ctx=document.getElementById('c-pnl-chart');if(!ctx)return;
   const pct=v=>ventas>0?Math.round(Math.abs(v)/ventas*1000)/10:0;
-  const labels=['Costos Meli','Costo inventario','Embalaje','Gastos operativos','Utilidad neta'];
-  const values=[pct(costosMeli),pct(costoInv),pct(embalaje),pct(gastos),pct(utilNeta)];
-  const colors=['#EF4444','#F97316','#F97316','#8B5CF6','#10B981'];
+  const labels=segmentos.map(s=>s[0]);
+  const values=segmentos.map(s=>pct(s[1]));
+  const colors=segmentos.map(s=>s[2]);
   CHARTS['c-pnl-chart']=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data:values,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw.toFixed(1)+'% de $100 vendido'}}},scales:{y:{ticks:{color:tick,font:{size:11}},grid:{display:false}},x:{ticks:{color:tick,font:{size:10},callback:v=>v+'%'},grid:{color:grid},max:100}}}});
 }
 
 function renderAll(period){
   const rows=filterRows(period);
   renderPeriodPills();renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderDatosCorregir();renderInvCapital();renderInvSalud();renderInvAtascado();renderInvAuditor();renderInsights(rows);renderTipoChart(rows);renderTcgFormato(rows);renderWeekly();
+  // El Estado de Resultados respeta el período: si está visible, se recalcula con cada cambio de pill
+  if(document.getElementById('panel-pnl')?.classList.contains('active'))renderPnL();
 }
 
 function setPeriod(btn,period){
