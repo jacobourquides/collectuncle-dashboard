@@ -824,6 +824,7 @@ const margenColor=m=>m>=0.25?'#10B981':m>=0.15?'#F59E0B':'#EF4444';
 let ITEMS_BY_ORDER={};  // OrderID -> [{cat, precio, costo}, ...] desde Items_Ordenes
 let INVENTARIO=[];  // filas de la pestaña Inventario
 window.GASTOS_OPS=0;window.GASTOS_DETAIL={};window.GASTOS_LIST=[];
+window.DQ_FECHAS=[]; // filas de Gastos/Ventas con fecha nula (gviz devuelve null si la celda es texto en una columna de fechas)
 
 function toggleTheme(){const html=document.documentElement;const isDark=html.getAttribute('data-theme')==='dark';html.setAttribute('data-theme',isDark?'light':'dark');document.getElementById('theme-btn').innerHTML=isDark?'<i class="ti-moon"></i> Oscuro':'<i class="ti-sun"></i> Claro';renderAll(currentPeriod);}
 function showPanel(name,btn){
@@ -839,7 +840,8 @@ function parseFecha(c){if(!c)return null;if(c.v){const m=String(c.v).match(/Date
 
 function processGvizData(data){
   try{
-    ALL_ROWS=(data.table.rows||[]).map(r=>{
+    window.DQ_FECHAS=(window.DQ_FECHAS||[]).filter(x=>x.tab!=='Ventas');
+    ALL_ROWS=(data.table.rows||[]).map((r,idx)=>{
       const c=r.c||[],g=i=>c[i]||null;
       // Estructura ACTUAL Ventas A4:V (columna A=OrderID agregada, todo corrido +1):
       // A(0)=OrderID, B(1)=Fecha, C(2)=Producto, D(3)=Estado Pago, E(4)=Piezas,
@@ -850,10 +852,15 @@ function processGvizData(data){
       const prod=String(g(2)?.v??'');
       const tipoRaw=String(g(20)?.v??'');          // crudo, sin trim: lo usa el validador de captura
       const tipo=tipoRaw.trim()||'Otro';
+      const fecha=parseFecha(g(1));
+      // Fila con OrderID y algo capturado (producto, estado, plataforma o precio) pero sin fecha válida.
+      // Las filas que solo traen el OrderID pre-llenado no son capturas. Rango A4 → fila del Sheet = idx+4.
+      const capturada=prod||String(g(3)?.v??'')||String(g(5)?.v??'')||parseN(g(7)?.f??g(7)?.v);
+      if(orderId!=null&&capturada&&!fecha)window.DQ_FECHAS.push({tab:'Ventas',id:'Orden '+orderId,det:`Fila ${idx+4} · ${prod||'(sin producto)'} — Fecha vacía o capturada como texto; corregir la celda B${idx+4}`,monto:parseN(g(7)?.f??g(7)?.v)||0});
       return{
         orderId,tipoRaw,
         piezasRaw:parseN(g(4)?.v),                   // null si la celda está vacía (piezas abajo asume 1)
-        fecha:parseFecha(g(1)),
+        fecha,
         estado:String(g(3)?.v??''),
         precioVenta:parseN(g(7)?.f??g(7)?.v),
         piezas:parseN(g(4)?.v)||1,
@@ -919,17 +926,21 @@ function processGastosData(data){
     const excluir=['Compra de Inventario','Compra de inventario'];
     window.GASTOS_ADS=[];  // {fecha, canal:'meta'|'meli', monto} para deducción por período
     window.GASTOS_LIST=[]; // {fecha, cat, monto} de gastos operativos (sin compra de inventario), para el P&L por período
-    rows.forEach(r=>{
+    window.DQ_FECHAS=(window.DQ_FECHAS||[]).filter(x=>x.tab!=='Gastos');
+    rows.forEach((r,idx)=>{
       const c=r.c||[];
       const cat=String(c[1]?.v??'');
       const monto=parseN(c[2]?.f??c[2]?.v)||0;
+      const fecha=parseFecha(c[0]);
+      // Fila capturada (categoría o monto) sin fecha válida: el rango empieza en A2, así que la fila del Sheet es idx+2
+      if((cat||monto>0)&&!fecha)window.DQ_FECHAS.push({tab:'Gastos',id:'Fila '+(idx+2),det:`${cat.trim()||'(sin categoría)'} — Fecha vacía o capturada como texto; corregir la celda A${idx+2}`,monto});
       if(cat&&monto>0)totales[cat]=(totales[cat]||0)+monto;
-      if(cat&&monto>0&&!excluir.includes(cat.trim()))window.GASTOS_LIST.push({fecha:parseFecha(c[0]),cat,monto});
+      if(cat&&monto>0&&!excluir.includes(cat.trim()))window.GASTOS_LIST.push({fecha,cat,monto});
       // Capturar publicidad por canal, con fecha (col A) para filtrar por período
       const catL=cat.trim().toLowerCase();
       if(monto>0&&(catL==='publicidad meta'||catL==='publicidad meli')){
         window.GASTOS_ADS.push({
-          fecha:parseFecha(c[0]),
+          fecha,
           canal:catL==='publicidad meta'?'meta':'meli',
           monto:monto
         });
@@ -1398,6 +1409,7 @@ function renderAlerts(){
 const DQ_CATS_VALIDAS=['Funko','TCG - Deportes','TCG - Animacion','ThrillJoy','Otros'];
 const DQ_GRUPOS=[ // orden = severidad (dinero → piezas → cosmético)
   {k:'money', t:'Descuadre $ orden vs items',      c:'#EF4444'},
+  {k:'fecha', t:'Fecha inválida',                   c:'#EF4444'},
   {k:'pzs',   t:'Descuadre de piezas orden vs items', c:'#F97316'},
   {k:'frac',  t:'Piezas fraccionarias en Inventario', c:'#F59E0B'},
   {k:'cat',   t:'Categoría inválida en Ventas',     c:'#F59E0B'},
@@ -1410,6 +1422,8 @@ const dqEsc=x=>String(x).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt
 // Devuelve [{k, tab, id, det, badge, mag}] sin ordenar. `mag` ordena dentro de cada grupo (mayor primero).
 function auditarCaptura(){
   const out=[];
+  // Fecha inválida: detectadas al parsear Gastos y Ventas (gviz devuelve null cuando la celda es texto en una columna de fechas)
+  (window.DQ_FECHAS||[]).forEach(h=>out.push({k:'fecha',tab:h.tab,id:h.id,det:h.det,badge:dqMoney(h.monto),mag:h.monto||0}));
   const trimCheck=(tab,id,col,v)=>{
     if(typeof v!=='string'||v===v.trim())return;
     const donde=v!==v.trimStart()?(v!==v.trimEnd()?'al inicio y al final':'al inicio'):'al final';
