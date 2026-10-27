@@ -393,7 +393,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
     <div class="pnl-wrap">
       <div class="pnl-header">
         <div class="pnl-title">Estado de Resultados</div>
-        <div class="pnl-period">Collectuncle · Enero – Mayo 2026 (YTD)</div>
+        <div class="pnl-period" id="pnl-period">Collectuncle</div>
       </div>
 
       <!-- Summary cards -->
@@ -1720,8 +1720,23 @@ function renderTipoChart(rows){
   mkChart('c-tipo-chart','bar',tipos,[{label:'Ventas',data:tipos.map(t=>bT[t].v),backgroundColor:'#FCD34D',borderRadius:4,borderSkipped:false},{label:'Ganancia',data:tipos.map(t=>bT[t].g),backgroundColor:'#6EE7B7',borderRadius:4,borderSkipped:false}]);
 }
 
+// Subtítulo del Estado de Resultados: rango real de la primera a la última venta (estado "Venta").
+// Mismo año: "Abril – Octubre 2026"; distinto año: "Abr 2026 – Ene 2027"; un solo mes: "Octubre 2026".
+function pnlPeriodoLabel(rows){
+  const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const fechas=rows.filter(r=>r.estado==='Venta'&&r.fecha instanceof Date&&!isNaN(r.fecha)).map(r=>r.fecha);
+  if(!fechas.length)return '';
+  const ini=new Date(Math.min(...fechas)), fin=new Date(Math.max(...fechas));
+  const y0=ini.getFullYear(), y1=fin.getFullYear(), m0=ini.getMonth(), m1=fin.getMonth();
+  if(y0!==y1)return `${MESES[m0].slice(0,3)} ${y0} – ${MESES[m1].slice(0,3)} ${y1}`;
+  if(m0===m1)return `${MESES[m0]} ${y0}`;
+  return `${MESES[m0]} – ${MESES[m1]} ${y0}`;
+}
+
 function renderPnL(){
   const rows=ALL_ROWS;
+  const elPeriodo=document.getElementById('pnl-period');
+  if(elPeriodo){const lbl=pnlPeriodoLabel(rows);elPeriodo.textContent='Collectuncle'+(lbl?` · ${lbl} · todo el periodo`:'');}
   const ventas=rows.reduce((s,r)=>s+(r.precioVenta||0),0);
   const cargosMeli=rows.reduce((s,r)=>s+(r.cargosMeli||0),0);
   const enviosMeli=rows.reduce((s,r)=>s+(r.envioMeli||0),0);
