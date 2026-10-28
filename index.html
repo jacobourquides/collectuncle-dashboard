@@ -343,6 +343,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,san
       </div>
     </div>
     <div class="section-label">Inventario · capital y stock</div>
+    <div style="margin-bottom:12px">
+      <div class="card">
+        <div class="card-title" onclick="toggleMeliPrecios()" style="cursor:pointer" title="Ver lista completa"><i class="ti ti-tag" style="color:var(--gold)"></i>Precios Mercado Libre <span id="mp-toggle" style="font-size:11px;color:var(--teal);font-weight:400">▸ ver todas</span></div>
+        <div class="card-sub">Foto de hoy desde la pestaña Meli_Precios · no depende del período</div>
+        <div id="mp-body"></div>
+      </div>
+    </div>
     <div class="row4">
       <div class="card">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
@@ -823,6 +830,8 @@ let pnlCanal='Todos';
 const margenColor=m=>m>=0.25?'#10B981':m>=0.15?'#F59E0B':'#EF4444';
 let ITEMS_BY_ORDER={};  // OrderID -> [{cat, precio, costo}, ...] desde Items_Ordenes
 let INVENTARIO=[];  // filas de la pestaña Inventario
+let MELI_PRECIOS=null;  // filas de la pestaña Meli_Precios; null = pestaña no cargada o vacía
+let MELI_PRECIOS_TODAS=false;  // lista expandida (▸ ver todas)
 window.GASTOS_OPS=0;window.GASTOS_DETAIL={};window.GASTOS_LIST=[];
 window.DQ_FECHAS=[]; // filas de Gastos/Ventas con fecha nula (gviz devuelve null si la celda es texto en una columna de fechas)
 
@@ -1627,6 +1636,56 @@ function renderInvAtascado(){
   }).join('');
 }
 
+// Card "Precios Mercado Libre": foto de hoy de Meli_Precios, no depende del período.
+const MP_SEM=[['ROJO','Rojo','#EF4444'],['AMBAR','Ámbar','#F59E0B'],['VERDE','Verde','#10B981'],['GRIS','Gris','var(--text-3)']];
+const mpEsc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const mpMoney=n=>'$'+Math.round(n||0).toLocaleString('es-MX');
+function toggleMeliPrecios(){
+  if(!(MELI_PRECIOS||[]).length)return;
+  MELI_PRECIOS_TODAS=!MELI_PRECIOS_TODAS;renderMeliPrecios();
+}
+function renderMeliPrecios(){
+  const el=document.getElementById('mp-body'),tg=document.getElementById('mp-toggle');if(!el)return;
+  const pubs=MELI_PRECIOS||[];
+  if(!pubs.length){
+    el.innerHTML='<div style="padding:12px;color:var(--text-3);font-size:12px">Corre <strong style="color:var(--text-2)">Collectuncle → Meli: actualizar precios ahora</strong> en el Sheet.</div>';
+    if(tg)tg.textContent='';
+    return;
+  }
+  const lista=p=>p.precio*p.stock;  // $ de stock a precio de lista
+  const chips=MP_SEM.map(([k,label,col])=>{
+    const xs=pubs.filter(p=>p.sem===k);
+    return `<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:8px 10px;text-align:center">
+      <div style="font-size:11px;color:${col};font-weight:500">● ${label} <strong style="color:var(--text);font-family:'SF Mono','Fira Code',Consolas,monospace">${xs.length}</strong></div>
+      <div style="font-size:10px;color:var(--text-3);margin-top:2px">${mpMoney(xs.reduce((s,p)=>s+lista(p),0))}</div>
+    </div>`;
+  }).join('');
+  const perdiendo=pubs.filter(p=>p.catalogo==='perdiendo');
+  const actualizado=pubs.map(p=>p.actualizado).filter(Boolean).sort().pop()||'—';
+  const orden={ROJO:0,AMBAR:1,VERDE:2,GRIS:3};
+  const sorted=pubs.slice().sort((a,b)=>((orden[a.sem]??4)-(orden[b.sem]??4))||(b.vis90-a.vis90));
+  const visibles=MELI_PRECIOS_TODAS?sorted:sorted.slice(0,8);
+  const filas=visibles.map(p=>{
+    const col=(MP_SEM.find(x=>x[0]===p.sem)||MP_SEM[3])[2];
+    const titulo=p.link?`<a href="${mpEsc(p.link)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${mpEsc(p.titulo)}</a>`:mpEsc(p.titulo);
+    const objetivo=p.objetivo!=null?mpMoney(p.objetivo):'—';
+    const nota=p.sem==='GRIS'?'sin costo en Inventario':p.reco;
+    return `<div class="alert-item">
+      <span style="color:${col};flex-shrink:0;font-size:11px;line-height:1.5">●</span>
+      <div style="flex:1;min-width:0">
+        <div class="alert-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${mpEsc(p.titulo)}">${titulo}</div>
+        <div class="alert-detail"><span style="font-family:'SF Mono','Fira Code',Consolas,monospace;color:var(--text)">${mpMoney(p.precio)} → ${objetivo}</span> · ${p.vis90.toLocaleString('es-MX')} visitas / ${p.ven90.toLocaleString('es-MX')} ventas 90d</div>
+        <div class="alert-detail" style="color:var(--text-3)">${mpEsc(nota)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">${chips}</div>
+    <div style="font-size:11px;color:var(--text-2);margin-bottom:8px">Actualizado: ${mpEsc(actualizado)} · <span style="color:${perdiendo.length?'#EF4444':'var(--text-2)'}">${perdiendo.length} publicaciones perdiendo el catálogo</span> · ${mpMoney(perdiendo.reduce((s,p)=>s+lista(p),0))} de stock sin visibilidad</div>
+    <div>${filas}</div>
+    ${!MELI_PRECIOS_TODAS&&sorted.length>visibles.length?`<div style="font-size:10px;color:var(--text-3);padding-top:6px">${sorted.length-visibles.length} publicaciones más · ▸ ver todas</div>`:''}`;
+  if(tg)tg.textContent=MELI_PRECIOS_TODAS?'▾ ver menos':'▸ ver todas';
+}
+
 function renderInsights(rows){
   const sum=(arr,k)=>arr.reduce((s,r)=>s+(r[k]||0),0);
   // --- Plataformas (margen REAL, después de descontar publicidad por canal) ---
@@ -1918,7 +1977,7 @@ function renderPnLChart(ventas,segmentos){
 
 function renderAll(period){
   const rows=filterRows(period);
-  renderPeriodPills();renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderDatosCorregir();renderInvCapital();renderInvSalud();renderInvAtascado();renderInvAuditor();renderInsights(rows);renderTipoChart(rows);renderTcgFormato(rows);renderWeekly();
+  renderPeriodPills();renderMonthPills();renderKPIs(rows);renderTipoCards(rows);renderMonth(rows);renderDonut(rows);renderPlat(rows);renderFranq(rows);renderAlerts();renderDatosCorregir();renderInvCapital();renderInvSalud();renderInvAtascado();renderInvAuditor();renderMeliPrecios();renderInsights(rows);renderTipoChart(rows);renderTcgFormato(rows);renderWeekly();
   // El Estado de Resultados respeta el período: si está visible, se recalcula con cada cambio de pill
   if(document.getElementById('panel-pnl')?.classList.contains('active'))renderPnL();
 }
@@ -2029,14 +2088,55 @@ function loadInventario(cbNext){
   document.head.appendChild(sv);
 }
 
+// Lee la pestaña Meli_Precios (foto de hoy, la escribe "Collectuncle → Meli: actualizar precios ahora").
+// Columnas A1:Z -> A(0)=MLM_ID, C(2)=Titulo, E(4)=Costo, F(5)=Stock Meli, H(7)=Precio actual,
+// J(9)=Visitas 90d, L(11)=Ventas 90d, N(13)=Catalogo, O(14)=Precio para ganar, Q(16)=Precio piso,
+// R(17)=Precio objetivo, S(18)=Cambio $, U(20)=Semaforo, V(21)=Recomendacion, W(22)=Precio pagina,
+// Y(24)=Actualizado, Z(25)=Link. Si la pestaña no existe gviz responde status:'error' -> queda vacía.
+function processMeliPreciosData(data){
+  try{
+    if(!data||data.status!=='ok'||!data.table){MELI_PRECIOS=[];console.log('Meli_Precios sin datos');return;}
+    MELI_PRECIOS=(data.table.rows||[]).map(r=>{
+      const c=r.c||[],g=i=>c[i]||null,num=i=>parseN(g(i)?.f??g(i)?.v);
+      const id=String(g(0)?.v??'').trim();
+      if(!id||id==='MLM_ID')return null;
+      return{
+        id, titulo:String(g(2)?.v??'').trim()||id,
+        costo:num(4), stock:num(5)||0, precio:num(7)||0,
+        vis90:num(9)||0, ven90:num(11)||0,
+        catalogo:String(g(13)?.v??'').trim().toLowerCase(),
+        ptw:num(14), piso:num(16), objetivo:num(17), cambio:num(18),
+        sem:String(g(20)?.v??'').trim().toUpperCase(),
+        reco:String(g(21)?.v??'').trim(),
+        precioPagina:num(22),
+        actualizado:g(24)?.f||(parseFecha(g(24))?parseFecha(g(24)).toLocaleDateString('es-MX'):''),
+        link:String(g(25)?.v??'').trim()
+      };
+    }).filter(x=>x);
+    console.log('Meli_Precios cargado:',MELI_PRECIOS.length,'publicaciones');
+  }catch(e){console.error('Meli_Precios error:',e);MELI_PRECIOS=[];}
+}
+
+function loadMeliPrecios(cbNext){
+  const cbM='cum_'+Date.now();
+  window[cbM]=function(data){ window.google.visualization.Query.setResponse(data); };
+  window.google.visualization.Query.setResponse=function(data){ processMeliPreciosData(data); cbNext(); };
+  const urlM=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&responseHandler=${cbM}&sheet=Meli_Precios&range=A1:Z500`;
+  const sm=document.createElement('script');sm.src=urlM;
+  sm.onerror=()=>{ console.log('Meli_Precios no disponible'); cbNext(); };
+  document.head.appendChild(sm);
+}
+
 function loadAndRender(){
   document.getElementById('last-update').textContent='Actualizando...';
-  // Cadena secuencial (JSONP comparte un solo callback): Items -> Inventario -> Gastos -> Ventas.
+  // Cadena secuencial (JSONP comparte un solo callback): Items -> Inventario -> Meli_Precios -> Gastos -> Ventas.
   loadItems(function(){
     loadInventario(function(){
-      loadGastos(function(){
-        window.google.visualization.Query.setResponse=processGvizData;
-        loadVentas();
+      loadMeliPrecios(function(){
+        loadGastos(function(){
+          window.google.visualization.Query.setResponse=processGvizData;
+          loadVentas();
+        });
       });
     });
   });
