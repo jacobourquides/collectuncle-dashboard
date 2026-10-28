@@ -1669,12 +1669,17 @@ function renderMeliPrecios(){
     const col=(MP_SEM.find(x=>x[0]===p.sem)||MP_SEM[3])[2];
     const titulo=p.link?`<a href="${mpEsc(p.link)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${mpEsc(p.titulo)}</a>`:mpEsc(p.titulo);
     const objetivo=p.objetivo!=null?mpMoney(p.objetivo):'—';
+    // Roja por catálogo (no por piso): el objetivo no aplica, se muestra lo que pide el catálogo y el piso.
+    const porCatalogo=p.sem==='ROJO'&&/^Para (ganar|igualar)/i.test(p.reco);
+    const precios=porCatalogo
+      ?`${mpMoney(p.precio)} · catálogo pide ${p.ptw!=null?mpMoney(p.ptw):'—'} · piso ${p.piso!=null?mpMoney(p.piso):'—'}`
+      :`${mpMoney(p.precio)} → ${objetivo}`;
     const nota=p.sem==='GRIS'?'sin costo en Inventario':p.reco;
     return `<div class="alert-item">
       <span style="color:${col};flex-shrink:0;font-size:11px;line-height:1.5">●</span>
       <div style="flex:1;min-width:0">
         <div class="alert-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${mpEsc(p.titulo)}">${titulo}</div>
-        <div class="alert-detail"><span style="font-family:'SF Mono','Fira Code',Consolas,monospace;color:var(--text)">${mpMoney(p.precio)} → ${objetivo}</span> · ${p.vis90.toLocaleString('es-MX')} visitas / ${p.ven90.toLocaleString('es-MX')} ventas 90d</div>
+        <div class="alert-detail"><span style="font-family:'SF Mono','Fira Code',Consolas,monospace;color:var(--text)">${precios}</span> · ${p.vis90.toLocaleString('es-MX')} visitas / ${p.ven90.toLocaleString('es-MX')} ventas 90d</div>
         <div class="alert-detail" style="color:var(--text-3)">${mpEsc(nota)}</div>
       </div>
     </div>`;
